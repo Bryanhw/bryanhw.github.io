@@ -865,21 +865,21 @@
         <div class="fb-err" id="fbDevErr"></div>
 
         <label class="fb-label" for="fbOpinion">你的意见 <span class="fb-badge req">必填</span></label>
-        <textarea class="fb-textarea" id="fbOpinion" maxlength="150"
+        <textarea class="fb-textarea" id="fbOpinion" maxlength="300"
                   placeholder="请尽量写具体：在哪个页面、哪个位置，你的体验如何，遇到了什么问题。例如「首页顶部那排按钮在手机上挤在一起，点起来不太方便」"></textarea>
-        <div class="fb-count" id="fbOpinionCount">0 / 150 字</div>
+        <div class="fb-count" id="fbOpinionCount">0 / 300 字</div>
         <div class="fb-err" id="fbOpinionErr"></div>
 
         <div class="fb-actions">
           <button class="fb-submit" id="fbSubmit" type="submit">提交留言</button>
-          <span class="fb-note">留言只会送达站主（阎浩文）本人，不会在网页上公开显示。</span>
+          <span class="fb-note">留言经由 FormSubmit 转发服务投递到站主（阎浩文）的邮箱，只有站主能看到，不会在网页上公开显示。</span>
         </div>
       </form>
 
       <div class="fb-done" id="fbDone" hidden>
         <div class="ok" aria-hidden="true">✓</div>
         <h3 id="fbDoneTitle">已收到你的留言</h3>
-        <p id="fbDoneMsg">谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。</p>
+        <p id="fbDoneMsg">谢谢你花时间写下这些。留言会送到站主本人的邮箱，不会在网页上公开显示。</p>
         <button type="button" id="fbAgain">再写一条</button>
       </div>
     </div>
@@ -977,11 +977,14 @@ chatInput.addEventListener("keydown", e => { if (e.key === "Enter") ask(chatInpu
 addMsg(KNOWLEDGE.greeting, "ai");
 
 /* ================= 留言反馈 ================= */
-/* 本站是纯静态单文件（双击即可打开、零外部依赖）。
-   默认走「邮件」通道：访客提交后，内容直接发送到站主本人的邮箱，
+/* 本站是纯静态单文件（双击即可打开、零外部依赖），没有后端，
+   所以留言靠 FormSubmit 免费转发服务（https://formsubmit.co）投递到站主邮箱：
+   访客点「提交留言」→ 本站 POST 给 FormSubmit → FormSubmit 转发邮件给站主。
    只有站主能看到，网页上不会公开显示任何留言。
-   若以后接入在线表单服务（如 Formspree），把地址填到下面这一行即可自动切换。 */
-const FEEDBACK_ENDPOINT = "";                          // 例："https://formspree.io/f/xxxxxxx"
+   注意：FormSubmit 会对内容做一次转发（免费版无密钥，邮箱即地址），
+   介意可换成 Formspree / Web3Forms；把下面这行改回空串 "" 则退回 mailto 邮件通道
+   （那条路要求访客本机装好邮件客户端，实测部分 Windows 机器根本弹不出内容）。 */
+const FEEDBACK_ENDPOINT = "https://formsubmit.co/ajax/yhw20070910@outlook.com";
 const OWNER_EMAIL = "yhw20070910@outlook.com";
 
 const fbForm = document.getElementById("fbForm");
@@ -1002,9 +1005,11 @@ const fbDoneMsg = document.getElementById("fbDoneMsg");
 const fbSubmit = document.getElementById("fbSubmit");
 
 /* 「你的意见」的字数上限，与 textarea 的 maxlength 保持一致。
-   mailto 链接有长度上限（Outlook 约 2000 字符、Windows ShellExecute 约 2048），
-   而 encodeURIComponent 会让每个汉字占 9 个字符，所以必须限制长度。 */
-const FB_OPINION_MAX = 150;
+   走 FormSubmit 通道时长度本来不受限，设上限只是防止留言过分冗长；
+   但下面的 mailto 兜底通道有链接长度上限（Outlook 约 2000 字符、
+   Windows ShellExecute 约 2048），而 encodeURIComponent 会让每个汉字占 9 个字符，
+   所以兜底分支仍会用 MAILTO_SAFE_LIMIT 再拦一次。 */
+const FB_OPINION_MAX = 300;
 const MAILTO_SAFE_LIMIT = 1800;
 
 function syncOpinionCount() {
@@ -1087,7 +1092,7 @@ function showFeedbackDone(nick, viaMail) {
   if (fbDoneMsg) {
     fbDoneMsg.textContent = viaMail
       ? "请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。"
-      : "谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。";
+      : "谢谢你花时间写下这些。留言会送到站主本人的邮箱，不会在网页上公开显示。";
   }
   fbForm.hidden = true;
   fbDone.hidden = false;
@@ -1112,14 +1117,22 @@ fbForm.addEventListener("submit", async e => {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          nickname: nick,
-          relation: relationText,
-          device: deviceText,
-          opinion: opinion,
-          time
+          "昵称": nick,
+          "关系": relationText,
+          "访问设备": deviceText,
+          "你的意见": opinion,
+          "提交时间": time,
+          /* 下面三个下划线开头的是 FormSubmit 保留字段：
+             分别控制邮件标题、正文排版，以及关掉它默认的验证码中转页
+             （AJAX 模式必须关闭，否则拿不到 JSON 响应）。 */
+          _subject: "[个人主页留言] " + nick + "（" + relationText + "）",
+          _template: "table",
+          _captcha: "false"
         })
       });
-      if (!res.ok) throw new Error("bad status");
+      /* FormSubmit 失败时不一定给出非 2xx，所以连 body 里的 success 一起判断 */
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && String(data.success) === "false")) throw new Error("bad response");
       showFeedbackDone(nick, false);
     } catch (err) {
       fbSubmit.disabled = false; fbSubmit.textContent = "提交留言";
