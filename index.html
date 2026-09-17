@@ -566,6 +566,8 @@
   .fb-submit:hover{filter:brightness(1.1)}
   .fb-submit:disabled{opacity:.6;cursor:default}
   .fb-note{font-size:12.5px;color:var(--muted);max-width:380px;line-height:1.6}
+  .fb-count{font-size:12.5px;color:var(--muted);text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
+  .fb-count.near{color:var(--danger);font-weight:700}
   .fb-done{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:28px 20px}
   .fb-done[hidden]{display:none}
   .fb-done .ok{
@@ -863,8 +865,9 @@
         <div class="fb-err" id="fbDevErr"></div>
 
         <label class="fb-label" for="fbOpinion">你的意见 <span class="fb-badge req">必填</span></label>
-        <textarea class="fb-textarea" id="fbOpinion"
+        <textarea class="fb-textarea" id="fbOpinion" maxlength="150"
                   placeholder="请尽量写具体：在哪个页面、哪个位置，你的体验如何，遇到了什么问题。例如「首页顶部那排按钮在手机上挤在一起，点起来不太方便」"></textarea>
+        <div class="fb-count" id="fbOpinionCount">0 / 150 字</div>
         <div class="fb-err" id="fbOpinionErr"></div>
 
         <div class="fb-actions">
@@ -876,7 +879,7 @@
       <div class="fb-done" id="fbDone" hidden>
         <div class="ok" aria-hidden="true">✓</div>
         <h3 id="fbDoneTitle">已收到你的留言</h3>
-        <p>谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。</p>
+        <p id="fbDoneMsg">谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。</p>
         <button type="button" id="fbAgain">再写一条</button>
       </div>
     </div>
@@ -992,9 +995,24 @@ const fbDeviceOther = document.getElementById("fbDeviceOther");
 const fbDevErr = document.getElementById("fbDevErr");
 const fbOpinion = document.getElementById("fbOpinion");
 const fbOpinionErr = document.getElementById("fbOpinionErr");
+const fbOpinionCount = document.getElementById("fbOpinionCount");
 const fbDone = document.getElementById("fbDone");
 const fbDoneTitle = document.getElementById("fbDoneTitle");
+const fbDoneMsg = document.getElementById("fbDoneMsg");
 const fbSubmit = document.getElementById("fbSubmit");
+
+/* 「你的意见」的字数上限，与 textarea 的 maxlength 保持一致。
+   mailto 链接有长度上限（Outlook 约 2000 字符、Windows ShellExecute 约 2048），
+   而 encodeURIComponent 会让每个汉字占 9 个字符，所以必须限制长度。 */
+const FB_OPINION_MAX = 150;
+const MAILTO_SAFE_LIMIT = 1800;
+
+function syncOpinionCount() {
+  if (!fbOpinionCount) return;
+  const n = fbOpinion.value.length;
+  fbOpinionCount.textContent = n + " / " + FB_OPINION_MAX + " 字";
+  fbOpinionCount.classList.toggle("near", n >= FB_OPINION_MAX - 10);
+}
 
 /* 读取某个单选组当前选中的值，没选就返回空串 */
 const pickedRadio = name => {
@@ -1059,8 +1077,18 @@ function validateFeedback() {
   return ok;
 }
 
-function showFeedbackDone(nick) {
-  if (fbDoneTitle) fbDoneTitle.textContent = nick ? "谢谢你的留言，" + nick + "！" : "已收到你的留言";
+/* viaMail = true 表示只是打开了邮件草稿，并没有真正发送出去，文案必须说实话 */
+function showFeedbackDone(nick, viaMail) {
+  if (fbDoneTitle) {
+    fbDoneTitle.textContent = viaMail
+      ? "邮件草稿已为你打开"
+      : (nick ? "谢谢你的留言，" + nick + "！" : "已收到你的留言");
+  }
+  if (fbDoneMsg) {
+    fbDoneMsg.textContent = viaMail
+      ? "请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。"
+      : "谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。";
+  }
   fbForm.hidden = true;
   fbDone.hidden = false;
 }
@@ -1092,7 +1120,7 @@ fbForm.addEventListener("submit", async e => {
         })
       });
       if (!res.ok) throw new Error("bad status");
-      showFeedbackDone(nick);
+      showFeedbackDone(nick, false);
     } catch (err) {
       fbSubmit.disabled = false; fbSubmit.textContent = "提交留言";
       fbOpinionErr.textContent = "提交失败，请稍后重试，或直接发邮件到 " + OWNER_EMAIL + "。";
@@ -1104,10 +1132,18 @@ fbForm.addEventListener("submit", async e => {
                  "\n访问设备：" + deviceText +
                  "\n\n你的意见：\n" + opinion +
                  "\n\n提交时间：" + time;
-    location.href = "mailto:" + OWNER_EMAIL +
-                    "?subject=" + encodeURIComponent(subject) +
-                    "&body=" + encodeURIComponent(body);
-    showFeedbackDone(nick);
+    const mailtoUrl = "mailto:" + OWNER_EMAIL +
+                      "?subject=" + encodeURIComponent(subject) +
+                      "&body=" + encodeURIComponent(body);
+
+    /* 超长会被邮件客户端静默截断，宁可拦下来让访客精简，也不要悄悄丢内容 */
+    if (mailtoUrl.length > MAILTO_SAFE_LIMIT) {
+      fbOpinionErr.textContent = "留言偏长（约 " + mailtoUrl.length + " 字符，上限 " + MAILTO_SAFE_LIMIT + "），可能被邮件客户端截断，请把「你的意见」精简一些。";
+      return;
+    }
+
+    location.href = mailtoUrl;
+    showFeedbackDone(nick, true);
   }
 });
 
@@ -1116,12 +1152,16 @@ fbRelOther.addEventListener("input", () => { if (fbRelErr.textContent) { fbRelEr
 fbDeviceOther.addEventListener("input", () => { if (fbDevErr.textContent) { fbDevErr.textContent = ""; fbDeviceOther.classList.remove("invalid"); } });
 fbRelChips.addEventListener("change", () => { fbRelErr.textContent = ""; fbRelChips.classList.remove("invalid"); syncOtherInputs(); });
 fbDevChips.addEventListener("change", () => { fbDevErr.textContent = ""; fbDevChips.classList.remove("invalid"); syncOtherInputs(); });
-fbOpinion.addEventListener("input", () => { if (fbOpinionErr.textContent) { fbOpinionErr.textContent = ""; fbOpinion.classList.remove("invalid"); } });
+fbOpinion.addEventListener("input", () => {
+  syncOpinionCount();
+  if (fbOpinionErr.textContent) { fbOpinionErr.textContent = ""; fbOpinion.classList.remove("invalid"); }
+});
 
 document.getElementById("fbAgain").addEventListener("click", () => {
   fbForm.reset();
   syncOtherInputs();
   preselectDevice();
+  syncOpinionCount();
   fbForm.hidden = false;
   fbDone.hidden = true;
   fbSubmit.disabled = false;
@@ -1132,6 +1172,7 @@ document.getElementById("fbAgain").addEventListener("click", () => {
 /* 进页面时先按设备预选，保证「其他」输入框状态与选项一致 */
 preselectDevice();
 syncOtherInputs();
+syncOpinionCount();
 
 /* ================= Hash 路由 ================= */
 const VIEWS = ["home", "info", "traits", "chat", "feedback"];
