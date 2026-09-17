@@ -583,6 +583,32 @@
   }
   .fb-done button:hover{background:var(--blue-100)}
 
+  /* ================= 留言墙 ================= */
+  .wall{margin-top:22px}
+  .wall-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .wall-head h3{font-size:17px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:9px}
+  .wall-count{font-size:12.5px;color:var(--muted);font-weight:700}
+  .wall-refresh{
+    border:1px solid var(--line);background:var(--card);color:var(--accent-strong);font-weight:700;
+    padding:7px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit;transition:.15s;
+  }
+  .wall-refresh:hover{background:var(--blue-100)}
+  .wall-refresh:disabled{opacity:.6;cursor:default}
+  .wall-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .wall-card{
+    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:15px 17px;
+    display:flex;flex-direction:column;gap:9px;box-shadow:var(--sh-card);transition:.18s;
+  }
+  .wall-card:hover{box-shadow:var(--sh-card-hover);transform:translateY(-2px)}
+  .wall-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .wall-nick{font-weight:800;color:var(--accent-strong);font-size:14.5px}
+  .wall-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--blue-100);color:var(--accent)}
+  .wall-time{font-size:11.5px;color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+  .wall-text{font-size:14px;line-height:1.72;color:var(--body-text);white-space:pre-wrap;word-break:break-word}
+  .wall-msg{font-size:13.5px;color:var(--muted);padding:10px 0;line-height:1.7}
+  .wall-msg.err{color:var(--danger);font-weight:700}
+  .wall-msg[hidden]{display:none}
+
   /* ================= 手机适配 ================= */
   @media (max-width:900px){
     .hero-grid{grid-template-columns:1fr;gap:26px}
@@ -872,16 +898,26 @@
 
         <div class="fb-actions">
           <button class="fb-submit" id="fbSubmit" type="submit">提交留言</button>
-          <span class="fb-note">留言经由 FormSubmit 转发服务投递到站主（阎浩文）的邮箱，只有站主能看到，不会在网页上公开显示。</span>
+          <span class="fb-note">留言会直接提交到站主自己的数据库（Supabase），只有站主能看到。站主确认后，你的留言会出现在下面的留言墙。</span>
         </div>
       </form>
 
       <div class="fb-done" id="fbDone" hidden>
         <div class="ok" aria-hidden="true">✓</div>
         <h3 id="fbDoneTitle">已收到你的留言</h3>
-        <p id="fbDoneMsg">谢谢你花时间写下这些。留言会送到站主本人的邮箱，不会在网页上公开显示。</p>
+        <p id="fbDoneMsg">谢谢你花时间写下这些。留言已经存进站主的数据库，站主确认后会出现在下面的留言墙。</p>
         <button type="button" id="fbAgain">再写一条</button>
       </div>
+    </div>
+
+    <!-- 留言墙：公开显示的留言都已由站主确认（数据库里 approved = true） -->
+    <div class="wall" id="fbWall">
+      <div class="wall-head">
+        <h3><span class="flag-dot" aria-hidden="true"></span>大家的留言 <span class="wall-count" id="fbWallCount"></span></h3>
+        <button class="wall-refresh" type="button" id="fbWallRefresh">刷新</button>
+      </div>
+      <div class="wall-list" id="fbWallList"></div>
+      <p class="wall-msg" id="fbWallMsg">正在读取留言…</p>
     </div>
   </section>
 
@@ -977,13 +1013,28 @@ chatInput.addEventListener("keydown", e => { if (e.key === "Enter") ask(chatInpu
 addMsg(KNOWLEDGE.greeting, "ai");
 
 /* ================= 留言反馈 ================= */
-/* 本站是纯静态单文件（双击即可打开、零外部依赖），没有后端，
-   所以留言靠 FormSubmit 免费转发服务（https://formsubmit.co）投递到站主邮箱：
-   访客点「提交留言」→ 本站 POST 给 FormSubmit → FormSubmit 转发邮件给站主。
-   只有站主能看到，网页上不会公开显示任何留言。
-   注意：FormSubmit 会对内容做一次转发（免费版无密钥，邮箱即地址），
-   介意可换成 Formspree / Web3Forms；把下面这行改回空串 "" 则退回 mailto 邮件通道
-   （那条路要求访客本机装好邮件客户端，实测部分 Windows 机器根本弹不出内容）。 */
+/* 本站是纯静态单文件（双击即可打开、零外部依赖），没有自己的服务器。
+   留言通过 Supabase 的 REST 接口（底层是 PostgREST）直接写进站主的数据库：
+
+       访客点「提交留言」→ 本站 POST 到 Supabase → 留言存进 messages 表
+
+   表里有一个 approved 开关：新留言默认 false（不公开），
+   站主在 Supabase 后台确认后勾成 true，才会出现在页面下方的留言墙。
+
+   前端用的是可以公开的 anon / publishable key（它设计上就允许放在网页里），
+   所以「谁能读、能写什么」全部由数据库的 RLS 策略决定，不靠前端自觉：
+
+       · 访客只能 INSERT，而且只能写 approved = false
+       · 任何人都只能读到 approved = true 的行
+       · 访客没有任何 UPDATE / DELETE 权限
+
+   ⚠ 绝对不要把 service_role key 放进这个文件 —— 它会绕过上面所有规则。 */
+const SUPABASE_URL = "https://cgxqralaqlmycqkyrkco.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_rI80OwKYloyhTmxS0LY3Tg_z-TCz0g5";  /* publishable key，设计上就是可公开的 */
+
+/* 兜底通道：万一 Supabase 不可用（网络异常、项目暂停等），
+   自动改用 FormSubmit 免费转发服务把留言投递到站主邮箱，尽量不让留言丢掉。
+   把 FEEDBACK_ENDPOINT 改成空串 "" 就彻底关掉这层兜底。 */
 const FEEDBACK_ENDPOINT = "https://formsubmit.co/ajax/yhw20070910@outlook.com";
 const OWNER_EMAIL = "yhw20070910@outlook.com";
 
@@ -1092,12 +1143,138 @@ function showFeedbackDone(nick, viaMail) {
   if (fbDoneMsg) {
     fbDoneMsg.textContent = viaMail
       ? "请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。"
-      : "谢谢你花时间写下这些。留言会送到站主本人的邮箱，不会在网页上公开显示。";
+      : "谢谢你花时间写下这些。留言已经存进站主的数据库，站主确认后会出现在下面的留言墙。";
   }
   fbForm.hidden = true;
   fbDone.hidden = false;
 }
 
+/* ---------- 写入 Supabase ---------- */
+async function postToSupabase(row) {
+  const res = await fetch(SUPABASE_URL + "/rest/v1/messages", {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+      /* return=minimal：不必把整行回传，省流量 */
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify(row)
+  });
+
+  if (res.ok) return true;
+
+  const info = await res.json().catch(() => null);
+  const text = (info && (info.message || info.details || info.hint)) || "";
+
+  /* 数据库里的防重复触发器抛的错，单独标记，好在界面上给出准确提示 */
+  if (/DUPLICATE_MESSAGE/.test(text)) {
+    const dup = new Error("duplicate");
+    dup.duplicate = true;
+    throw dup;
+  }
+  throw new Error(text || ("HTTP " + res.status));
+}
+
+/* ---------- 读取留言墙（只拿审核通过的留言） ---------- */
+async function loadWall() {
+  const list = document.getElementById("fbWallList");
+  const msg = document.getElementById("fbWallMsg");
+  const count = document.getElementById("fbWallCount");
+  const btn = document.getElementById("fbWallRefresh");
+  if (!list || !msg) return;
+
+  if (!SUPABASE_ANON_KEY) {
+    msg.className = "wall-msg";
+    msg.hidden = false;
+    msg.textContent = "留言墙会在填入 Supabase 的 anon key 之后显示。";
+    if (count) count.textContent = "";
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+
+  try {
+    const res = await fetch(
+      SUPABASE_URL + "/rest/v1/messages" +
+        "?select=nick,relation,created_at,content" +
+        "&order=created_at.desc" +
+        "&limit=30",
+      { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY } }
+    );
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const rows = await res.json();
+
+    list.innerHTML = "";
+
+    if (!rows.length) {
+      if (count) count.textContent = "";
+      msg.className = "wall-msg";
+      msg.hidden = false;
+      msg.textContent = "还没有公开的留言。写下你的想法，成为第一条吧。";
+      return;
+    }
+
+    msg.hidden = true;
+    if (count) count.textContent = "· " + rows.length + " 条";
+    rows.forEach(r => list.appendChild(wallCard(r)));
+  } catch (err) {
+    if (count) count.textContent = "";
+    msg.className = "wall-msg err";
+    msg.hidden = false;
+    msg.textContent = "留言墙暂时读取失败，稍后再试。";
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "刷新"; }
+  }
+}
+
+/* 生成一张留言卡。
+   内容全部用 textContent 塞进去 —— 访客写的东西绝不能被当成 HTML 执行。 */
+function wallCard(r) {
+  const el = document.createElement("div");
+  el.className = "wall-card";
+
+  const meta = document.createElement("div");
+  meta.className = "wall-meta";
+
+  const nick = document.createElement("span");
+  nick.className = "wall-nick";
+  nick.textContent = r.nick || "匿名";
+  meta.appendChild(nick);
+
+  if (r.relation) {
+    const tag = document.createElement("span");
+    tag.className = "wall-tag";
+    tag.textContent = r.relation;
+    meta.appendChild(tag);
+  }
+
+  const time = document.createElement("span");
+  time.className = "wall-time";
+  time.textContent = formatWallTime(r.created_at);
+  meta.appendChild(time);
+
+  const body = document.createElement("p");
+  body.className = "wall-text";
+  body.textContent = r.content || "";
+
+  el.appendChild(meta);
+  el.appendChild(body);
+  return el;
+}
+
+/* ISO 时间 →「2026年9月17日 14:03」 */
+function formatWallTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = n => (n < 10 ? "0" + n : "" + n);
+  return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
+         pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+/* ---------- 提交留言 ---------- */
 fbForm.addEventListener("submit", async e => {
   e.preventDefault();
   if (!validateFeedback()) return;
@@ -1110,8 +1287,34 @@ fbForm.addEventListener("submit", async e => {
   const opinion = fbOpinion.value.trim();
   const time = new Date().toLocaleString("zh-CN");
 
+  fbSubmit.disabled = true;
+  fbSubmit.textContent = "提交中…";
+  const restore = () => { fbSubmit.disabled = false; fbSubmit.textContent = "提交留言"; };
+
+  /* 第一优先：写进站主自己的 Supabase 数据库 */
+  if (SUPABASE_ANON_KEY) {
+    try {
+      await postToSupabase({
+        nick: nick,
+        relation: relationText,
+        device: deviceText,
+        content: opinion
+      });
+      showFeedbackDone(nick, false);
+      loadWall();                 /* 站主可能刚好审核了别的留言，顺手刷新 */
+      return;
+    } catch (err) {
+      if (err && err.duplicate) {
+        restore();
+        fbOpinionErr.textContent = "这条留言刚刚已经提交过了，不用重复发送。";
+        return;
+      }
+      /* 其余错误不打断，继续往下走兜底通道 */
+    }
+  }
+
+  /* 第二优先：FormSubmit 转发到站主邮箱（不依赖数据库） */
   if (FEEDBACK_ENDPOINT) {
-    fbSubmit.disabled = true; fbSubmit.textContent = "提交中…";
     try {
       const res = await fetch(FEEDBACK_ENDPOINT, {
         method: "POST",
@@ -1134,30 +1337,32 @@ fbForm.addEventListener("submit", async e => {
       const data = await res.json().catch(() => null);
       if (!res.ok || (data && String(data.success) === "false")) throw new Error("bad response");
       showFeedbackDone(nick, false);
-    } catch (err) {
-      fbSubmit.disabled = false; fbSubmit.textContent = "提交留言";
-      fbOpinionErr.textContent = "提交失败，请稍后重试，或直接发邮件到 " + OWNER_EMAIL + "。";
-    }
-  } else {
-    const subject = "[个人主页留言] " + nick + "（" + relationText + "）";
-    const body = "昵称：" + nick +
-                 "\n关系：" + relationText +
-                 "\n访问设备：" + deviceText +
-                 "\n\n你的意见：\n" + opinion +
-                 "\n\n提交时间：" + time;
-    const mailtoUrl = "mailto:" + OWNER_EMAIL +
-                      "?subject=" + encodeURIComponent(subject) +
-                      "&body=" + encodeURIComponent(body);
-
-    /* 超长会被邮件客户端静默截断，宁可拦下来让访客精简，也不要悄悄丢内容 */
-    if (mailtoUrl.length > MAILTO_SAFE_LIMIT) {
-      fbOpinionErr.textContent = "留言偏长（约 " + mailtoUrl.length + " 字符，上限 " + MAILTO_SAFE_LIMIT + "），可能被邮件客户端截断，请把「你的意见」精简一些。";
       return;
+    } catch (err) {
+      /* 继续落到最后的邮件兜底 */
     }
-
-    location.href = mailtoUrl;
-    showFeedbackDone(nick, true);
   }
+
+  /* 最后兜底：打开访客本机的邮件草稿 */
+  const subject = "[个人主页留言] " + nick + "（" + relationText + "）";
+  const body = "昵称：" + nick +
+               "\n关系：" + relationText +
+               "\n访问设备：" + deviceText +
+               "\n\n你的意见：\n" + opinion +
+               "\n\n提交时间：" + time;
+  const mailtoUrl = "mailto:" + OWNER_EMAIL +
+                    "?subject=" + encodeURIComponent(subject) +
+                    "&body=" + encodeURIComponent(body);
+
+  /* 超长会被邮件客户端静默截断，宁可拦下来让访客精简，也不要悄悄丢内容 */
+  if (mailtoUrl.length > MAILTO_SAFE_LIMIT) {
+    restore();
+    fbOpinionErr.textContent = "留言偏长（约 " + mailtoUrl.length + " 字符，上限 " + MAILTO_SAFE_LIMIT + "），可能被邮件客户端截断，请把「你的意见」精简一些。";
+    return;
+  }
+
+  location.href = mailtoUrl;
+  showFeedbackDone(nick, true);
 });
 
 fbNick.addEventListener("input", () => { if (fbNickErr.textContent) { fbNickErr.textContent = ""; fbNick.classList.remove("invalid"); } });
@@ -1181,6 +1386,9 @@ document.getElementById("fbAgain").addEventListener("click", () => {
   fbSubmit.textContent = "提交留言";
   fbNick.focus();
 });
+
+/* 留言墙的手动刷新按钮 */
+document.getElementById("fbWallRefresh").addEventListener("click", loadWall);
 
 /* 进页面时先按设备预选，保证「其他」输入框状态与选项一致 */
 preselectDevice();
@@ -1216,6 +1424,8 @@ function render() {
   navLinks.classList.remove("open");
   navToggle.setAttribute("aria-expanded", "false");
   activateReveals(document.querySelector(".view.active"));
+  /* 留言墙按需加载：只有进到留言页才发这个网络请求，不给首页增加多余负担 */
+  if (route === "feedback") loadWall();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
