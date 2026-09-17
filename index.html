@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="阎浩文（Bryan）的个人主页 —— 天津大学·香港理工大学·深圳未来技术学院 智能医学工程大一学生，含数字分身「小文」。" />
+<meta name="theme-color" content="#e4e1f9" id="metaTheme" />
+<title>阎浩文 Bryan · 个人主页</title>
+<script>
+  /* 在样式生效前先决定主题，避免首屏"闪白"；未手动选择过则跟随系统偏好 */
+  (function () {
+    try {
+      var saved = localStorage.getItem("yhw-theme");
+      var dark = saved ? saved === "dark"
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches);
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root{
+    /* 品牌蓝阶：用于渐变、深色卡片，两套主题共用 */
+    --blue-900:#0b1e3f; --blue-800:#10294f; --blue-700:#143a6b; --blue-600:#1c55a0;
+    --blue-500:#2f7ce0; --blue-400:#4f9af5; --blue-300:#86bdfb; --blue-100:#e7f0fd;
+    /* 语义色：随主题切换 */
+    --ink:#102a4c; --muted:#5b6f8c; --bg:#e4e1f9; --card:#fff; --line:#d6e3f5;
+    --radius:18px; --shadow:0 10px 30px rgba(20,58,107,.10);
+    --nav-h:64px;
+    /* 文字强调色（浅色主题用深蓝保证对比度） */
+    --accent:#1c55a0; --accent-strong:#143a6b;
+    /* 表面分层 */
+    --surface-1:linear-gradient(180deg,#f5f9ff,#fafcff);
+    --surface-2:linear-gradient(160deg,#f5f9ff,#eaf2ff);
+    --surface-chat:#fbfcff;
+    --bubble-ai:#eef4fd;
+    --field-bg:#fff;
+    --icon-bg:linear-gradient(135deg,var(--blue-100),#dbe9fd);
+    --ring:#fff;
+    --line-hover:var(--blue-300);
+    --body-text:#2a3f5e;
+    /* 导航 */
+    --nav-bg:rgba(255,255,255,.72); --nav-bg-solid:rgba(255,255,255,.94);
+    --nav-shadow:0 6px 22px rgba(20,58,107,.09);
+    --menu-shadow:0 20px 44px rgba(20,58,107,.18);
+    /* 背景三层：氛围渐变 / 局部纹理 / 噪点 */
+    --body-bg:
+      radial-gradient(1200px 620px at 12% -12%,#dcd8f9 0%,transparent 58%),
+      radial-gradient(1000px 600px at 100% 0%,#cecaf5 0%,transparent 52%),
+      linear-gradient(180deg,#eae8fb 0%,#dcd9f7 100%);
+    --flow-1:rgba(116,108,238,.30); --flow-2:rgba(90,124,240,.24); --flow-3:rgba(150,140,246,.20);
+    --weave-line:rgba(70,66,209,.065); --weave-grid:rgba(70,66,209,.04);
+    --noise-opacity:.07;
+    /* 深色卡片（获奖 / 联系 CTA） */
+    --award-bg:linear-gradient(140deg,#10294f,#143a6b);
+    --award-shadow:0 12px 30px rgba(16,41,79,.28);
+    --cta-bg:linear-gradient(135deg,#1c55a0,#0b1e3f);
+    --cta-shadow:0 18px 44px rgba(11,30,63,.32);
+    /* 卡片阴影与状态色 */
+    --sh-card:0 6px 18px rgba(20,58,107,.06);
+    --sh-card-hover:0 16px 32px rgba(20,58,107,.13);
+    --danger:#c0392b; --danger-soft:#fdeaea; --danger-line:#e08b8b;
+    color-scheme:light;
+  }
+
+  /* ================= 深色主题：同样的结构，只换语义色 ================= */
+  :root[data-theme="dark"]{
+    --ink:#e8edfb; --muted:#95a4c6; --bg:#0a0f22; --card:#141b34; --line:#28324f;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --blue-100:#1c2545;
+    --accent:#7fb4f9; --accent-strong:#a9cdfd;
+    --surface-1:linear-gradient(180deg,#18203a,#151c33);
+    --surface-2:linear-gradient(160deg,#182443,#131a30);
+    --surface-chat:#111730;
+    --bubble-ai:#1b2540;
+    --field-bg:#0f1526;
+    --icon-bg:linear-gradient(135deg,#1e2a4d,#182342);
+    --ring:#1b2340;
+    --line-hover:#35507f;
+    --body-text:#c5d1ea;
+    --nav-bg:rgba(12,17,34,.72); --nav-bg-solid:rgba(12,17,34,.94);
+    --nav-shadow:0 6px 22px rgba(0,0,0,.50);
+    --menu-shadow:0 20px 44px rgba(0,0,0,.55);
+    --body-bg:
+      radial-gradient(1200px 620px at 12% -12%,#161d3c 0%,transparent 58%),
+      radial-gradient(1000px 600px at 100% 0%,#131a38 0%,transparent 52%),
+      linear-gradient(180deg,#0b1126 0%,#080c1a 100%);
+    --flow-1:rgba(80,72,190,.26); --flow-2:rgba(50,86,190,.22); --flow-3:rgba(96,86,200,.18);
+    --weave-line:rgba(146,140,255,.06); --weave-grid:rgba(146,140,255,.035);
+    --noise-opacity:.05;
+    --award-bg:linear-gradient(140deg,#1a2444,#1f2c52);
+    --award-shadow:0 12px 30px rgba(0,0,0,.50);
+    --cta-bg:linear-gradient(135deg,#1a3f78,#0a1730);
+    --cta-shadow:0 18px 44px rgba(0,0,0,.55);
+    --sh-card:0 6px 18px rgba(0,0,0,.35);
+    --sh-card-hover:0 16px 32px rgba(0,0,0,.50);
+    --danger:#f08c8c; --danger-soft:#3a1c1c; --danger-line:#8a4a4a;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    position:relative;
+    font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    background:var(--body-bg);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    padding-top:var(--nav-h);
+    transition:color .3s ease;
+  }
+  ::placeholder{color:var(--muted);opacity:.85}
+  .wrap{position:relative;z-index:3;max-width:1080px;margin:0 auto;padding:24px 20px 56px}
+
+  /* ================= 背景层（氛围 → 纹理 → 噪点） ================= */
+
+  /* 1) 渐变微流动：极缓慢漂移的柔光，让底色"活着"但不抢内容 */
+  .bg-flow{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(46% 38% at 16% 6%,var(--flow-1),transparent 60%),
+      radial-gradient(42% 34% at 86% 2%,var(--flow-2),transparent 58%),
+      radial-gradient(54% 42% at 64% 98%,var(--flow-3),transparent 64%);
+    animation:flowDrift 30s ease-in-out infinite alternate;
+    will-change:transform;
+  }
+  @keyframes flowDrift{
+    from{transform:translate3d(-1.4%,-1%,0) scale(1.05)}
+    to{transform:translate3d(1.6%,1.2%,0) scale(1.11)}
+  }
+
+  /* 2) 局部纹理：斜条纹（赛车语言）+ 细网格，径向遮罩让纹理只在首屏附近出现并向下渐隐 */
+  .bg-weave{
+    position:absolute;top:0;left:0;right:0;z-index:1;height:960px;pointer-events:none;
+    background-image:
+      repeating-linear-gradient(-55deg,var(--weave-line) 0 2px,transparent 2px 16px),
+      linear-gradient(var(--weave-grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--weave-grid) 1px,transparent 1px);
+    background-size:auto,46px 46px,46px 46px;
+    mask-image:radial-gradient(1080px 620px at 50% -10%,#000 0%,rgba(0,0,0,.5) 44%,transparent 76%);
+    -webkit-mask-image:radial-gradient(1080px 620px at 50% -10%,#000 0%,rgba(0,0,0,.5) 44%,transparent 76%);
+  }
+
+  /* 3) 极淡噪点：消除大色块的塑料感；内联 SVG 生成，不引入外部文件 */
+  .bg-noise{
+    position:absolute;inset:0;z-index:2;pointer-events:none;opacity:var(--noise-opacity);
+    background-repeat:repeat;background-size:120px 120px;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='120'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='120'%20height='120'%20filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* 尊重"减少动态效果"系统偏好 */
+  @media (prefers-reduced-motion:reduce){
+    .bg-flow{animation:none}
+    .btn-leave{animation:none;box-shadow:0 10px 24px rgba(126,240,176,.38)}
+  }
+
+  /* ================= 顶部导航 ================= */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:80;
+    background:var(--nav-bg);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid transparent;
+    transition:background .25s,border-color .25s,box-shadow .25s;
+  }
+  .nav.scrolled{background:var(--nav-bg-solid);border-bottom-color:var(--line);box-shadow:var(--nav-shadow)}
+  .nav-inner{position:relative;max-width:1080px;margin:0 auto;height:var(--nav-h);padding:0 20px;display:flex;align-items:center;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:16px;white-space:nowrap}
+  .brand-flag{
+    width:26px;height:18px;flex:0 0 26px;border-radius:3px;transform:skewX(-12deg);
+    background:
+      linear-gradient(45deg,var(--blue-800) 25%,transparent 25%,transparent 75%,var(--blue-800) 75%),
+      linear-gradient(45deg,var(--blue-800) 25%,#fff 25%,#fff 75%,var(--blue-800) 75%);
+    background-size:9px 9px;background-position:0 0,4.5px 4.5px;
+    box-shadow:0 2px 6px rgba(16,41,79,.25);
+  }
+  .brand-en{color:var(--accent);font-size:12.5px;letter-spacing:1px;margin-left:2px}
+  /* 汉堡菜单：所有屏幕尺寸统一收进下拉菜单 */
+  .nav-links{
+    position:absolute;top:calc(100% + 6px);right:20px;z-index:90;
+    display:none;flex-direction:column;gap:4px;
+    min-width:226px;padding:10px;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--menu-shadow);
+  }
+  .nav-links.open{display:flex;animation:menuIn .18s ease}
+  @keyframes menuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .nav-link{
+    padding:11px 14px;border-radius:10px;text-decoration:none;color:var(--muted);
+    font-weight:700;font-size:14px;transition:.15s;white-space:nowrap;
+  }
+  .nav-link:hover{color:var(--accent);background:var(--blue-100)}
+  .nav-link.active{
+    color:#fff;background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    box-shadow:0 6px 16px rgba(20,58,107,.24);
+  }
+  .nav-cta{
+    margin-left:auto;text-decoration:none;color:#fff;font-weight:700;font-size:13.5px;white-space:nowrap;
+    padding:9px 18px;border-radius:10px;
+    background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%);
+    transition:.15s;
+  }
+  .nav-cta:hover{filter:brightness(1.1)}
+  .nav-toggle{
+    display:block;flex:0 0 auto;width:42px;height:38px;border:1px solid var(--line);
+    border-radius:10px;background:var(--card);color:var(--accent-strong);font-size:18px;cursor:pointer;transition:.15s;
+  }
+  .nav-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
+  .nav-toggle[aria-expanded="true"]{background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;border-color:transparent}
+  /* 主题切换按钮：浅色时显示月亮（切到深色），深色时显示太阳（切回浅色） */
+  .theme-toggle{
+    display:grid;place-items:center;flex:0 0 auto;width:42px;height:38px;cursor:pointer;
+    border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent-strong);
+    font-size:16px;line-height:1;transition:.15s;
+  }
+  .theme-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
+  .theme-toggle .ic-light{display:none}
+  :root[data-theme="dark"] .theme-toggle .ic-light{display:block}
+  :root[data-theme="dark"] .theme-toggle .ic-dark{display:none}
+  .nav-speed{height:3px;background:linear-gradient(90deg,var(--blue-700),var(--blue-400),var(--blue-700));opacity:.9}
+
+  /* ================= 视图切换 ================= */
+  .view{display:none}
+  .view.active{display:block;animation:viewIn .4s cubic-bezier(.2,.7,.2,1)}
+  @keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* 滚动入场 */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ================= 首页 Hero ================= */
+  .hero2{
+    position:relative;overflow:hidden;border-radius:24px;color:#fff;
+    background:linear-gradient(135deg,#0b1e3f 0%,#143a6b 52%,#1c55a0 100%);
+    box-shadow:0 20px 50px rgba(11,30,63,.35);
+    padding:54px 46px;
+  }
+  .hero2::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(-55deg,transparent 0 12px,rgba(255,255,255,.05) 12px 24px);
+    mask-image:linear-gradient(120deg,transparent 35%,#000 100%);
+    -webkit-mask-image:linear-gradient(120deg,transparent 35%,#000 100%);
+  }
+  .hero2::after{
+    content:"";position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;
+    background:radial-gradient(circle,rgba(79,154,245,.55),transparent 68%);pointer-events:none;
+  }
+  .hero2 .flag-corner{
+    position:absolute;top:18px;right:20px;width:44px;height:28px;opacity:.9;transform:skewX(-12deg);
+    background:
+      linear-gradient(45deg,#fff 25%,transparent 25%,transparent 75%,#fff 75%),
+      linear-gradient(45deg,#fff 25%,rgba(255,255,255,.25) 25%,rgba(255,255,255,.25) 75%,#fff 75%);
+    background-size:10px 10px;background-position:0 0,5px 5px;border-radius:3px;pointer-events:none;
+  }
+  .hero2 .eyebrow{
+    position:relative;display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;font-weight:700;letter-spacing:.6px;color:#bcd9ff;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+    padding:5px 14px;border-radius:999px;
+  }
+  .hero2 h1{position:relative;font-size:42px;line-height:1.24;font-weight:800;letter-spacing:.5px;margin-top:20px}
+  .hero2 h1 .hl{color:var(--blue-300)}
+  .hero2 .typed-line{position:relative;display:block;font-size:19px;font-weight:700;color:#cfe3ff;margin-top:14px;min-height:30px}
+  .hero2 .caret{display:inline-block;width:2px;height:19px;background:var(--blue-300);margin-left:3px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero2 .lede{position:relative;max-width:620px;color:#d6e6ff;font-size:15.5px;margin-top:16px}
+  .hero2 .btns{position:relative;display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    font-weight:800;font-size:14.5px;padding:12px 24px;border-radius:12px;
+    clip-path:polygon(11px 0,100% 0,calc(100% - 11px) 100%,0 100%);transition:.16s;
+  }
+  .btn-primary{background:#fff;color:var(--blue-800)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.45)}
+  .btn-ghost:hover{background:rgba(255,255,255,.18)}
+  /* 主页醒目入口：直接进入留言反馈（用站内已有的"在线"薄荷绿做强调色） */
+  .btn-leave{
+    background:linear-gradient(135deg,#8ff5bd,#3fd08a);color:#06301c;
+    border:1px solid rgba(255,255,255,.42);
+    animation:leaveGlow 2.8s ease-in-out infinite;
+  }
+  .btn-leave:hover{
+    transform:translateY(-2px);background:linear-gradient(135deg,#a6ffcd,#4ee09a);
+    box-shadow:0 16px 34px rgba(126,240,176,.55);
+  }
+  @keyframes leaveGlow{
+    0%,100%{box-shadow:0 10px 24px rgba(126,240,176,.34)}
+    50%{box-shadow:0 10px 36px rgba(126,240,176,.68)}
+  }
+
+  /* Hero 双栏布局 + 「小文」对话预览卡（唯一主视觉） */
+  .hero-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+  .hero-visual{position:relative;display:flex;justify-content:flex-end}
+  .mini-chat{
+    display:block;width:100%;max-width:332px;padding:16px;border-radius:18px;text-decoration:none;color:#fff;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 22px 48px rgba(3,12,30,.38);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:transform .2s,border-color .2s,box-shadow .2s;
+    animation:visualIn .7s cubic-bezier(.2,.7,.2,1) both .15s;
+  }
+  @keyframes visualIn{from{opacity:0;transform:translateY(18px) scale(.95)}to{opacity:1;transform:none}}
+  .mini-chat:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.34);box-shadow:0 28px 54px rgba(3,12,30,.46)}
+  .mini-chat-head{
+    display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;
+    padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.14);
+  }
+  .mini-chat-head .live{
+    margin-left:auto;font-size:10.5px;font-weight:700;color:#7ef0b0;
+    background:rgba(126,240,176,.14);padding:2px 8px;border-radius:999px;
+  }
+  .mini-bubble{font-size:12.5px;line-height:1.6;padding:9px 12px;border-radius:12px;margin-top:10px;max-width:92%}
+  .mini-bubble.ai{background:rgba(255,255,255,.13);color:#eaf3ff;border-bottom-left-radius:4px}
+  .mini-bubble.user{margin-left:auto;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff;border-bottom-right-radius:4px}
+  .mini-ask{
+    margin-top:14px;text-align:center;font-size:12.5px;font-weight:800;color:var(--blue-900);
+    background:#fff;border-radius:10px;padding:9px;
+  }
+
+  /* 数据条 */
+  .stats{
+    position:relative;z-index:2;margin:-30px 26px 0;
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;
+  }
+  .stat{padding:22px 18px;text-align:center;position:relative}
+  .stat + .stat::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:1px;background:var(--line)}
+  .stat-num{font-size:34px;font-weight:800;color:var(--accent);line-height:1.1}
+  .stat-num small{font-size:18px;color:var(--blue-400)}
+  .stat-lb{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600}
+
+  /* ================= 通用区块 ================= */
+  .block{margin-top:52px}
+  .block-head{text-align:center;max-width:640px;margin:0 auto 26px}
+  .block-eyebrow{
+    display:inline-block;font-size:12px;font-weight:800;letter-spacing:1.5px;
+    color:var(--accent);text-transform:uppercase;margin-bottom:8px;
+  }
+  .block-head h2{font-size:27px;font-weight:800;letter-spacing:.3px}
+  .block-head p{color:var(--muted);font-size:14.5px;margin-top:8px}
+  .flag-dot{
+    display:inline-block;width:14px;height:14px;margin-right:8px;border-radius:4px;transform:skewX(-10deg) translateY(1px);
+    background:
+      linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+      linear-gradient(45deg,var(--accent) 25%,#fff 25%,#fff 75%,var(--accent) 75%);
+    background-size:6px 6px;background-position:0 0,3px 3px;
+  }
+
+  /* 关于我 */
+  .about{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:stretch}
+  .about-main{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:30px;position:relative;overflow:hidden;
+  }
+  .about-main::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:5px;opacity:.6;
+    background:repeating-linear-gradient(-55deg,var(--blue-500) 0 18px,var(--blue-300) 18px 36px);
+  }
+  .about-main p{font-size:15px;color:var(--body-text);margin-bottom:14px}
+  .about-main p:last-child{margin-bottom:0}
+  .about-side{
+    background:var(--surface-2);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;gap:12px;
+  }
+  .avatar-big{
+    width:108px;height:108px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(145deg,var(--blue-500),var(--blue-700));color:#fff;
+    font-size:42px;font-weight:800;border:4px solid var(--ring);box-shadow:0 10px 26px rgba(31,85,158,.35);
+  }
+  .about-side .nm{font-size:19px;font-weight:800}
+  .about-side .rl{font-size:13px;color:var(--accent);font-weight:700}
+  .about-side .mini{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+  .mini-tag{font-size:11.5px;font-weight:700;color:var(--accent-strong);background:var(--card);border:1px solid var(--line);padding:3px 10px;border-radius:999px}
+
+  /* 卡片网格 */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;
+    box-shadow:var(--sh-card);transition:.2s;position:relative;overflow:hidden;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:var(--sh-card-hover);border-color:var(--line-hover)}
+  .card .ico{
+    width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:21px;
+    background:var(--icon-bg);margin-bottom:14px;
+  }
+  .card h3{font-size:16px;font-weight:800;margin-bottom:6px}
+  .card p{font-size:13.5px;color:var(--muted)}
+  .card .stripe{position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(180deg,var(--blue-500),var(--blue-300))}
+
+  /* 获奖 */
+  .awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .award{
+    background:var(--award-bg);color:#fff;border-radius:16px;padding:24px;
+    position:relative;overflow:hidden;box-shadow:var(--award-shadow);transition:.2s;
+  }
+  .award:hover{transform:translateY(-4px)}
+  .award::after{
+    content:"";position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle,rgba(79,154,245,.5),transparent 70%);
+  }
+  .award .medal{font-size:26px}
+  .award .tt{font-size:16.5px;font-weight:800;margin-top:12px;position:relative}
+  .award .ds{font-size:13px;color:#bcd9ff;margin-top:6px;position:relative}
+
+  /* 联系 CTA */
+  .cta{
+    background:var(--cta-bg);color:#fff;border-radius:22px;padding:44px 40px;
+    position:relative;overflow:hidden;box-shadow:var(--cta-shadow);text-align:center;
+  }
+  .cta::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(-55deg,transparent 0 12px,rgba(255,255,255,.06) 12px 24px);
+    mask-image:linear-gradient(180deg,transparent,#000);-webkit-mask-image:linear-gradient(180deg,transparent,#000);
+  }
+  .cta h2{position:relative;font-size:27px;font-weight:800}
+  .cta p{position:relative;color:#cfe3ff;margin-top:10px;font-size:14.5px}
+  .mails{position:relative;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+  .mail-pill{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;
+    padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;transition:.16s;word-break:break-all;
+  }
+  .mail-pill:hover{background:rgba(255,255,255,.2)}
+  .mail-pill .lb{color:#a9c9f5;font-size:11.5px}
+  .cta .btn-primary{margin-top:24px}
+
+  /* ================= 二级页 ================= */
+  .page-head{padding:14px 4px 6px;margin-bottom:6px}
+  .crumbs{font-size:12.5px;color:var(--muted);font-weight:600}
+  .crumbs a{color:var(--accent);text-decoration:none}
+  .page-head h2{font-size:28px;font-weight:800;margin-top:10px;display:flex;align-items:center;gap:10px}
+  .page-head p{color:var(--muted);font-size:14.5px;margin-top:6px}
+
+  .panel{
+    margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:26px;position:relative;overflow:hidden;
+  }
+  .panel::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:5px;opacity:.55;
+    background:repeating-linear-gradient(-55deg,var(--blue-500) 0 18px,var(--blue-300) 18px 36px);
+  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .info-card{background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .info-card .k{font-size:12.5px;color:var(--accent);font-weight:800;letter-spacing:.3px;margin-bottom:4px}
+  .info-card .v{font-size:15px}
+  .tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .tag{background:var(--blue-100);color:var(--accent-strong);padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700}
+  .mail-list{display:flex;flex-direction:column;gap:6px}
+  .mail-list a{color:var(--accent);text-decoration:none;font-size:13px;word-break:break-all}
+  .mail-list a:hover{text-decoration:underline}
+  .mail-list .lb{font-size:11px;color:var(--muted)}
+
+  .traits-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .trait-item{
+    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
+    padding:18px;display:flex;align-items:flex-start;gap:12px;
+  }
+  .trait-item .emoji{font-size:23px}
+  .trait-item .tt{font-size:15px;font-weight:800;margin-bottom:3px}
+  .trait-item .td{font-size:13.5px;color:var(--muted)}
+
+  /* 聊天 */
+  .chat{border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);background:var(--card);overflow:hidden}
+  .chat-head{
+    padding:16px 22px;background:linear-gradient(135deg,var(--blue-800),var(--blue-600) 60%,var(--blue-500));
+    color:#fff;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
+  }
+  .chat-head::after{
+    content:"";position:absolute;right:0;top:0;bottom:0;width:90px;pointer-events:none;
+    background:repeating-linear-gradient(-55deg,transparent 0 9px,rgba(255,255,255,.12) 9px 18px);
+  }
+  .chat-head .face{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px}
+  .chat-head .t{font-size:16px;font-weight:800}
+  .chat-head .s{font-size:12px;opacity:.85;margin-top:1px}
+  .chat-head .live{
+    margin-left:auto;font-size:11.5px;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:999px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .chat-head .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#7ef0b0;box-shadow:0 0 0 3px rgba(126,240,176,.35)}
+  .chat-body{height:360px;overflow-y:auto;padding:20px 22px;background:var(--surface-chat);display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:14.5px;white-space:pre-wrap;line-height:1.6;animation:pop .2s ease}
+  .msg.ai{align-self:flex-start;background:var(--bubble-ai);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px}
+  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff;border-bottom-right-radius:4px}
+  .msg .who{font-size:11px;opacity:.7;margin-bottom:3px;font-weight:800}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .msg.typing{display:flex;gap:5px;align-items:center;padding:14px 16px}
+  .msg.typing span{width:7px;height:7px;border-radius:50%;background:var(--blue-400);animation:bounce 1.2s infinite}
+  .msg.typing span:nth-child(2){animation-delay:.15s}
+  .msg.typing span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+  .quick{display:flex;flex-wrap:wrap;gap:8px;padding:12px 22px 0;background:var(--surface-chat)}
+  .quick button{
+    border:1px solid var(--blue-400);background:var(--card);color:var(--accent-strong);padding:6px 12px;border-radius:999px;
+    font-size:12.5px;cursor:pointer;font-weight:700;transition:.15s;
+  }
+  .quick button:hover{background:var(--blue-500);color:#fff}
+  .chat-input{display:flex;gap:10px;padding:14px 22px 18px;background:var(--surface-chat)}
+  .chat-input input{
+    flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14.5px;
+    outline:none;background:var(--field-bg);color:var(--ink);
+  }
+  .chat-input input:focus{border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(79,154,245,.15)}
+  .chat-input button{
+    border:none;cursor:pointer;background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;
+    padding:0 22px;border-radius:12px;font-size:14.5px;font-weight:800;transition:.15s;
+    clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  }
+  .chat-input button:hover{filter:brightness(1.1)}
+
+  /* ================= 页脚 ================= */
+  .page-footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:56px}
+  .footer-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:18px}
+  .footer-links a{color:var(--accent);text-decoration:none;font-weight:700;font-size:13px}
+  .footer-links a:hover{text-decoration:underline}
+  .copyright{
+    max-width:760px;margin:16px auto 0;padding:16px 20px;background:var(--surface-chat);border:1px solid var(--line);
+    border-radius:14px;line-height:1.8;text-align:left;
+  }
+  .copyright p:first-child{font-weight:800;color:var(--accent-strong);letter-spacing:.3px}
+  .copyright p + p{margin-top:6px}
+
+  /* ================= 留言反馈 ================= */
+  .fb-form{display:flex;flex-direction:column;gap:4px}
+  .fb-form[hidden]{display:none}
+  .fb-label{font-size:14px;font-weight:800;color:var(--ink);margin-top:14px;display:flex;align-items:center;gap:8px}
+  .fb-label:first-child{margin-top:0}
+  .fb-badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px}
+  .fb-badge.req{background:var(--danger-soft);color:var(--danger)}
+  .fb-badge.opt{background:var(--blue-100);color:var(--accent)}
+  .fb-textarea,.fb-input{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;
+    font-family:inherit;color:var(--ink);background:var(--field-bg);outline:none;transition:.15s;
+  }
+  .fb-textarea{resize:vertical;min-height:132px;line-height:1.6}
+/* 单选胶囊组（关系 / 设备） */
+.fb-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:2px}
+.fb-chip{position:relative;display:inline-flex}
+.fb-chip input{position:absolute;width:1px;height:1px;opacity:0;margin:0;pointer-events:none}
+.fb-chip span{
+  display:inline-flex;align-items:center;padding:9px 17px;border-radius:999px;
+  border:1px solid var(--line);background:var(--field-bg);color:var(--ink);
+  font-size:14px;font-weight:700;cursor:pointer;user-select:none;transition:.15s;
+}
+.fb-chip span:hover{border-color:var(--line-hover);background:var(--blue-100)}
+.fb-chip input:checked + span{
+  background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;
+  border-color:transparent;box-shadow:0 6px 16px rgba(20,58,107,.22);
+}
+.fb-chip input:focus-visible + span{outline:2px solid var(--blue-400);outline-offset:2px}
+.fb-chips.invalid span{border-color:var(--danger-line)}
+/* 选择「其他」后展开的补充输入框 */
+.fb-other{display:none;margin-top:10px}
+.fb-other.show{display:block}
+  .fb-textarea:focus,.fb-input:focus{border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(79,154,245,.15)}
+  .fb-input.invalid,.fb-textarea.invalid{border-color:var(--danger-line);box-shadow:0 0 0 3px rgba(192,57,43,.10)}
+  .fb-err{font-size:12.5px;color:var(--danger);font-weight:700;min-height:17px;margin-top:3px}
+  .fb-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+  .fb-submit{
+    border:none;cursor:pointer;color:#fff;font-weight:800;font-size:14.5px;padding:12px 30px;border-radius:12px;
+    background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:.15s;
+  }
+  .fb-submit:hover{filter:brightness(1.1)}
+  .fb-submit:disabled{opacity:.6;cursor:default}
+  .fb-note{font-size:12.5px;color:var(--muted);max-width:380px;line-height:1.6}
+  .fb-done{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:28px 20px}
+  .fb-done[hidden]{display:none}
+  .fb-done .ok{
+    width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:30px;
+    background:linear-gradient(145deg,var(--blue-400),var(--blue-700));color:#fff;
+    box-shadow:0 10px 26px rgba(31,85,158,.35);
+  }
+  .fb-done h3{font-size:19px;font-weight:800}
+  .fb-done p{font-size:14px;color:var(--muted);max-width:430px}
+  .fb-done button{
+    margin-top:8px;border:1px solid var(--line);background:var(--card);color:var(--accent-strong);font-weight:700;
+    padding:9px 20px;border-radius:10px;cursor:pointer;font-size:14px;transition:.15s;
+  }
+  .fb-done button:hover{background:var(--blue-100)}
+
+  /* ================= 手机适配 ================= */
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;gap:26px}
+    .hero-visual{justify-content:flex-start}
+    .mini-chat{max-width:420px}
+  }
+  @media (max-width:760px){
+    .nav-links{left:14px;right:14px;min-width:0}
+    .nav-link{padding:12px 14px}
+    .nav-cta{display:none}
+    .theme-toggle{margin-left:auto}
+    .nav-toggle{margin-left:8px}
+  }
+  @media (max-width:600px){
+    .wrap{padding:18px 14px 40px}
+    .hero2{padding:36px 22px;border-radius:20px}
+    .hero2 h1{font-size:30px}
+    .hero2 .typed-line{font-size:16px}
+    .stats{margin:-22px 10px 0;grid-template-columns:1fr;box-shadow:var(--shadow)}
+    .stat + .stat::before{left:18%;right:18%;top:0;bottom:auto;width:auto;height:1px}
+    .about{grid-template-columns:1fr}
+    .cta{padding:32px 20px}
+    .cta h2{font-size:22px}
+    .page-head h2{font-size:23px}
+    .chat-body{height:320px}
+    .msg{max-width:90%}
+    .block-head h2{font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<!-- 背景层：渐变微流动 / 局部斜纹理（遮罩渐隐）/ 极淡噪点 -->
+<div class="bg-flow" aria-hidden="true"></div>
+<div class="bg-weave" aria-hidden="true"></div>
+<div class="bg-noise" aria-hidden="true"></div>
+
+<!-- ================= 顶部导航 ================= -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#/home">
+      <span class="brand-flag" aria-hidden="true"></span>
+      <span>阎浩文<span class="brand-en">Bryan</span></span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="主导航">
+      <a class="nav-link" data-view="home" href="#/home">首页</a>
+      <a class="nav-link" data-view="info" href="#/info">个人信息</a>
+      <a class="nav-link" data-view="traits" href="#/traits">我的特点</a>
+      <a class="nav-link" data-view="chat" href="#/chat">数字分身</a>
+      <a class="nav-link" data-view="feedback" href="#/feedback">留言反馈</a>
+    </nav>
+    <a class="nav-cta" href="mailto:yhw20070910@outlook.com">联系我</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换深色 / 浅色主题" title="切换深色 / 浅色主题">
+      <span class="ic-dark" aria-hidden="true">☾</span>
+      <span class="ic-light" aria-hidden="true">☀</span>
+    </button>
+    <button class="nav-toggle" id="navToggle" aria-label="展开菜单" aria-expanded="false">☰</button>
+  </div>
+  <div class="nav-speed" aria-hidden="true"></div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= 视图：首页（个人简介） ================= -->
+  <section class="view" id="view-home" data-view="home">
+
+    <div class="hero2">
+      <span class="flag-corner" aria-hidden="true"></span>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">天津大学 · 香港理工大学 · 深圳未来技术学院</span>
+          <h1>你好，我是 <span class="hl">阎浩文</span> Bryan</h1>
+          <span class="typed-line"><span id="typed"></span><span class="caret" aria-hidden="true"></span></span>
+          <p class="lede">一名智能医学工程专业的大一学生，正在探索如何用 AI 辅助自己更高效地获取和掌握知识。性格乐于助人，喜欢围棋、阅读和打羽毛球。</p>
+          <div class="btns">
+            <a class="btn btn-primary" href="#/info">认识我 →</a>
+            <a class="btn btn-ghost" href="#/chat">💬 和数字分身「小文」聊聊</a>
+            <a class="btn btn-leave" href="#/feedback">✍️ 给我留言</a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <a class="mini-chat" href="#/chat" aria-label="和数字分身「小文」聊聊">
+            <div class="mini-chat-head">🤖 小文 · 数字分身<span class="live">在线</span></div>
+            <div class="mini-bubble ai">你好呀！我是小文，阎浩文的数字分身 👋</div>
+            <div class="mini-bubble user">你平时在忙什么？</div>
+            <div class="mini-bubble ai">在学智能医学工程，也在研究怎么用 AI 让学习更高效～</div>
+            <div class="mini-ask">问问小文 →</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="stat-num" data-target="2">0</div><div class="stat-lb">所院校联合培养</div></div>
+      <div class="stat"><div class="stat-num" data-target="3">0</div><div class="stat-lb">项省级以上获奖</div></div>
+      <div class="stat"><div class="stat-num" data-target="6">0</div><div class="stat-lb">个前沿关注方向</div></div>
+    </div>
+
+    <div class="block reveal">
+      <div class="block-head">
+        <span class="block-eyebrow">About</span>
+        <h2>关于我</h2>
+        <p>简单介绍一下我自己，以及我正在做的事。</p>
+      </div>
+      <div class="about">
+        <div class="about-main">
+          <p>我是阎浩文（Bryan），来自深圳，目前是一名智能医学工程专业的大一新生，就读于天津大学香港理工大学深圳未来技术学院。</p>
+          <p>我对「AI 如何帮助人更好地学习」这件事特别感兴趣：正在尝试用 AI 辅助我读书、做笔记、理解复杂概念、整理信息，并把这些方法用到日常学习里。</p>
+          <p>除了学习，我喜欢下围棋、阅读和打羽毛球。性格上乐于助人、做事有条理，喜欢先把事情理清楚再动手。未来我希望把 AI 真正用到医疗健康等前沿领域。</p>
+        </div>
+        <div class="about-side">
+          <div class="avatar-big" aria-label="头像占位">阎</div>
+          <div class="nm">阎浩文</div>
+          <div class="rl">Bryan · 智能医学工程</div>
+          <div class="mini">
+            <span class="mini-tag">深圳</span>
+            <span class="mini-tag">大一新生</span>
+            <span class="mini-tag">AI 学习者</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block reveal">
+      <div class="block-head">
+        <span class="block-eyebrow">Focus</span>
+        <h2>我关注的方向</h2>
+        <p>六个我最关心、也最想去深入了解的前沿领域。</p>
+      </div>
+      <div class="cards">
+        <div class="card"><span class="stripe"></span><div class="ico">📚</div><h3>AI 辅助学习</h3><p>用 AI 更高效地读书、记笔记、理解概念、整理信息。</p></div>
+        <div class="card"><span class="stripe"></span><div class="ico">🤖</div><h3>AI 应用</h3><p>关注人工智能在真实场景中的落地与实际使用。</p></div>
+        <div class="card"><span class="stripe"></span><div class="ico">🧠</div><h3>脑机接口</h3><p>探索大脑与机器之间的信息通道会带来怎样的可能。</p></div>
+        <div class="card"><span class="stripe"></span><div class="ico">🩺</div><h3>前沿医疗</h3><p>关注新技术如何改变医疗诊断与健康管理。</p></div>
+        <div class="card"><span class="stripe"></span><div class="ico">🚗</div><h3>自动驾驶</h3><p>关注智能出行的安全性、效率与未来形态。</p></div>
+        <div class="card"><span class="stripe"></span><div class="ico">🛩️</div><h3>低空经济</h3><p>关注无人机与低空飞行带来的新产业机会。</p></div>
+      </div>
+    </div>
+
+    <div class="block reveal">
+      <div class="block-head">
+        <span class="block-eyebrow">Honors</span>
+        <h2>获奖与荣誉</h2>
+        <p>一路走来的一些小成绩。</p>
+      </div>
+      <div class="awards">
+        <div class="award"><div class="medal">🥇</div><div class="tt">外研社杯口语比赛</div><div class="ds">国家级一等奖</div></div>
+        <div class="award"><div class="medal">🏆</div><div class="tt">广东省生物科普论文大赛</div><div class="ds">特等奖</div></div>
+        <div class="award"><div class="medal">🎓</div><div class="tt">深圳市高级中学（集团）中心校区</div><div class="ds">优秀毕业生</div></div>
+      </div>
+    </div>
+
+    <div class="block reveal">
+      <div class="cta">
+        <h2>想和我聊聊，或是有合作想法？</h2>
+        <p>欢迎通过以下任意邮箱联系我，也随时可以在数字分身处先问两句。</p>
+        <div class="mails">
+          <a class="mail-pill" href="mailto:yhw20070910@outlook.com">yhw20070910@outlook.com <span class="lb">常用</span></a>
+          <a class="mail-pill" href="mailto:3026445056@tju.edu.cn">3026445056@tju.edu.cn <span class="lb">天津大学</span></a>
+          <a class="mail-pill" href="mailto:26130039d@connect.polyu.hk">26130039d@connect.polyu.hk <span class="lb">香港理工大学</span></a>
+        </div>
+        <a class="btn btn-primary" href="#/chat">先找小文聊聊 →</a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= 视图：个人信息 ================= -->
+  <section class="view" id="view-info" data-view="info">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 个人信息</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>个人信息</h2>
+      <p>我的基本情况、联系方式与关注方向。</p>
+    </div>
+    <div class="panel">
+      <div class="grid">
+        <div class="info-card"><div class="k">姓名</div><div class="v">阎浩文（Bryan）</div></div>
+        <div class="info-card"><div class="k">身份</div><div class="v">学生 · 智能医学工程专业</div></div>
+        <div class="info-card"><div class="k">学校</div><div class="v">天津大学 · 香港理工大学 · 深圳未来技术学院</div></div>
+        <div class="info-card"><div class="k">城市</div><div class="v">深圳</div></div>
+        <div class="info-card"><div class="k">兴趣</div><div class="v">围棋 · 阅读 · 羽毛球</div></div>
+        <div class="info-card">
+          <div class="k">联系</div>
+          <div class="mail-list">
+            <a href="mailto:yhw20070910@outlook.com">yhw20070910@outlook.com<span class="lb"> · 常用</span></a>
+            <a href="mailto:3026445056@tju.edu.cn">3026445056@tju.edu.cn<span class="lb"> · 天津大学</span></a>
+            <a href="mailto:26130039d@connect.polyu.hk">26130039d@connect.polyu.hk<span class="lb"> · 香港理工大学</span></a>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="k">关心方向</div>
+          <div class="tag-list">
+            <span class="tag">AI 辅助学习</span><span class="tag">AI 应用</span><span class="tag">脑机接口</span>
+            <span class="tag">前沿医疗</span><span class="tag">自动驾驶</span><span class="tag">低空经济</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：我的特点 ================= -->
+  <section class="view" id="view-traits" data-view="traits">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我的特点</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>我的特点</h2>
+      <p>认识我的人，大概会用这几个词形容我。</p>
+    </div>
+    <div class="panel">
+      <div class="traits-grid">
+        <div class="trait-item"><span class="emoji">🤝</span><div><div class="tt">乐于助人</div><div class="td">同学有困难我很乐意搭把手，遇到问题主动帮大家解决。</div></div></div>
+        <div class="trait-item"><span class="emoji">🧩</span><div><div class="tt">有条理</div><div class="td">喜欢把事情理清楚再动手，先规划后执行。</div></div></div>
+        <div class="trait-item"><span class="emoji">📚</span><div><div class="tt">爱学习</div><div class="td">热衷用 AI 辅助获取知识，保持对新事物的好奇。</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：数字分身 ================= -->
+  <section class="view" id="view-chat" data-view="chat">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 数字分身</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>数字分身 · 小文</h2>
+      <p>基于我本人的信息，回答关于我的问题。</p>
+    </div>
+    <div class="panel">
+      <div class="chat">
+        <div class="chat-head">
+          <div class="face">🤖</div>
+          <div>
+            <div class="t">数字分身 · 小文</div>
+            <div class="s">基于我本人的信息，回答关于我的问题</div>
+          </div>
+          <span class="live">在线</span>
+        </div>
+        <div class="quick" id="quick"></div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-input">
+          <input id="chatInput" type="text" placeholder="问问关于阎浩文的事，例如：你在做什么？" autocomplete="off" />
+          <button id="sendBtn">发送</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：留言反馈 ================= -->
+  <section class="view" id="view-feedback" data-view="feedback">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 留言反馈</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>留言反馈</h2>
+      <p>欢迎写下你的建议与意见。带上昵称、你和我的关系、访问设备，我会更容易理解你的反馈。</p>
+    </div>
+    <div class="panel">
+      <form class="fb-form" id="fbForm" novalidate>
+        <label class="fb-label" for="fbNick">你的昵称 <span class="fb-badge req">必填</span></label>
+        <input class="fb-input" id="fbNick" type="text" autocomplete="nickname" maxlength="24"
+               placeholder="我该怎么称呼你？" />
+        <div class="fb-err" id="fbNickErr"></div>
+
+        <div class="fb-label" id="fbRelLabel">你和我的关系 <span class="fb-badge req">必填</span></div>
+        <div class="fb-chips" id="fbRelChips" role="radiogroup" aria-labelledby="fbRelLabel">
+          <label class="fb-chip"><input type="radio" name="fbRelation" value="朋友" /><span>朋友</span></label>
+          <label class="fb-chip"><input type="radio" name="fbRelation" value="同学" /><span>同学</span></label>
+          <label class="fb-chip"><input type="radio" name="fbRelation" value="家人" /><span>家人</span></label>
+          <label class="fb-chip"><input type="radio" name="fbRelation" value="老师" /><span>老师</span></label>
+          <label class="fb-chip"><input type="radio" name="fbRelation" value="其他" data-other="fbRelOther" /><span>其他</span></label>
+        </div>
+        <input class="fb-input fb-other" id="fbRelOther" type="text" maxlength="24"
+               placeholder="请写下具体关系，比如亲戚、室友、网友" />
+        <div class="fb-err" id="fbRelErr"></div>
+
+        <div class="fb-label" id="fbDevLabel">你正在用什么设备访问 <span class="fb-badge req">必填</span></div>
+        <div class="fb-chips" id="fbDevChips" role="radiogroup" aria-labelledby="fbDevLabel">
+          <label class="fb-chip"><input type="radio" name="fbDevice" value="手机" /><span>手机</span></label>
+          <label class="fb-chip"><input type="radio" name="fbDevice" value="平板" /><span>平板</span></label>
+          <label class="fb-chip"><input type="radio" name="fbDevice" value="电脑" /><span>电脑</span></label>
+          <label class="fb-chip"><input type="radio" name="fbDevice" value="其他" data-other="fbDeviceOther" /><span>其他</span></label>
+        </div>
+        <input class="fb-input fb-other" id="fbDeviceOther" type="text" maxlength="24"
+               placeholder="请写下设备种类，比如智能手表、游戏机" />
+        <div class="fb-err" id="fbDevErr"></div>
+
+        <label class="fb-label" for="fbOpinion">你的意见 <span class="fb-badge req">必填</span></label>
+        <textarea class="fb-textarea" id="fbOpinion"
+                  placeholder="请尽量写具体：在哪个页面、哪个位置，你的体验如何，遇到了什么问题。例如「首页顶部那排按钮在手机上挤在一起，点起来不太方便」"></textarea>
+        <div class="fb-err" id="fbOpinionErr"></div>
+
+        <div class="fb-actions">
+          <button class="fb-submit" id="fbSubmit" type="submit">提交留言</button>
+          <span class="fb-note">留言只会送达站主（阎浩文）本人，不会在网页上公开显示。</span>
+        </div>
+      </form>
+
+      <div class="fb-done" id="fbDone" hidden>
+        <div class="ok" aria-hidden="true">✓</div>
+        <h3 id="fbDoneTitle">已收到你的留言</h3>
+        <p>谢谢你花时间写下这些。内容会直接送达站主本人，不会公开显示。</p>
+        <button type="button" id="fbAgain">再写一条</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 页脚 ================= -->
+  <footer class="page-footer">
+    <div class="footer-links">
+      <a href="#/home">首页</a>
+      <a href="#/info">个人信息</a>
+      <a href="#/traits">我的特点</a>
+      <a href="#/chat">数字分身</a>
+      <a href="#/feedback">留言反馈</a>
+      <a href="mailto:yhw20070910@outlook.com">联系我</a>
+    </div>
+    <p>阎浩文 · 个人主页 v3</p>
+    <div class="copyright">
+      <p>© 2026 阎浩文（Bryan） All Rights Reserved.</p>
+      <p>本页面所有内容（包括文字、排版、设计及数字分身信息）均为本人原创，仅用于个人展示，不侵犯任何第三方知识产权。本网站含有 AI 生成内容。如需转载或引用，请先征得本人同意。</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ================= 数字分身知识库（沿用 v1） ================= */
+const KNOWLEDGE = {
+  name: "阎浩文",
+  alias: "小文",
+  occupation: "天津大学-香港理工大学-深圳未来技术学院 智能医学工程专业的大一新生（学生）",
+  focus: "AI 辅助学习、AI 应用、脑机接口、前沿医疗、自动驾驶与低空经济",
+  doing: "我目前是一名大一新生，专业是智能医学工程。主要在做的事情是：学习专业知识，同时探索如何用 AI 辅助自己更高效地读书、做笔记、理解复杂概念、整理信息。我会把我学到的 AI 方法应用到日常学习和未来的科研里。",
+  contact: "想联系我可以发邮件：\n常见邮箱 yhw20070910@outlook.com\n天津大学邮箱 3026445056@tju.edu.cn\n香港理工大学邮箱 26130039d@connect.polyu.hk\n也可以直接在校内找我——毕竟我是乐于助人的阎浩文 :)",
+  traits: "我的兴趣是围棋、阅读和打羽毛球。性格上一个明显特点是乐于助人，我很乐意帮同学解决问题；做事比较有条理，喜欢先把事情理清楚再动手。如果要用几个词形容我，那就是：乐于助人、有条理、爱学习。",
+  awards: "我的获奖经历：\n· 外研社杯口语比赛 国家级一等奖\n· 广东省生物科普论文大赛 特等奖\n· 深圳市高级中学（集团）中心校区 优秀毕业生",
+  greeting: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系，或者他最近在忙什么。"
+};
+
+const RULES = [
+  { keys: ["你好", "hi", "hello", "嗨", "在吗", "你是谁"], ans: KNOWLEDGE.greeting + "\n\n你也可以点下面的快捷问题直接问我。" },
+  { keys: ["你干什么", "你在干什么", "在做什么", "在干嘛", "忙什么", "最近", "学习"], ans: KNOWLEDGE.doing },
+  { keys: ["联系", "联系方式", "邮箱", "怎么找到", "微信", "电话", "找谁"], ans: KNOWLEDGE.contact },
+  { keys: ["特点", "性格", "是什么样", "怎么样的人", "为人", "擅长"], ans: KNOWLEDGE.traits },
+  { keys: ["获奖", "奖项", "荣誉", "奖", "经历", "比赛", "一等奖", "特等奖", "优秀毕业生", "外研社", "论文"], ans: KNOWLEDGE.awards },
+  { keys: ["兴趣", "爱好", "喜欢", "围棋", "阅读", "书", "羽毛球", "运动"], ans: KNOWLEDGE.traits },
+  { keys: ["名字", "叫什么", "姓名", "你是"], ans: "我叫" + KNOWLEDGE.name + "。我是他的数字分身，他本人是" + KNOWLEDGE.occupation + "。" },
+  { keys: ["专业", "职业", "学生", "做什么的", "学的", "学院", "大学", "学校"], ans: KNOWLEDGE.occupation },
+  { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术"], ans: "他最关心的方向是：" + KNOWLEDGE.focus + "，也更倾向于把 AI 方法真正用起来。" },
+  { keys: ["介绍", "简介", "了解一下", "介绍下自己"], ans: "我是" + KNOWLEDGE.name + "，今年刚入学，是一名" + KNOWLEDGE.occupation + "。我的兴趣是围棋、阅读、打羽毛球，乐于助人，目前主要在用 AI 辅助学习。" }
+];
+
+const FALLBACK = "这个问题我还没学会回答～你可以试着问我：你在做什么？怎么联系你？你有什么特点？";
+
+function answer(raw) {
+  const text = (raw || "").toLowerCase();
+  for (const r of RULES) { if (r.keys.some(k => text.includes(k))) return r.ans; }
+  return FALLBACK;
+}
+
+/* ================= 聊天 UI ================= */
+const chatBody = document.getElementById("chatBody");
+const chatInput = document.getElementById("chatInput");
+const quick = document.getElementById("quick");
+
+function addMsg(content, who) {
+  const m = document.createElement("div");
+  m.className = "msg " + who;
+  m.innerHTML = (who === "ai" ? '<div class="who">小文 · 数字分身</div>' : '<div class="who">我</div>') + content;
+  chatBody.appendChild(m);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function ask(text) {
+  if (!text || !text.trim()) return;
+  addMsg(text.trim(), "user");
+  chatInput.value = "";
+  const typing = document.createElement("div");
+  typing.className = "msg ai typing";
+  typing.innerHTML = "<span></span><span></span><span></span>";
+  chatBody.appendChild(typing);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  setTimeout(() => { typing.remove(); addMsg(answer(text), "ai"); }, 550);
+}
+
+document.getElementById("sendBtn").addEventListener("click", () => ask(chatInput.value));
+chatInput.addEventListener("keydown", e => { if (e.key === "Enter") ask(chatInput.value); });
+
+["你在做什么？", "怎么联系你？", "你有什么特点？", "你的获奖经历？", "你关心什么方向？"].forEach(q => {
+  const b = document.createElement("button");
+  b.textContent = q;
+  b.addEventListener("click", () => ask(q));
+  quick.appendChild(b);
+});
+
+addMsg(KNOWLEDGE.greeting, "ai");
+
+/* ================= 留言反馈 ================= */
+/* 本站是纯静态单文件（双击即可打开、零外部依赖）。
+   默认走「邮件」通道：访客提交后，内容直接发送到站主本人的邮箱，
+   只有站主能看到，网页上不会公开显示任何留言。
+   若以后接入在线表单服务（如 Formspree），把地址填到下面这一行即可自动切换。 */
+const FEEDBACK_ENDPOINT = "";                          // 例："https://formspree.io/f/xxxxxxx"
+const OWNER_EMAIL = "yhw20070910@outlook.com";
+
+const fbForm = document.getElementById("fbForm");
+const fbNick = document.getElementById("fbNick");
+const fbNickErr = document.getElementById("fbNickErr");
+const fbRelChips = document.getElementById("fbRelChips");
+const fbRelOther = document.getElementById("fbRelOther");
+const fbRelErr = document.getElementById("fbRelErr");
+const fbDevChips = document.getElementById("fbDevChips");
+const fbDeviceOther = document.getElementById("fbDeviceOther");
+const fbDevErr = document.getElementById("fbDevErr");
+const fbOpinion = document.getElementById("fbOpinion");
+const fbOpinionErr = document.getElementById("fbOpinionErr");
+const fbDone = document.getElementById("fbDone");
+const fbDoneTitle = document.getElementById("fbDoneTitle");
+const fbSubmit = document.getElementById("fbSubmit");
+
+/* 读取某个单选组当前选中的值，没选就返回空串 */
+const pickedRadio = name => {
+  const el = fbForm.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : "";
+};
+
+/* 选中「其他」时才展开它对应的补充输入框，切走时清空 */
+function syncOtherInputs() {
+  fbForm.querySelectorAll('input[type="radio"][data-other]').forEach(r => {
+    const box = document.getElementById(r.dataset.other);
+    if (!box) return;
+    box.classList.toggle("show", r.checked);
+    if (!r.checked) box.value = "";
+  });
+}
+
+/* 按访客当前设备先预选一个，访客仍然可以改成别的 */
+function preselectDevice() {
+  const ua = navigator.userAgent || "";
+  const touch = (navigator.maxTouchPoints || 0) > 1;
+  let guess = "电脑";
+  if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) guess = "平板";
+  else if (/Android/i.test(ua) && !/Mobile/i.test(ua)) guess = "平板";
+  else if (/Mobi|iPhone|iPod|Windows Phone|Android/i.test(ua)) guess = "手机";
+  else if (touch && /Macintosh/i.test(ua)) guess = "平板";   // iPadOS 默认以桌面版 UA 上报
+  const el = fbForm.querySelector('input[name="fbDevice"][value="' + guess + '"]');
+  if (el) el.checked = true;
+}
+
+function validateFeedback() {
+  let ok = true;
+
+  const nick = fbNick.value.trim();
+  if (!nick) { fbNickErr.textContent = "请先写下你的昵称。"; fbNick.classList.add("invalid"); ok = false; }
+  else { fbNickErr.textContent = ""; fbNick.classList.remove("invalid"); }
+
+  const rel = pickedRadio("fbRelation");
+  if (!rel) {
+    fbRelErr.textContent = "请选择你和站主的关系。"; fbRelChips.classList.add("invalid"); ok = false;
+  } else if (rel === "其他" && !fbRelOther.value.trim()) {
+    fbRelErr.textContent = "请写下具体关系。"; fbRelOther.classList.add("invalid"); ok = false;
+  } else {
+    fbRelErr.textContent = ""; fbRelChips.classList.remove("invalid"); fbRelOther.classList.remove("invalid");
+  }
+
+  const dev = pickedRadio("fbDevice");
+  if (!dev) {
+    fbDevErr.textContent = "请选择你正在使用的设备。"; fbDevChips.classList.add("invalid"); ok = false;
+  } else if (dev === "其他" && !fbDeviceOther.value.trim()) {
+    fbDevErr.textContent = "请写下设备种类。"; fbDeviceOther.classList.add("invalid"); ok = false;
+  } else {
+    fbDevErr.textContent = ""; fbDevChips.classList.remove("invalid"); fbDeviceOther.classList.remove("invalid");
+  }
+
+  const opinion = fbOpinion.value.trim();
+
+  if (!opinion) { fbOpinionErr.textContent = "请写下你的意见。"; fbOpinion.classList.add("invalid"); ok = false; }
+  else if (opinion.length < 4) { fbOpinionErr.textContent = "再多写一点吧，方便我理解你的意思。"; fbOpinion.classList.add("invalid"); ok = false; }
+  else { fbOpinionErr.textContent = ""; fbOpinion.classList.remove("invalid"); }
+
+  return ok;
+}
+
+function showFeedbackDone(nick) {
+  if (fbDoneTitle) fbDoneTitle.textContent = nick ? "谢谢你的留言，" + nick + "！" : "已收到你的留言";
+  fbForm.hidden = true;
+  fbDone.hidden = false;
+}
+
+fbForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!validateFeedback()) return;
+
+  const nick = fbNick.value.trim();
+  const relation = pickedRadio("fbRelation");
+  const relationText = relation === "其他" ? "其他：" + fbRelOther.value.trim() : relation;
+  const device = pickedRadio("fbDevice");
+  const deviceText = device === "其他" ? "其他：" + fbDeviceOther.value.trim() : device;
+  const opinion = fbOpinion.value.trim();
+  const time = new Date().toLocaleString("zh-CN");
+
+  if (FEEDBACK_ENDPOINT) {
+    fbSubmit.disabled = true; fbSubmit.textContent = "提交中…";
+    try {
+      const res = await fetch(FEEDBACK_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          nickname: nick,
+          relation: relationText,
+          device: deviceText,
+          opinion: opinion,
+          time
+        })
+      });
+      if (!res.ok) throw new Error("bad status");
+      showFeedbackDone(nick);
+    } catch (err) {
+      fbSubmit.disabled = false; fbSubmit.textContent = "提交留言";
+      fbOpinionErr.textContent = "提交失败，请稍后重试，或直接发邮件到 " + OWNER_EMAIL + "。";
+    }
+  } else {
+    const subject = "[个人主页留言] " + nick + "（" + relationText + "）";
+    const body = "昵称：" + nick +
+                 "\n关系：" + relationText +
+                 "\n访问设备：" + deviceText +
+                 "\n\n你的意见：\n" + opinion +
+                 "\n\n提交时间：" + time;
+    location.href = "mailto:" + OWNER_EMAIL +
+                    "?subject=" + encodeURIComponent(subject) +
+                    "&body=" + encodeURIComponent(body);
+    showFeedbackDone(nick);
+  }
+});
+
+fbNick.addEventListener("input", () => { if (fbNickErr.textContent) { fbNickErr.textContent = ""; fbNick.classList.remove("invalid"); } });
+fbRelOther.addEventListener("input", () => { if (fbRelErr.textContent) { fbRelErr.textContent = ""; fbRelOther.classList.remove("invalid"); } });
+fbDeviceOther.addEventListener("input", () => { if (fbDevErr.textContent) { fbDevErr.textContent = ""; fbDeviceOther.classList.remove("invalid"); } });
+fbRelChips.addEventListener("change", () => { fbRelErr.textContent = ""; fbRelChips.classList.remove("invalid"); syncOtherInputs(); });
+fbDevChips.addEventListener("change", () => { fbDevErr.textContent = ""; fbDevChips.classList.remove("invalid"); syncOtherInputs(); });
+fbOpinion.addEventListener("input", () => { if (fbOpinionErr.textContent) { fbOpinionErr.textContent = ""; fbOpinion.classList.remove("invalid"); } });
+
+document.getElementById("fbAgain").addEventListener("click", () => {
+  fbForm.reset();
+  syncOtherInputs();
+  preselectDevice();
+  fbForm.hidden = false;
+  fbDone.hidden = true;
+  fbSubmit.disabled = false;
+  fbSubmit.textContent = "提交留言";
+  fbNick.focus();
+});
+
+/* 进页面时先按设备预选，保证「其他」输入框状态与选项一致 */
+preselectDevice();
+syncOtherInputs();
+
+/* ================= Hash 路由 ================= */
+const VIEWS = ["home", "info", "traits", "chat", "feedback"];
+const viewEls = document.querySelectorAll(".view");
+const linkEls = document.querySelectorAll(".nav-link");
+const navLinks = document.getElementById("navLinks");
+const navToggle = document.getElementById("navToggle");
+
+function currentRoute() {
+  const h = (location.hash || "").replace(/^#\/?/, "");
+  return VIEWS.includes(h) ? h : "home";
+}
+
+function activateReveals(root) {
+  if (!root) return;
+  root.querySelectorAll(".reveal").forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight * 0.92) el.classList.add("in");
+    else revealObserver.observe(el);
+  });
+  root.querySelectorAll(".stat-num").forEach(el => countUp(el));
+}
+
+function render() {
+  const route = currentRoute();
+  viewEls.forEach(v => v.classList.toggle("active", v.dataset.view === route));
+  linkEls.forEach(l => l.classList.toggle("active", l.dataset.view === route));
+  navLinks.classList.remove("open");
+  navToggle.setAttribute("aria-expanded", "false");
+  activateReveals(document.querySelector(".view.active"));
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+window.addEventListener("hashchange", render);
+
+/* 滚动入场观察器 */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revealObserver.unobserve(e.target); } });
+}, { threshold: 0.12 });
+
+/* 数字滚动 */
+function countUp(el) {
+  if (el.dataset.done) return;
+  el.dataset.done = "1";
+  const target = parseInt(el.dataset.target, 10) || 0;
+  let cur = 0;
+  const timer = setInterval(() => {
+    cur += Math.max(1, Math.round(target / 20));
+    if (cur >= target) { cur = target; clearInterval(timer); }
+    el.textContent = cur;
+  }, 28);
+}
+
+/* 导航栏滚动状态 */
+const navEl = document.getElementById("nav");
+window.addEventListener("scroll", () => navEl.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
+
+/* 汉堡菜单开关 */
+navToggle.addEventListener("click", e => {
+  e.stopPropagation();
+  const open = navLinks.classList.toggle("open");
+  navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+});
+/* 点击菜单外 / 按 Esc 关闭 */
+document.addEventListener("click", e => {
+  if (!navLinks.classList.contains("open")) return;
+  if (navLinks.contains(e.target) || navToggle.contains(e.target)) return;
+  navLinks.classList.remove("open");
+  navToggle.setAttribute("aria-expanded", "false");
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && navLinks.classList.contains("open")) {
+    navLinks.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+});
+
+/* ================= 打字机 ================= */
+const PHRASES = [
+  "用 AI 让学习更高效",
+  "一名智能医学工程大一学生",
+  "喜欢围棋、阅读和羽毛球",
+  "乐于助人 · 有条理 · 爱学习"
+];
+const typedEl = document.getElementById("typed");
+let pi = 0, ci = PHRASES[0].length, deleting = false;
+function typeLoop() {
+  const full = PHRASES[pi];
+  typedEl.textContent = full.slice(0, ci);
+  if (!deleting && ci < full.length) { ci++; setTimeout(typeLoop, 90); }
+  else if (!deleting && ci === full.length) { deleting = true; setTimeout(typeLoop, 1500); }
+  else if (deleting && ci > 0) { ci--; setTimeout(typeLoop, 40); }
+  else { deleting = false; pi = (pi + 1) % PHRASES.length; setTimeout(typeLoop, 260); }
+}
+typeLoop();
+
+/* ================= 深色 / 浅色主题 ================= */
+const THEME_KEY = "yhw-theme";
+const themeToggle = document.getElementById("themeToggle");
+const rootEl = document.documentElement;
+const metaTheme = document.getElementById("metaTheme");
+
+function readSavedTheme() {
+  try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+}
+
+/* 同步浏览器地址栏配色与按钮提示文案 */
+function syncThemeChrome(t) {
+  if (metaTheme) metaTheme.setAttribute("content", t === "dark" ? "#0a0f22" : "#e4e1f9");
+  if (themeToggle) {
+    const label = t === "dark" ? "切换到浅色主题" : "切换到深色主题";
+    themeToggle.setAttribute("aria-label", label);
+    themeToggle.setAttribute("title", label);
+  }
+}
+
+function setTheme(t, persist) {
+  rootEl.setAttribute("data-theme", t);
+  syncThemeChrome(t);
+  if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
+}
+
+themeToggle.addEventListener("click", () => {
+  setTheme(rootEl.getAttribute("data-theme") === "dark" ? "light" : "dark", true);
+});
+
+/* 用户没手动选过时，跟随系统主题实时变化 */
+if (window.matchMedia) {
+  const mq = window.matchMedia("(prefers-color-scheme:dark)");
+  const onSysChange = e => { if (!readSavedTheme()) setTheme(e.matches ? "dark" : "light", false); };
+  if (mq.addEventListener) mq.addEventListener("change", onSysChange);
+  else if (mq.addListener) mq.addListener(onSysChange);
+}
+syncThemeChrome(rootEl.getAttribute("data-theme") || "light");
+
+/* 初始化 */
+render();
+</script>
+</body>
+</html>
