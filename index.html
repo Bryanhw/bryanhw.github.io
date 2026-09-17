@@ -583,31 +583,15 @@
   }
   .fb-done button:hover{background:var(--blue-100)}
 
-  /* ================= 留言墙 ================= */
-  .wall{margin-top:22px}
-  .wall-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-  .wall-head h3{font-size:17px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:9px}
-  .wall-count{font-size:12.5px;color:var(--muted);font-weight:700}
-  .wall-refresh{
-    border:1px solid var(--line);background:var(--card);color:var(--accent-strong);font-weight:700;
-    padding:7px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit;transition:.15s;
+  /* ================= 留言计数 ================= */
+  /* 页面上只出现一个数字；留言内容不对访客公开（数据库也没给匿名读取权限） */
+  .fb-stat{
+    margin-top:22px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;
+    padding:16px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface-1);
+    box-shadow:var(--sh-card);font-size:14.5px;color:var(--body-text);font-weight:600;text-align:center;
   }
-  .wall-refresh:hover{background:var(--blue-100)}
-  .wall-refresh:disabled{opacity:.6;cursor:default}
-  .wall-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-  .wall-card{
-    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:15px 17px;
-    display:flex;flex-direction:column;gap:9px;box-shadow:var(--sh-card);transition:.18s;
-  }
-  .wall-card:hover{box-shadow:var(--sh-card-hover);transform:translateY(-2px)}
-  .wall-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .wall-nick{font-weight:800;color:var(--accent-strong);font-size:14.5px}
-  .wall-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--blue-100);color:var(--accent)}
-  .wall-time{font-size:11.5px;color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
-  .wall-text{font-size:14px;line-height:1.72;color:var(--body-text);white-space:pre-wrap;word-break:break-word}
-  .wall-msg{font-size:13.5px;color:var(--muted);padding:10px 0;line-height:1.7}
-  .wall-msg.err{color:var(--danger);font-weight:700}
-  .wall-msg[hidden]{display:none}
+  .fb-stat[hidden]{display:none}
+  .fb-stat b{font-size:21px;font-weight:800;color:var(--accent-strong);font-variant-numeric:tabular-nums}
 
   /* ================= 手机适配 ================= */
   @media (max-width:900px){
@@ -898,27 +882,20 @@
 
         <div class="fb-actions">
           <button class="fb-submit" id="fbSubmit" type="submit">提交留言</button>
-          <span class="fb-note">留言会直接提交到站主自己的数据库（Supabase），只有站主能看到。站主确认后，你的留言会出现在下面的留言墙。</span>
+          <span class="fb-note">留言会直接提交到站主自己的数据库（Supabase），只有站主能看到，不会公开显示。</span>
         </div>
       </form>
 
       <div class="fb-done" id="fbDone" hidden>
         <div class="ok" aria-hidden="true">✓</div>
         <h3 id="fbDoneTitle">已收到你的留言</h3>
-        <p id="fbDoneMsg">谢谢你花时间写下这些。留言已经存进站主的数据库，站主确认后会出现在下面的留言墙。</p>
+        <p id="fbDoneMsg">谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。</p>
         <button type="button" id="fbAgain">再写一条</button>
       </div>
     </div>
 
-    <!-- 留言墙：公开显示的留言都已由站主确认（数据库里 approved = true） -->
-    <div class="wall" id="fbWall">
-      <div class="wall-head">
-        <h3><span class="flag-dot" aria-hidden="true"></span>大家的留言 <span class="wall-count" id="fbWallCount"></span></h3>
-        <button class="wall-refresh" type="button" id="fbWallRefresh">刷新</button>
-      </div>
-      <div class="wall-list" id="fbWallList"></div>
-      <p class="wall-msg" id="fbWallMsg">正在读取留言…</p>
-    </div>
+    <!-- 留言计数：访客只看到一个总数，看不到任何一条留言的内容 -->
+    <div class="fb-stat" id="fbStat" hidden></div>
   </section>
 
   <!-- ================= 页脚 ================= -->
@@ -1018,14 +995,17 @@ addMsg(KNOWLEDGE.greeting, "ai");
 
        访客点「提交留言」→ 本站 POST 到 Supabase → 留言存进 messages 表
 
-   表里有一个 approved 开关：新留言默认 false（不公开），
-   站主在 Supabase 后台确认后勾成 true，才会出现在页面下方的留言墙。
+   留言内容不对访客公开，只有站主在 Supabase 后台能看到。
+   数据库收到新留言时，会由一个触发器自动发邮件提醒站主。
+
+   页面上只显示一个总数（「已收到 N 条留言」），数值来自 message_count() 函数 ——
+   它是 security definer 的，调用者只能拿到一个数字，拿不到任何一条留言的内容。
 
    前端用的是可以公开的 anon / publishable key（它设计上就允许放在网页里），
    所以「谁能读、能写什么」全部由数据库的 RLS 策略决定，不靠前端自觉：
 
        · 访客只能 INSERT，而且只能写 approved = false
-       · 任何人都只能读到 approved = true 的行
+       · 匿名访客读不到 messages 里的任何一行（读取策略已被移除）
        · 访客没有任何 UPDATE / DELETE 权限
 
    ⚠ 绝对不要把 service_role key 放进这个文件 —— 它会绕过上面所有规则。 */
@@ -1143,7 +1123,7 @@ function showFeedbackDone(nick, viaMail) {
   if (fbDoneMsg) {
     fbDoneMsg.textContent = viaMail
       ? "请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。"
-      : "谢谢你花时间写下这些。留言已经存进站主的数据库，站主确认后会出现在下面的留言墙。";
+      : "谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。";
   }
   fbForm.hidden = true;
   fbDone.hidden = false;
@@ -1177,101 +1157,44 @@ async function postToSupabase(row) {
   throw new Error(text || ("HTTP " + res.status));
 }
 
-/* ---------- 读取留言墙（只拿审核通过的留言） ---------- */
-async function loadWall() {
-  const list = document.getElementById("fbWallList");
-  const msg = document.getElementById("fbWallMsg");
-  const count = document.getElementById("fbWallCount");
-  const btn = document.getElementById("fbWallRefresh");
-  if (!list || !msg) return;
+/* ---------- 读取留言总数 ----------
+   只调用数据库里的 message_count() 函数，拿回一个数字。
+   留言内容匿名访客一条也读不到 —— 读取策略已经在数据库层面撤掉了。 */
+async function loadCount() {
+  const box = document.getElementById("fbStat");
+  if (!box) return;
 
-  if (!SUPABASE_ANON_KEY) {
-    msg.className = "wall-msg";
-    msg.hidden = false;
-    msg.textContent = "留言墙会在填入 Supabase 的 anon key 之后显示。";
-    if (count) count.textContent = "";
-    return;
-  }
-
-  if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+  box.hidden = true;                    /* 拿不到就干脆不显示，不打扰访客 */
+  if (!SUPABASE_ANON_KEY) return;       /* 没配 key 时静默跳过 */
 
   try {
-    const res = await fetch(
-      SUPABASE_URL + "/rest/v1/messages" +
-        "?select=nick,relation,created_at,content" +
-        "&order=created_at.desc" +
-        "&limit=30",
-      { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY } }
-    );
+    const res = await fetch(SUPABASE_URL + "/rest/v1/rpc/message_count", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json"
+      },
+      body: "{}"
+    });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const rows = await res.json();
 
-    list.innerHTML = "";
+    const n = await res.json();
+    box.textContent = "";
 
-    if (!rows.length) {
-      if (count) count.textContent = "";
-      msg.className = "wall-msg";
-      msg.hidden = false;
-      msg.textContent = "还没有公开的留言。写下你的想法，成为第一条吧。";
-      return;
+    if (typeof n !== "number" || !isFinite(n) || n <= 0) {
+      box.appendChild(document.createTextNode("还没有收到留言，欢迎你做第一个。"));
+    } else {
+      box.appendChild(document.createTextNode("已收到 "));
+      const num = document.createElement("b");
+      num.textContent = String(n);
+      box.appendChild(num);
+      box.appendChild(document.createTextNode(" 条留言"));
     }
-
-    msg.hidden = true;
-    if (count) count.textContent = "· " + rows.length + " 条";
-    rows.forEach(r => list.appendChild(wallCard(r)));
+    box.hidden = false;
   } catch (err) {
-    if (count) count.textContent = "";
-    msg.className = "wall-msg err";
-    msg.hidden = false;
-    msg.textContent = "留言墙暂时读取失败，稍后再试。";
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "刷新"; }
+    box.hidden = true;                  /* 统计失败不报错，静默隐藏即可 */
   }
-}
-
-/* 生成一张留言卡。
-   内容全部用 textContent 塞进去 —— 访客写的东西绝不能被当成 HTML 执行。 */
-function wallCard(r) {
-  const el = document.createElement("div");
-  el.className = "wall-card";
-
-  const meta = document.createElement("div");
-  meta.className = "wall-meta";
-
-  const nick = document.createElement("span");
-  nick.className = "wall-nick";
-  nick.textContent = r.nick || "匿名";
-  meta.appendChild(nick);
-
-  if (r.relation) {
-    const tag = document.createElement("span");
-    tag.className = "wall-tag";
-    tag.textContent = r.relation;
-    meta.appendChild(tag);
-  }
-
-  const time = document.createElement("span");
-  time.className = "wall-time";
-  time.textContent = formatWallTime(r.created_at);
-  meta.appendChild(time);
-
-  const body = document.createElement("p");
-  body.className = "wall-text";
-  body.textContent = r.content || "";
-
-  el.appendChild(meta);
-  el.appendChild(body);
-  return el;
-}
-
-/* ISO 时间 →「2026年9月17日 14:03」 */
-function formatWallTime(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return "";
-  const pad = n => (n < 10 ? "0" + n : "" + n);
-  return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
-         pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 
 /* ---------- 提交留言 ---------- */
@@ -1301,7 +1224,7 @@ fbForm.addEventListener("submit", async e => {
         content: opinion
       });
       showFeedbackDone(nick, false);
-      loadWall();                 /* 站主可能刚好审核了别的留言，顺手刷新 */
+      loadCount();                /* 刚提交的留言也算进总数，顺手刷新一下 */
       return;
     } catch (err) {
       if (err && err.duplicate) {
@@ -1387,9 +1310,6 @@ document.getElementById("fbAgain").addEventListener("click", () => {
   fbNick.focus();
 });
 
-/* 留言墙的手动刷新按钮 */
-document.getElementById("fbWallRefresh").addEventListener("click", loadWall);
-
 /* 进页面时先按设备预选，保证「其他」输入框状态与选项一致 */
 preselectDevice();
 syncOtherInputs();
@@ -1424,8 +1344,8 @@ function render() {
   navLinks.classList.remove("open");
   navToggle.setAttribute("aria-expanded", "false");
   activateReveals(document.querySelector(".view.active"));
-  /* 留言墙按需加载：只有进到留言页才发这个网络请求，不给首页增加多余负担 */
-  if (route === "feedback") loadWall();
+  /* 留言总数按需加载：只有进到留言页才发这个请求，不给首页增加多余负担 */
+  if (route === "feedback") loadCount();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
