@@ -19,6 +19,8 @@
     } catch (e) {}
   })();
 </script>
+<!-- 没有 JS 时开场层无法自动退场，直接不显示，保证页面可用（此时也不会加滚动锁） -->
+<noscript><style>.intro{display:none!important}</style></noscript>
 <style>
   :root{
     /* 品牌蓝阶：用于渐变、深色卡片，两套主题共用 */
@@ -621,9 +623,364 @@
     .msg{max-width:90%}
     .block-head h2{font-size:22px}
   }
+  /* ================= 开场动画（赛车主题 · 可跳过） ================= */
+  /* 独立图层：固定使用深色赛道配色，浅色/深色主题下都有足够对比度；
+     播放结束或点击跳过后由 JS 从 DOM 移除，不影响后续页面。 */
+  .intro{
+    position:fixed;inset:0;z-index:200;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(900px 520px at 50% 112%,rgba(47,124,224,.32),transparent 64%),
+      radial-gradient(760px 420px at 50% -12%,rgba(79,154,245,.14),transparent 60%),
+      linear-gradient(180deg,#070c19 0%,#0c1428 52%,#0a1020 100%);
+    animation:introIn .45s ease-out both;
+  }
+  .intro.is-out{animation:introOut .6s ease-in both;pointer-events:none}
+  @keyframes introIn{from{opacity:0}to{opacity:1}}
+  @keyframes introOut{from{opacity:1}to{opacity:0}}
+
+  /* 播放期间锁滚动：动画没结束不让页面滑动 */
+  html.intro-lock,html.intro-lock body{overflow:hidden}
+
+  .intro-scene{position:absolute;inset:0;overflow:hidden}
+
+  /* --- 赛道地面：中央虚线远端淡出，暗示赛道伸向远方 --- */
+  /* 灯亮期间不出现，跟着赛车一起登场（2.5s） */
+  .intro-road{
+    position:absolute;left:0;right:0;bottom:0;height:46%;
+    background:linear-gradient(180deg,rgba(12,20,38,0) 0%,rgba(15,25,46,.88) 32%,#0a1122 100%);
+    animation:roadIn .5s ease-out 2.5s both;
+  }
+  @keyframes roadIn{from{opacity:0}to{opacity:1}}
+  .intro-road::before{
+    content:"";position:absolute;left:50%;top:0;bottom:0;width:9px;transform:translateX(-50%);
+    background:repeating-linear-gradient(180deg,rgba(226,238,255,.6) 0 24px,transparent 24px 62px);
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 36%,#000 100%);
+    mask-image:linear-gradient(180deg,transparent 0%,#000 36%,#000 100%);
+  }
+  .intro-road::after{
+    content:"";position:absolute;left:0;right:0;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(150,190,255,.36),transparent);
+  }
+
+  /* --- 起跑线（黑白格） --- */
+  .intro-startline{
+    position:absolute;left:7%;right:7%;bottom:21%;height:9px;z-index:2;
+    background:repeating-linear-gradient(90deg,#e9f2ff 0 19px,#16233c 19px 38px);
+    border-radius:2px;box-shadow:0 0 20px rgba(150,190,255,.3);
+    animation:startlineIn .5s ease-out 2.6s both;
+  }
+  @keyframes startlineIn{from{opacity:0;transform:scaleX(.7)}to{opacity:.9;transform:scaleX(1)}}
+
+  /* --- 五盏发车红灯：占满整个屏幕 --- */
+  /* 灯组铺满视口（宽屏横排五盏 / 窄屏竖排五盏），
+     0.40s 起每隔 0.35s 亮一盏 -> 1.80s 全亮 -> 2.25s 一起熄灭 -> 2.40s 整组淡出 */
+  .intro-lights{
+    position:absolute;inset:0;z-index:4;
+    display:grid;grid-template-columns:repeat(5,1fr);
+    justify-items:center;align-items:center;align-content:center;
+    gap:1vmin;padding:1.6vmin;
+    animation:lightsIn .45s ease-out .15s both,lightsOut .42s ease-in 2.4s forwards;
+  }
+  @keyframes lightsIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+  @keyframes lightsOut{to{opacity:0}}
+  .intro-lights i{
+    width:min(18.4vw,54vmin);aspect-ratio:1;border-radius:50%;opacity:.07;
+    background:radial-gradient(circle at 36% 30%,#ffd6cc,#ff5240 42%,#d11f16 72%,#7a0e0b);
+    box-shadow:0 0 9vmin rgba(255,64,44,.65),0 0 2.4vmin rgba(255,150,120,.55);
+    animation:lightOn .12s linear both,lightOff .18s linear 2.25s forwards;
+  }
+  .intro-lights i:nth-child(1){animation-delay:.40s,2.25s}
+  .intro-lights i:nth-child(2){animation-delay:.75s,2.25s}
+  .intro-lights i:nth-child(3){animation-delay:1.10s,2.25s}
+  .intro-lights i:nth-child(4){animation-delay:1.45s,2.25s}
+  .intro-lights i:nth-child(5){animation-delay:1.80s,2.25s}
+  @keyframes lightOn{to{opacity:1}}
+  @keyframes lightOff{from{opacity:1}to{opacity:0}}
+  /* 窄屏改成竖排，让五盏灯同样撑满屏幕 */
+  @media (max-width:560px){
+    .intro-lights{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr);gap:1.2vmin;padding:4vmin 0}
+    .intro-lights i{width:min(60vw,16vh)}
+  }
+
+  /* --- 赛车 + 卡通车手（SVG 手绘） --- */
+  .intro-car{
+    position:absolute;left:50%;bottom:19%;width:min(330px,58vw);z-index:5;
+    transform:translateX(-50%);
+    /* 2.55s 才登场（此前完全不可见）-> 2.83s 到位 -> 3.00s 起步冲刺 -> 3.95s 出屏 */
+    animation:carRun 1.4s linear 2.55s both;
+  }
+  @keyframes carRun{
+    0%{transform:translateX(-50%) translateY(64px) scale(.96);opacity:0;
+       animation-timing-function:cubic-bezier(.2,.8,.3,1)}
+    20%{transform:translateX(-50%) translateY(0) scale(1);opacity:1;
+        animation-timing-function:linear}
+    32%{transform:translateX(-50%) translateY(-2px) scale(1.02);opacity:1;
+        animation-timing-function:cubic-bezier(.55,0,.9,.45)}
+    100%{transform:translateX(96%) scale(.72);opacity:0}
+  }
+  /* 内层负责怠速抖动，与冲刺位移互不干扰 */
+  .intro-car .car-shake{
+    transform-origin:50% 88%;
+    animation:carShake .16s linear 2.85s infinite;
+  }
+  @keyframes carShake{
+    0%{transform:translateY(0) rotate(0)}
+    50%{transform:translateY(-2.5px) rotate(-.5deg)}
+    100%{transform:translateY(0) rotate(0)}
+  }
+  .intro-car svg{display:block;width:100%;height:auto}
+
+  /* --- 速度线（冲刺阶段拉满，赛车出屏后淡出，给结尾定格留白） --- */
+  .intro-speed{
+    position:absolute;inset:0;z-index:3;opacity:0;
+    animation:speedOn .16s linear 3s both,speedOff .5s linear 3.85s forwards;
+  }
+  @keyframes speedOn{to{opacity:1}}
+  @keyframes speedOff{from{opacity:1}to{opacity:0}}
+  .intro-speed i{
+    position:absolute;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,rgba(196,224,255,.92),transparent);
+    animation:speedRun .34s linear infinite;
+  }
+  .intro-speed i:nth-child(1){top:19%;left:-16%;width:32%}
+  .intro-speed i:nth-child(2){top:31%;left:-24%;width:44%;animation-delay:.06s}
+  .intro-speed i:nth-child(3){top:44%;left:-12%;width:38%;animation-delay:.11s}
+  .intro-speed i:nth-child(4){top:57%;left:-28%;width:48%;animation-delay:.04s}
+  .intro-speed i:nth-child(5){top:69%;left:-18%;width:36%;animation-delay:.09s}
+  .intro-speed i:nth-child(6){top:81%;left:-22%;width:42%;animation-delay:.14s}
+  @keyframes speedRun{
+    from{transform:translateX(0);opacity:0}
+    25%{opacity:1}
+    to{transform:translateX(360%);opacity:0}
+  }
+
+  /* --- 终点：卡通人物挥方格旗 --- */
+  .intro-finish{
+    position:absolute;left:50%;bottom:13%;width:min(215px,40vw);z-index:4;
+    transform:translateX(-50%);opacity:0;
+    animation:finishIn .5s cubic-bezier(.2,1,.3,1) 3.95s both;
+  }
+  @keyframes finishIn{
+    from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.94)}
+    to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  }
+  .intro-finish svg{display:block;width:100%;height:auto}
+  .intro-finish .flag-arm{
+    transform-box:view-box;transform-origin:74px 100px;
+    animation:flagWave .95s ease-in-out infinite alternate;
+  }
+  @keyframes flagWave{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+
+  /* --- 结尾定格：一行字（It's all to drive for with Bryan） --- */
+  .intro-title{
+    position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:6;
+    text-align:center;opacity:0;padding:0 20px;width:100%;max-width:min(94vw,980px);
+    animation:titleIn .78s cubic-bezier(.2,1,.3,1) 4.7s both;
+  }
+  @keyframes titleIn{
+    from{opacity:0;transform:translateX(-50%) translateY(18px)}
+    to{opacity:1;transform:translateX(-50%) translateY(0)}
+  }
+  .intro-title h1{
+    font-size:clamp(24px,4.6vw,56px);font-weight:800;letter-spacing:.005em;line-height:1.22;
+    color:#fff;text-shadow:0 12px 46px rgba(47,124,224,.55);
+    text-wrap:balance;
+  }
+  .intro-title h1 em{font-style:normal;font-weight:900;color:#8cc4ff}
+
+  /* --- 跳过按钮 & 进度条 --- */
+  .intro-skip{
+    position:absolute;right:20px;bottom:20px;z-index:10;
+    display:inline-flex;align-items:center;gap:7px;
+    padding:10px 18px;border-radius:999px;cursor:pointer;
+    font:inherit;font-size:14px;font-weight:600;color:#dce8ff;
+    background:rgba(255,255,255,.08);border:1px solid rgba(170,200,255,.28);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:background .2s,border-color .2s,transform .2s;
+  }
+  .intro-skip:hover{background:rgba(255,255,255,.17);border-color:rgba(190,215,255,.5);transform:translateY(-1px)}
+  .intro-skip:active{transform:none}
+  .intro-bar{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:9;background:rgba(255,255,255,.08)}
+  .intro-bar i{
+    display:block;height:100%;width:0;
+    background:linear-gradient(90deg,#2f7ce0,#8cc4ff);
+    animation:barFill 6.2s linear both;
+  }
+  @keyframes barFill{to{width:100%}}
+
+  /* 系统开启"减少动态效果"时动画立即收敛（JS 侧也会直接跳过） */
+  @media (prefers-reduced-motion:reduce){
+    .intro,.intro *{
+      animation-duration:.01s!important;animation-delay:0s!important;
+      animation-iteration-count:1!important;
+    }
+  }
 </style>
 </head>
 <body>
+
+<!-- ================= 开场动画（赛车主题 · 可跳过） ================= -->
+<div class="intro" id="intro" aria-label="开场动画">
+  <div class="intro-scene" aria-hidden="true">
+
+    <!-- 赛道地面与起跑线 -->
+    <div class="intro-road"></div>
+    <div class="intro-startline"></div>
+
+    <!-- 五盏发车红灯：占满整屏，逐个亮起 -> 全亮 -> 熄灭（熄灭后赛车才登场） -->
+    <div class="intro-lights"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <!-- 速度线 -->
+    <div class="intro-speed"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+    <!-- 赛车 + 卡通车手 -->
+    <div class="intro-car">
+      <div class="car-shake">
+        <svg viewBox="0 0 264 132">
+          <defs>
+            <linearGradient id="introBodyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#74acf9"/><stop offset="1" stop-color="#1c55a0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- 地面投影 -->
+          <ellipse cx="140" cy="117" rx="110" ry="9" fill="rgba(0,0,0,.42)"/>
+
+          <!-- 尾翼 -->
+          <path d="M26 40h34v10H26z" fill="#123061"/>
+          <rect x="40" y="50" width="7" height="18" rx="2" fill="#123061"/>
+
+          <!-- 车身主体（车头朝右） -->
+          <path d="M32 92V62c0-6 4-10 10-11l92-9c13-11 30-16 48-13l22 4c21 8 36 21 45 32 3 4 3 9 1 13v14z"
+                fill="url(#introBodyGrad)"/>
+          <!-- 车身下沿暗部 -->
+          <path d="M32 92h226v-6c-40 4-190 6-226 6z" fill="#0f2b52" opacity=".5"/>
+
+          <!-- 座舱开口 -->
+          <path d="M136 54c14-9 30-12 46-9l14 3c-12 8-27 12-43 11z" fill="#0b1526"/>
+
+          <!-- 卡通车手：头盔 + 护目镜 + 微笑 -->
+          <path d="M157 31a15 15 0 0 1 30 0z" fill="#e0322a"/>
+          <circle cx="172" cy="34" r="15" fill="#f4f8ff"/>
+          <path d="M158 32h28v5a5 5 0 0 1-5 5h-18a5 5 0 0 1-5-5z" fill="#1b2a47"/>
+          <circle cx="166" cy="36" r="2.5" fill="#8fc0ff"/>
+          <circle cx="177" cy="36" r="2.5" fill="#8fc0ff"/>
+          <path d="M167 45c3 2.6 7 2.6 10 0" stroke="#1b2a47" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+          <!-- 车身无任何文字/号码 -->
+
+          <!-- 后轮 -->
+          <circle cx="78" cy="92" r="23" fill="#151c2d"/>
+          <circle cx="78" cy="92" r="9.5" fill="#93a9c9"/>
+          <circle cx="78" cy="92" r="3.5" fill="#4a5f80"/>
+          <!-- 前轮 -->
+          <circle cx="212" cy="92" r="23" fill="#151c2d"/>
+          <circle cx="212" cy="92" r="9.5" fill="#93a9c9"/>
+          <circle cx="212" cy="92" r="3.5" fill="#4a5f80"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 终点：卡通人物挥方格旗 -->
+    <div class="intro-finish">
+      <svg viewBox="0 0 200 220">
+        <ellipse cx="100" cy="209" rx="54" ry="8" fill="rgba(0,0,0,.4)"/>
+
+        <!-- 腿与鞋 -->
+        <path d="M84 150v46a8 8 0 0 0 16 0v-46z" fill="#16345f"/>
+        <path d="M108 150v46a8 8 0 0 0 16 0v-46z" fill="#16345f"/>
+        <ellipse cx="92" cy="201" rx="13" ry="7" fill="#0d1a30"/>
+        <ellipse cx="116" cy="201" rx="13" ry="7" fill="#0d1a30"/>
+
+        <!-- 身体（赛车服） -->
+        <path d="M74 96c0-14 11-24 26-24s26 10 26 24v56H74z" fill="#1c55a0"/>
+        <path d="M100 74v78" stroke="#0f2b52" stroke-width="2.5" opacity=".55"/>
+
+        <!-- 左臂：叉腰 -->
+        <path d="M78 104c-10 6-14 18-10 28" stroke="#16345f" stroke-width="13"
+              fill="none" stroke-linecap="round"/>
+
+        <!-- 举旗手臂（含旗杆与方格旗，整体绕肩膀摆动） -->
+        <g class="flag-arm">
+          <path d="M124 100V22" stroke="#d9e6ff" stroke-width="5" stroke-linecap="round"/>
+          <g>
+            <rect x="126" y="22" width="21" height="16" fill="#0d1424"/>
+            <rect x="147" y="22" width="21" height="16" fill="#f4f8ff"/>
+            <rect x="168" y="22" width="21" height="16" fill="#0d1424"/>
+            <rect x="126" y="38" width="21" height="16" fill="#f4f8ff"/>
+            <rect x="147" y="38" width="21" height="16" fill="#0d1424"/>
+            <rect x="168" y="38" width="21" height="16" fill="#f4f8ff"/>
+            <rect x="126" y="54" width="21" height="16" fill="#0d1424"/>
+            <rect x="147" y="54" width="21" height="16" fill="#f4f8ff"/>
+            <rect x="168" y="54" width="21" height="16" fill="#0d1424"/>
+          </g>
+          <path d="M74 100c14-4 34-6 50 0" stroke="#16345f" stroke-width="14"
+                fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- 头 -->
+        <circle cx="100" cy="56" r="24" fill="#f7d9bd"/>
+        <path d="M76 48a24 24 0 0 1 48 0z" fill="#1c55a0"/>
+        <path d="M76 48h48v5H76z" fill="#143a6b"/>
+        <circle cx="91" cy="59" r="3.2" fill="#1b2a47"/>
+        <circle cx="109" cy="59" r="3.2" fill="#1b2a47"/>
+        <path d="M91 69c4 5 14 5 18 0" stroke="#1b2a47" stroke-width="2.6"
+              fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 结尾定格：一行字 -->
+    <div class="intro-title">
+      <h1>It's all to drive for with <em>Bryan</em></h1>
+    </div>
+
+  </div>
+
+  <button class="intro-skip" id="introSkip" type="button">跳过 <span aria-hidden="true">›</span></button>
+  <div class="intro-bar"><i></i></div>
+</div>
+<script>
+  /* 开场动画控制：锁滚动 → 播完自动收尾 / 点"跳过"立即收尾 / 结束后从 DOM 移除。
+     放在开场层之后、主脚本之前，避免被后面的渲染逻辑影响。 */
+  (function () {
+    var intro = document.getElementById("intro");
+    if (!intro) return;
+    var root = document.documentElement;
+    var TOTAL = 6200;   /* 与 CSS 进度条 barFill 的 6.2s 对齐 */
+    var FADE = 620;     /* 与 .intro.is-out 的 0.6s 收尾动画对齐 */
+    var done = false, timer = null;
+
+    function removeLayer() {
+      if (intro.parentNode) intro.parentNode.removeChild(intro);
+    }
+    function end(immediate) {
+      if (done) return;
+      done = true;
+      if (timer) { clearTimeout(timer); timer = null; }
+      root.classList.remove("intro-lock");
+      if (immediate) { removeLayer(); return; }
+      intro.classList.add("is-out");
+      intro.addEventListener("animationend", function onEnd(e) {
+        if (e.target !== intro) return;
+        intro.removeEventListener("animationend", onEnd);
+        removeLayer();
+      });
+      setTimeout(removeLayer, FADE + 150);  /* 兜底：收尾动画事件缺失时也能移除 */
+    }
+
+    /* 系统开启"减少动态效果"：不播放，直接移除 */
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches) {
+      end(true);
+      return;
+    }
+
+    root.classList.add("intro-lock");
+    var skip = document.getElementById("introSkip");
+    if (skip) skip.addEventListener("click", function () { end(false); });
+    timer = setTimeout(function () { end(false); }, TOTAL);
+  })();
+</script>
 
 <!-- 背景层：渐变微流动 / 局部斜纹理（遮罩渐隐）/ 极淡噪点 -->
 <div class="bg-flow" aria-hidden="true"></div>
