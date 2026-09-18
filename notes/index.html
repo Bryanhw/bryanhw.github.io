@@ -165,7 +165,7 @@
 <main class="wrap">
   <article class="doc">
 <h1 class="doc-title">阎浩文个人主页 · v3 对话记录</h1>
-<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）<br><strong>线上地址</strong>：https://bryanhw.github.io/<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~10 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
+<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~11 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
 <hr class="rule">
 <h2>第 1 轮 · 把网页正式发布到网上（2026-09-17）</h2>
 <p><strong>我的需求</strong> 前两版都是存在电脑里、双击才能打开的网页，只能自己看。我想要一个<strong>能直接发链接给同学、老师和未来导师</strong>的网址，手机上也能正常打开。</p>
@@ -345,8 +345,46 @@
 <li>工作区提交：<code>79d2c0f</code>（改版）+ <code>aac932d</code>（文档回填）。</li>
 </ul>
 <hr class="rule">
+<h2>第 11 轮 · 把开发过程做成能直接发链接的对话记录页（2026-09-18）</h2>
+<p><strong>我的需求</strong></p>
+<ul>
+<li>先把 git 更新一下，把这次的对话追加进 markdown；</li>
+<li>然后<strong>发布到网上</strong>。</li>
+</ul>
+<p>（我选了「主页保持现状 + 新增一个对话记录页」这个范围：主页已经很稳、不想再动，只要多一个可以直接发给别人的链接。）</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>新增生成脚本，把 <code>docs/v3对话记录.md</code> 转成网页 <code>outputs/v3/notes.html</code>：</li>
+<ul>
+<li>自己写了个<strong>迷你 markdown 解析器</strong>（标题 / 段落 / 引用 / 有序无序列表 / 表格 / 分隔线 / 行内代码与加粗），<strong>不引入任何第三方库</strong>，继续维持「单文件、零外部依赖」；</li>
+<li>直接沿用主页那套 CSS 变量与渐变背景，所以两页看起来是同一个网站；</li>
+<li>两页<strong>主题互通</strong>：同一个 <code>localStorage</code> 键 <code>yhw-theme</code>、同一段防闪白脚本、同一个 favicon、同一个手机地址栏颜色；</li>
+<li>页面左上角有「← 返回主页」，页脚也有返回链接。</li>
+</ul>
+<li>发布到<strong>独立路径</strong> <code>notes/index.html</code> → https://bryanhw.github.io/notes/ ，<strong>主页文件一个字节都没动</strong>。</li>
+<li>生成脚本<strong>自带 14 条自检</strong>：任何一条不过就<strong>不写盘</strong>，从流程上保证不会产出半成品页面。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>编辑器报「文件写锁超时」，但系统层根本没有锁。</strong> 中途要对交接文档做较大改动时，编辑工具连续报写锁超时，后来连很小的改动也失败；单独去查系统层文件锁却显示<strong>谁都没有占用</strong>。最后绕开的办法是：<strong>先用「新建文件」写一段待追加的内容 + 一个拼接脚本，再用脚本直接改文件</strong>——新路径不受影响，问题也就绕过去了。</li>
+<li><strong>加粗横跨行内代码，导致页面上漏出字面的 <code>**</code>。</strong> 源文里有「<code>**…</code>代码<code>…**</code>」这种写法。第一版解析器按反引号把一行切成几块、<strong>每块各自</strong>处理加粗，结果加粗标记被切在两块里、永远配不成对。<strong>是自检先把它拦下来了</strong>（没写出坏文件），随后改成：先把代码段抽成占位符 → 整体转义 → 做加粗替换 → 最后还原代码段，加粗就能跨过代码段。</li>
+<li><strong>自检本身也会写错。</strong> 第一版表格数量的断言拿「以 <code>| </code> 开头的行数」去比 <code>&lt;table&gt;</code> 个数，逻辑根本不对（一个表格有多行）；还有一处把「轮次标题 10 个」写死，结果页面上其实是 <strong>11 个</strong> <code>&lt;h2&gt;</code>（10 轮 + 1 个「附：v3 最终状态速览」）。<strong>教训：断言要写「与源文数量相等」这种关系，而不是写死数字。</strong></li>
+<li><strong>手机端表格多出 5px 横向滚动。</strong> 表格设了 420px 最小宽度，而手机上卡片内宽只有约 417px，于是表格自己多出一条几乎看不见的横向滚动条。已在窄屏断点里取消最小宽度。</li>
+<li><strong>Pages 构建延迟又一次骗人。</strong> 推送成功后前 4 次探测都是 404，第 5 次（约 60 秒后）才拿到新页面并 SHA256 一致。<strong>「推上去了」≠「线上已更新」</strong>，这条再次被验证。</li>
+<li><strong>改这一页的顺序很重要</strong>：这份对话记录<strong>就是</strong>那个网页的内容源，所以必须「先追加文字 → 再重新生成网页 → 再发布」，否则线上页面会比 markdown 旧一轮。</li>
+</ul>
+<p><strong>最终校验结果</strong></p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>生成器自检（<code>build_notes.py</code>）</td><td><strong>14 / 14 PASS</strong>（不过则不写盘）</td></tr><tr><td>布局量化（<code>notes_layout.py</code>）</td><td><strong>20 / 20 PASS</strong>：浅/深 × 桌面/手机四种组合均<strong>无横向溢出</strong>、卡片不超视口、表格溢出 0px</td></tr><tr><td>主题切换实测</td><td>无头浏览器确认 <code>preferredColorScheme=1 → light</code>、<code>=0 → dark</code></td></tr><tr><td>定格截图目视</td><td>浅/深 × 桌面/手机 + 表格局部共 6 张，渲染正常</td></tr><tr><td>线上发布</td><td>前 4 次 404，<strong>第 5 次命中且 SHA256 逐字节一致</strong>；复核主页哈希<strong>未变</strong></td></tr><tr><td>文档一致性（<code>verify_docs.py</code>）</td><td><strong>ALL DOC CHECKS PASSED</strong></td></tr></tbody></table></div>
+<p><strong>发布结果</strong></p>
+<ul>
+<li>线上 https://bryanhw.github.io/notes/ 与本地 <code>outputs/v3/notes.html</code> <strong>SHA256 字节完全一致</strong>。</li>
+<li><strong>主页 https://bryanhw.github.io/ 未被改动</strong>（哈希 <code>93114817…95F87C4</code> 发布前后一致）。</li>
+<li>发布提交：<code>798e1a7</code>。</li>
+<li>桌面存档新增 <code>notes.html</code>，并同步更新 <code>v3开发记录.md</code> 与本文件。</li>
+</ul>
+<hr class="rule">
 <h2>附：v3 最终状态速览</h2>
-<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，103229 字节，SHA256 <code>93114817…95F87C4</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，103229 字节，SHA256 <code>93114817…95F87C4</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
 <blockquote><p>留言数据一行为 2026-09-17 的复核结果（上线时清空为 0，之后收到 2 条访客留言）。留言数会随访客留言变化，需要看当前值时以实时调用 <code>message_count()</code> 为准。</p></blockquote>
   </article>
 </main>
