@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="阎浩文个人主页 v3 开发对话记录 —— 从发布上线到留言系统、开场动画的完整过程，含踩坑与验证记录。" />
+<meta name="theme-color" content="#e4e1f9" id="metaTheme" />
+<title>阎浩文个人主页 · v3 对话记录</title>
+<meta name="author" content="阎浩文 Bryan" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231c55a0'/><text x='32' y='46' font-family='system-ui,sans-serif' font-size='40' font-weight='700' fill='%23ffffff' text-anchor='middle'>B</text></svg>" />
+<script>
+  /* 与主页同一套逻辑、同一个键：在样式生效前决定主题，避免首屏"闪白" */
+  (function () {
+    try {
+      var saved = localStorage.getItem("yhw-theme");
+      var dark = saved ? saved === "dark"
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches);
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root{
+    --blue-900:#0b1e3f; --blue-800:#10294f; --blue-700:#143a6b; --blue-600:#1c55a0;
+    --blue-500:#2f7ce0; --blue-400:#4f9af5; --blue-300:#86bdfb; --blue-100:#e7f0fd;
+    --ink:#102a4c; --muted:#5b6f8c; --bg:#e4e1f9; --card:#fff; --line:#d6e3f5;
+    --radius:18px; --shadow:0 10px 30px rgba(20,58,107,.10);
+    --nav-h:64px;
+    --accent:#1c55a0; --accent-strong:#143a6b;
+    --field-bg:#fff;
+    --body-text:#2a3f5e;
+    --nav-bg:rgba(255,255,255,.72); --nav-bg-solid:rgba(255,255,255,.94);
+    --nav-shadow:0 6px 22px rgba(20,58,107,.09);
+    --body-bg:
+      radial-gradient(1200px 620px at 12% -12%,#dcd8f9 0%,transparent 58%),
+      radial-gradient(1000px 600px at 100% 0%,#cecaf5 0%,transparent 52%),
+      linear-gradient(180deg,#eae8fb 0%,#dcd9f7 100%);
+    --sh-card:0 6px 18px rgba(20,58,107,.06);
+    color-scheme:light;
+}
+  :root[data-theme="dark"]{
+    --ink:#e8edfb; --muted:#95a4c6; --bg:#0a0f22; --card:#141b34; --line:#28324f;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --blue-100:#1c2545;
+    --accent:#7fb4f9; --accent-strong:#a9cdfd;
+    --field-bg:#0f1526;
+    --body-text:#c5d1ea;
+    --nav-bg:rgba(12,17,34,.72); --nav-bg-solid:rgba(12,17,34,.94);
+    --nav-shadow:0 6px 22px rgba(0,0,0,.50);
+    --body-bg:
+      radial-gradient(1200px 620px at 12% -12%,#161d3c 0%,transparent 58%),
+      radial-gradient(1000px 600px at 100% 0%,#131a38 0%,transparent 52%),
+      linear-gradient(180deg,#0b1126 0%,#080c1a 100%);
+    --sh-card:0 6px 18px rgba(0,0,0,.35);
+    color-scheme:dark;
+}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);background:var(--body-bg);background-attachment:fixed;
+    line-height:1.75;-webkit-font-smoothing:antialiased;
+    padding-top:var(--nav-h);transition:color .3s ease;
+  }
+  code{
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:.9em;background:var(--blue-100);color:var(--accent-strong);
+    padding:2px 6px;border-radius:6px;word-break:break-word;
+  }
+  a{color:var(--accent)}
+
+  /* ===== 导航（与主页同款） ===== */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;height:var(--nav-h);
+    background:var(--nav-bg);border-bottom:1px solid var(--line);
+    box-shadow:var(--nav-shadow);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  }
+  .nav-inner{
+    max-width:1080px;margin:0 auto;height:var(--nav-h);padding:0 20px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .brand{font-weight:700;letter-spacing:.3px;color:var(--ink);text-decoration:none}
+  .brand span{color:var(--accent)}
+  .nav-link{
+    color:var(--muted);text-decoration:none;font-size:14px;padding:8px 12px;
+    border-radius:10px;border:1px solid transparent;transition:.2s;
+  }
+  .nav-link:hover{color:var(--accent);background:var(--blue-100);border-color:var(--blue-300)}
+  .theme-toggle{
+    margin-left:auto;width:40px;height:40px;border-radius:50%;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center;transition:.2s;
+  }
+  .theme-toggle:hover{background:var(--blue-100);border-color:var(--blue-300)}
+  .theme-toggle .ic-light{display:none}
+  :root[data-theme="dark"] .theme-toggle .ic-light{display:block}
+  :root[data-theme="dark"] .theme-toggle .ic-dark{display:none}
+
+  /* ===== 正文 ===== */
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 72px}
+  .doc{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--sh-card);padding:34px 34px 30px;
+  }
+  .doc-title{
+    font-size:26px;line-height:1.4;margin-bottom:18px;padding-bottom:16px;
+    border-bottom:2px solid var(--line);
+  }
+  h2{
+    font-size:20px;margin:36px 0 14px;padding-left:12px;
+    border-left:4px solid var(--accent);line-height:1.45;
+  }
+  h3{font-size:16px;margin:24px 0 10px}
+  .doc > h2:first-of-type{margin-top:26px}
+  p{margin:10px 0;color:var(--body-text)}
+  .doc strong{color:var(--ink)}
+  ul,ol{margin:10px 0 10px 22px}
+  li{margin:6px 0;color:var(--body-text)}
+  hr.rule{border:0;border-top:1px dashed var(--line);margin:30px 0}
+  blockquote{
+    margin:16px 0;padding:14px 18px;background:var(--blue-100);
+    border-left:4px solid var(--blue-300);border-radius:0 12px 12px 0;
+  }
+  blockquote p{margin:6px 0;color:var(--body-text);font-size:14.5px}
+  .table-wrap{overflow-x:auto;margin:16px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--blue-100);color:var(--ink);font-weight:600;white-space:nowrap}
+  td{color:var(--body-text)}
+  tbody tr:nth-child(even){background:var(--blue-100)}
+  footer{
+    max-width:820px;margin:0 auto;padding:0 20px 56px;
+    color:var(--muted);font-size:13px;text-align:center;line-height:2;
+  }
+  footer a{color:var(--muted)}
+
+  @media (max-width:560px){
+    .wrap{padding:20px 14px 56px}
+    .doc{padding:22px 18px 20px;border-radius:14px}
+    .doc-title{font-size:21px}
+    h2{font-size:17.5px;margin:28px 0 12px}
+    body{line-height:1.7}
+    .brand{display:none}
+    /* 手机上卡片本就窄，取消表格最小宽度，让两列正好铺满、不留多余的横向滚动 */
+    table{min-width:0}
+    th,td{padding:8px 10px}
+    th{white-space:normal}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">阎浩文 <span>Bryan</span></a>
+    <a class="nav-link" href="/">← 返回主页</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换深色 / 浅色主题" title="切换深色 / 浅色主题">
+      <span class="ic-dark" aria-hidden="true">☾</span>
+      <span class="ic-light" aria-hidden="true">☀</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="doc">
+<h1 class="doc-title">阎浩文个人主页 · v3 对话记录</h1>
+<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）<br><strong>线上地址</strong>：https://bryanhw.github.io/<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~10 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
+<hr class="rule">
+<h2>第 1 轮 · 把网页正式发布到网上（2026-09-17）</h2>
+<p><strong>我的需求</strong> 前两版都是存在电脑里、双击才能打开的网页，只能自己看。我想要一个<strong>能直接发链接给同学、老师和未来导师</strong>的网址，手机上也能正常打开。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>网页托管到 <strong>GitHub Pages</strong> —— 免费静态托管、自带 HTTPS，不需要买服务器和域名。</li>
+<li>新建代码仓库 <code>Bryanhw/bryanhw.github.io</code>，线上地址 <strong>https://bryanhw.github.io/</strong>。</li>
+<li>补上浏览器标签页图标（favicon：蓝底圆角白字「B」）与作者信息、页面描述等 meta。</li>
+<li>补上 <code>.nojekyll</code> 与 <code>README.md</code>，确保 Pages 能正确构建。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li>本机的 <code>github.com:443</code> HTTPS 传输间歇性被阻断，普通 <code>git push</code> 会失败。最终改为<strong>走 SSH，并把端口换成 443</strong>（在 <code>~/.ssh/config</code> 里把 <code>HostName</code> 指向 <code>ssh.github.com</code>、<code>Port 443</code>），推送通道才稳定下来。</li>
+<li>GitHub Pages 构建有 30~60 秒延迟，<strong>「推上去了」不等于「线上已更新」</strong>。为避免自欺，验证一律用 <strong>SHA256 字节级比对</strong>，确认线上拿到的确实是本地那一份。</li>
+</ul>
+<hr class="rule">
+<h2>第 2 轮 · 深色 / 浅色主题一键切换</h2>
+<p><strong>我的需求</strong> 晚上看这个页面太亮了，希望能切换成深色；而且<strong>要记住我的选择</strong>，下次打开还是上次那个主题，不要每次都重新点。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>右上角新增主题切换按钮，浅色（蓝白）↔ 深色（深夜蓝）。</li>
+<li>所有颜色统一改用 <strong>CSS 变量</strong>定义在 <code>:root</code>，深色模式通过 <code>:root[data-theme="dark"]</code> 整体覆盖 —— 切换主题不用改任何一处样式代码。</li>
+<li>访客的选择存在浏览器本地（<code>localStorage</code>，键名 <code>yhw-theme</code>），下次自动沿用。</li>
+<li>第一次访问、还没手动选过时，<strong>自动跟随电脑或手机的深色模式设置</strong>。</li>
+<li><code>&lt;head&gt;</code> 内置一段内联脚本，在页面渲染前就确定主题，<strong>避免「先白闪一下再变黑」</strong>。</li>
+<li>手机上连浏览器地址栏颜色也会跟着变（<code>theme-color</code> meta 动态更新）。</li>
+</ul>
+<hr class="rule">
+<h2>第 3 轮 · 做留言板（第一版：转发到我的邮箱）</h2>
+<p><strong>我的需求</strong> 首页只有我的信息，别人看完没法跟我说点什么。我想加一个留言入口，让访客能留个话给我。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>首页顶部新增「✍️ 给我留言」按钮，点进去是留言表单，也可以用网址 <code>#/feedback</code> 直达。</li>
+<li>表单 4 项：昵称（最多 24 字）、与我的关系（朋友 / 同学 / 家人 / 老师 / 其他，选「其他」才出现补充输入框）、正在使用的设备（手机 / 平板 / 电脑 / 其他，按访客当前设备<strong>自动预选</strong>）、留言内容（最多 300 字，右下角<strong>实时字数提示</strong>）。</li>
+<li>提交通道用 <strong>FormSubmit</strong> 把留言转发到我的邮箱，并保留 <code>mailto:</code> 作为最后兜底（三级：FormSubmit → 打开邮件客户端）。</li>
+<li>加上防重复提交与提交结果提示。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li>最早的方案只有 <code>mailto:</code> 链接。实测发现：<code>mailto:</code> 能不能用，完全取决于访客电脑装没装邮件软件、有没有配好账号 —— 本机就出现<strong>「邮件窗口弹出来了，但里面是空的」</strong>，访客以为提交成功，我这边却什么都收不到。所以改成了以服务端转发为主、<code>mailto:</code> 只做最后兜底。</li>
+</ul>
+<hr class="rule">
+<h2>第 4 轮 · 换成我自己的数据库</h2>
+<p><strong>我的需求</strong> 留言只变成我邮箱里的一封邮件，<strong>留不住、没法统计、也没法管理</strong>；而且完全依赖第三方的免费转发服务，总觉得不踏实。我想让留言真正存进我自己的地方。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>接入 <strong>Supabase</strong>（免费版 PostgreSQL 数据库），新建数据表 <code>messages</code>：昵称、关系、访问设备、留言内容、提交时间（服务器时间，访客无法伪造），以及一个仅给我自己参考的标记列 <code>approved</code>。</li>
+<li><strong>数据库层面</strong>写死三条规则，而不是靠前端自觉：</li>
+<ol>
+<li>匿名访客<strong>只能新增</strong>留言；</li>
+<li>新增时<strong>只能标为「未审核」</strong>（即使有人改前端代码也没用，数据库会直接拒绝）；</li>
+<li>匿名访客<strong>完全读不到留言内容</strong>。</li>
+</ol>
+<li>网页源码里<strong>只放一把可公开的 publishable key</strong>（它从设计上就是给公开网页用的）；<strong>真正的管理者密钥 <code>service_role</code> 绝不进网页</strong>。</li>
+<li>为了保持「单文件、零依赖」的设计，<strong>没有引入官方 JS 库</strong>，直接用浏览器原生 <code>fetch</code> 调用接口。</li>
+<li>三级兜底保留：<strong>数据库 → 邮箱转发（FormSubmit） → 打开邮件客户端</strong>，前一级失败才用下一级。</li>
+</ul>
+<hr class="rule">
+<h2>第 5 轮 · 公开留言墙 → 改为只站主可见 + 显示真实留言总数</h2>
+<p><strong>我的需求</strong> 一开始我设想的是把留言<strong>审核后公开</strong>展示在页面上（留言墙）。后来觉得不行：访客留言时默认是「说给我一个人听」，公开出去未必是他们想要的；而且公开内容一旦出现不合适的话，我还得盯着删。所以<strong>留言墙不要了，只有我能看</strong>。但是 —— 一条都不显示的话，页面会显得没人来过，我希望访客能知道这里<strong>确实有人在留言</strong>，所以想显示一个真实的留言条数。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>移除留言墙相关的前端代码（<code>loadWall()</code> / <code>wallCard()</code> / <code>formatWallTime()</code> / 刷新按钮等全部删除，静态校验确认这些标识符出现次数为 <strong>0</strong>）。</li>
+<li>数据库新增函数 <code>message_count()</code>：<code>security definer</code> + <code>stable</code>，<strong>只返回一个数字</strong>，访客拿不到任何一条留言内容。</li>
+<li>留言页新增 <code>loadCount()</code>：进入留言页才去请求这个数字（首页不产生该请求，避免浪费）。</li>
+<li><strong>一条留言都没有时</strong>显示：「还没有收到留言，欢迎你做第一个。」；有留言时显示「已收到 <strong>N</strong> 条留言」（N 加粗）。</li>
+<li>万一数据库连不上、或返回的东西不是数字，<strong>这一行安静地隐藏</strong>，绝不在页面上弹报错。</li>
+<li>读取权限整体撤销，只单独放开「读总数」这一个函数 —— 防垃圾留言从「靠审核」变成「<strong>根本读不到</strong>」。</li>
+</ul>
+<hr class="rule">
+<h2>第 6 轮 · 新留言自动邮件提醒</h2>
+<p><strong>我的需求</strong> 留言虽然存住了，但我总不能天天登录后台去看有没有新留言。<strong>有留言就主动告诉我</strong>。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>在数据库内部装一个能发网络请求的扩展（<code>pg_net</code>），在 <code>messages</code> 表上挂触发器：<strong>每写进一行，就异步发一封提醒邮件</strong>到 <code>yhw20070910@outlook.com</code>。</li>
+<li>邮件标题形如 <code>[个人主页新留言] 昵称（关系）</code>，正文是一张表格：昵称、关系、访问设备、留言全文、提交时间。</li>
+<li><strong>整个提醒过程不含任何前端代码</strong>，因此前端不需要放任何额外密钥。</li>
+<li>提醒是<strong>异步</strong>的：邮件服务万一出问题，<strong>不会影响留言本身的保存</strong>，留言一定存得住。</li>
+<li>即使访客提交完立刻关掉页面，邮件照样会发出。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li>创建 <code>pg_net</code> 时按常规写法指定 schema 会报 <code>schema "net" does not exist</code> —— 原因是 <code>pg_net</code> 自己会创建名为 <code>net</code> 的命名空间，而「指定存放 schema」的语法要求该 schema 事先存在。正确写法是把它装到已存在的 <code>extensions</code> schema 下，装完仍然用 <code>net.http_post</code> 调用。</li>
+</ul>
+<hr class="rule">
+<h2>第 7 轮 · 提交前自查 + 清理测试数据 + 修正历史文档 + 线上核验</h2>
+<p><strong>我的需求</strong> 这份网页是作业，要交出去了。我希望：<strong>文件干净</strong>（不要夹带脚本、临时文件、密钥）、<strong>数据干净</strong>（开发时我自己发的测试留言不要留在数据库里）、<strong>文档准确</strong>（前面几版文档里已经改过的文件名、文件夹名别再是错的），而且这些都要<strong>有据可查</strong>，不能靠「我觉得应该没问题」。</p>
+<p><strong>AI 的交付</strong></p>
+<p><strong>① 提交前自查（全部通过）</strong></p>
+<ul>
+<li>确认页面真正<strong>单文件自包含</strong>：外部 URL 0 个、相对路径引用 0 个、<code>file://</code> 0 个。</li>
+<li>扫描密钥：<strong>没有</strong>数据库密码、连接串、私钥、<code>service_role</code>、<code>sb_secret_</code> —— 那 3 处「命中」经人工核对，都是「<strong>绝对不要</strong>把 service_role key 放进去」这类警示注释的误报。</li>
+<li>确认页面<strong>不泄露任何访客留言内容</strong>；确认历史文档保留不删（只修正错的引用）。</li>
+<li>确认工作区仓库 <code>git remote -v</code> 为空，<strong>不可能被误推</strong>。</li>
+</ul>
+<p><strong>② 静态校验</strong>（<code>check_v3.py</code>） 35 个 id 全唯一、28 个 <code>getElementById</code> 目标全部存在、括号平衡、46 个 CSS 变量全部有定义、字数上限 <code>maxlength</code> 与常量 <code>FB_OPINION_MAX</code> 一致；留言墙遗留标识符 <strong>0 处</strong>。结果：<strong>ALL STATIC CHECKS PASSED</strong>。</p>
+<p><strong>③ 数据库测试数据归零</strong> 开发期间留下的测试留言（最后一条是我自己发的 <code>333333</code>）与误建的空表全部清理。收尾核验：匿名调用 <code>message_count()</code> 返回 <strong><code>0</code></strong>，匿名读取留言返回<strong>空</strong>。</p>
+<p><strong>④ 修正历史文档里的失效引用</strong> 前面几版的文档里提到了后来已改名的文件与文件夹，逐处修正（工作区版与桌面存档版都改）：<code>开发对话记录.md</code> → <code>v1开发记录.md</code>、文件夹名 <code>cst ai 智能网页作业</code> → <code>cst ai 个人主页作业</code>、文件名自指错误等。历史文档<strong>保留不删</strong>，只把错的引用改对。</p>
+<p><strong>⑤ 线上核验</strong> 用无头浏览器抓取线上 <code>#/feedback</code> 页面的 DOM，确认留言计数那一行实际渲染为「还没有收到留言，欢迎你做第一个。」，并且对访客可见。 线上文件与本地存档、工作区三方 <strong>SHA256 完全一致</strong>：<code>612A8FDA…C2FE3</code>，75582 字节。</p>
+<p><strong>过程中的坑（值得记下来）</strong></p>
+<ul>
+<li><strong>Supabase SQL Editor 的结果面板只显示最后一条语句的结果。</strong> 多条语句一起跑，前面语句的明细会被盖住；要单独看某条，得在编辑器里<strong>选中那一段</strong>再按 <code>Ctrl+Enter</code>。</li>
+<li><strong>结果面板可能是上一次查询的残留。</strong> 面板显示「1 row」并不代表我刚跑的那条语句真的执行了 —— 我用 <code>delete</code> 删了两次都没生效，最后是去 <strong>Dashboard → Table Editor</strong> 里勾选那行删掉的（表格变成「No rows found」这种看得见的反馈最可靠）。</li>
+<li>教训：<strong>判断一次写入是否生效，必须以独立的只读查询返回值为准</strong>，不能依赖「我点了 Run / 看到 Success」。</li>
+<li>排查过程中还顺手排除了三个看似可疑、其实无关的原因：不是缓存（<code>CF-Cache-Status: DYNAMIC</code>）、不是项目搞错（页面与后台是同一个项目）、不是 RLS（<code>rls_forced = false</code>，且本就没有 DELETE 策略）。</li>
+</ul>
+<hr class="rule">
+<h2>第 8 轮 · 把网址发给我 + 整理归档</h2>
+<p><strong>我的需求</strong> 把网站发给我看一下；另外把这次的东西<strong>更新到 git</strong>，并把我们这段对话<strong>整理成 markdown 文件</strong>。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>在内置浏览器中打开 https://bryanhw.github.io/ ，并给出留言页 <code>#/feedback</code> 与代码仓库地址。</li>
+<li>把 v3 的文档、SQL 脚本与网页工作版纳入 git 版本管理；同时把会话上传目录（临时截图）排除出版本管理，避免临时文件混进仓库。</li>
+<li>生成本文件 <code>docs/v3对话记录.md</code>，并同步一份到桌面存档文件夹，使 v1 / v2 / v3 三版的「开发记录 + 对话记录」都齐全。</li>
+</ul>
+<hr class="rule">
+<h2>第 9 轮 · 开场动画：五盏发车灯 → 赛车冲刺 → 结尾一行字（2026-09-18）</h2>
+<p><strong>我的需求</strong> 希望打开网站时先来一段<strong>赛车主题的开场动画</strong>，有点仪式感，不要一进来就是干巴巴的信息页；但要保留「跳过」按钮，别让人干等。</p>
+<p><strong>AI 的交付（含一次改版）</strong></p>
+<ul>
+<li>初版做的是「发车灯<strong>倒数 3-2-1</strong> → 赛车冲刺 → 卡通车手挥方格旗」。</li>
+<li>看过之后我提出改版，最终定稿为： <strong>五盏红灯铺满整屏、逐个点亮 → 五盏同时熄灭（这才是真实的 F1 发车信号）→ 赛车才登场冲刺 → 终点车手挥方格旗 → 定格一行字 <code>It's all to drive for with Bryan</code></strong>，全程约 6.2 秒。</li>
+<li>灯、赛车、车手、方格旗、速度线全部是<strong>手写的 SVG + CSS</strong>，不是图片 —— 不增加任何外部依赖，放大也不模糊。</li>
+<li>手机上五盏灯自动改成竖排，同样铺满屏幕；电脑上保持横排（更接近真实 F1 发车灯）。</li>
+<li>沿用我此前的要求：<strong>车身不含任何文字或号码</strong>。</li>
+<li>点「跳过」、或系统开启了「减少动态效果」，都会不播放直接进主页。</li>
+<li>已于 2026-09-18 上线（提交 <code>885b117</code>）。</li>
+</ul>
+<p><strong>AI 是怎么保证「顺序对」的</strong> 动画顺序不能靠肉眼看截图来判断。AI 写了一个时序推演脚本 <code>intro_timeline.py</code>：从浏览器 CSSOM 里直接读出每个动画的延迟、时长、填充模式与关键帧，按 CSS 规则<strong>算出</strong>每一毫秒各元素的不透明度，再断言编排顺序。这个脚本第一次运行就抓到了两个真 bug（见下）。</p>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>CSS 隐式 <code>from</code> 的陷阱（真 bug）</strong>：写 <code>@keyframes fadeOut{to{opacity:0}}</code> 时，隐式 <code>from</code> 取的是<strong>元素基础样式的值</strong>，而不是上一帧的值。如果基础值本来就是 0，整段动画就退化成 <code>0 → 0</code> 的<strong>空动画</strong>，元素会<strong>直接跳变</strong>而不是淡出。<code>lightOff</code> 与 <code>speedOff</code> 都中招了，修法是显式写出 <code>from{opacity:1}</code>。这个问题肉眼极难发现，是时序脚本抓出来的。</li>
+<li><strong>虚拟时间不推进 CSS 动画时钟</strong>：无头浏览器的 <code>--virtual-time-budget</code> 只推进 <code>setTimeout</code>，CSS 动画的 <code>currentTime</code> 恒为 0。所以「第 3 秒画面长什么样」不能用它来判断，只能靠 CSSOM 推演 + 强制定格的截图探针。</li>
+<li><strong>GitHub 的 SSH 通道（443 端口）这次也时通时断</strong>，大约三次才能成功一次（失败串是 <code>port 443: Connection timed out</code>）。解决办法是把「提交」和「上传」解耦，只对上传做反复重试，避免留下「已提交但没推上去」的半成品状态。</li>
+</ul>
+<hr class="rule">
+<h2>第 10 轮 · 开场动画第三轮改版：赛车现代化 + 车头朝左 + 方向盘特写（2026-09-18）</h2>
+<p><strong>我的需求</strong> 我找了两张参考图，提了三点要求：</p>
+<ol>
+<li><strong>赛车造型要更现代</strong> —— 参考 FIA 2026 概念车渲染图：深蓝渐变车身 + 红/黄/白拉花、Halo 座舱保护结构、大轮毂罩、多层前翼、宽大尾翼。</li>
+<li><strong>车头方向调转</strong> —— 原来车头是朝右冲的，改成<strong>整体镜像朝左</strong>，速度线方向也要跟着反过来。</li>
+<li><strong>新增一个方向盘特写镜头</strong> —— 参考真实 F1 方向盘：碳纤维蝶形盘体、顶部换挡灯带、中间液晶屏显示挡位与数据、左右多功能按钮、握把指示灯。</li>
+</ol>
+<p><strong>AI 先问了我三个问题（这点很好）</strong></p>
+<ul>
+<li>赛车方向怎么调？→ 我选了<strong>整体镜像，车头朝左</strong>（而不是只翻转车头）。</li>
+<li>方向盘插在哪一段？→ 我选了<strong>「灯灭之后、赛车冲刺之前」</strong>。</li>
+<li>方向盘屏幕上显示什么？→ 我选了<strong>显示挡位与数据</strong>。</li>
+</ul>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>赛车按「车头朝左」<strong>整张重画</strong>：前翼在最左、尾翼在最右，深蓝渐变车身 + 三色拉花 + Halo + 大轮毂罩 + 卡通车手；冲刺关键帧终点改为向左的 <code>translateX(-232%)</code>；速度线定位由 <code>left</code> 改成 <code>right</code>，飞行方向同步反向。</li>
+<li>新增方向盘特写：碳纤维斜纹底、顶部 10 颗换挡灯<strong>逐颗亮起</strong>（绿 4 / 黄 3 / 红 3）、中央屏幕显示挡位 <code>8</code> 与 <code>LAP 88</code> / <code>56.0</code> / <code>+1.250</code> 及 4 组数据、左右按钮区（<code>N</code>/<code>OV</code>/<code>FUEL</code>/<code>MIX</code>/<code>SCEN</code> 与 <code>PIT</code>/<code>OK</code>/<code>PL</code>/<code>SOC</code> 等）、底部四色旋钮、两侧握把指示灯；盘面还会绕盘心<strong>微微打一下方向</strong>。</li>
+<li>因为多了方向盘这一段，<strong>总时长从 6.2 秒延长到 7.4 秒</strong>（给方向盘留出约 1.1 秒的可读时间，结尾保留约 1 秒定格）。</li>
+<li>已发布上线（提交 <code>aded24f</code>）。</li>
+</ul>
+<p><strong>AI 主动加的两条顺序硬约束</strong></p>
+<ul>
+<li>方向盘必须在<strong>灯灭之后</strong>才出现；</li>
+<li>方向盘必须在<strong>赛车出现之前</strong>完全退场（否则赛车会穿过方向盘）。</li>
+</ul>
+<p>这两条都写进了时序脚本做断言：实测方向盘 2.50s 出现、2.90s 全亮、4.00s 淡出，赛车 4.05s 才登场。</p>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>方向盘一开始没有居中（真 bug）。</strong> 居中位移 <code>translate(-50%,-50%)</code> 原本只写在动画关键帧里，于是「动画一旦被禁用」，盘面就贴在屏幕中心、右侧溢出屏幕。这是几何探针用 <code>animation:none</code> 定格元素时暴露出来的。<strong>教训：居中这类基础定位要写在元素的基础样式里，动画只负责在其之上叠加位移和缩放。</strong></li>
+<li><strong>校验脚本自己也有 bug。</strong> 时序脚本里嵌套函数用 <code>global ok</code> 只能改模块级变量，改不动 <code>main()</code> 里的局部变量，导致 <strong>FAIL 根本没计入退出码</strong> —— 脚本报「通过」其实是假的。改用可变容器 <code>state = {"ok": True}</code> 才修好。<strong>这说明校验脚本本身也要被质疑。</strong></li>
+<li><strong>收尾检查的虚拟时间预算必须跟着总时长走。</strong> 总时长改成 7.4s 后，原来卡 8s 的收尾检查会失败（7.4s + 0.62s 收尾 ≈ 8.1s 才移除），已改成 9s。</li>
+<li><strong>B 站参考视频打不开</strong>（返回 412），参考图之外的细节只能靠公开资料和自己的判断。</li>
+<li><strong>这次推送一次就成功了</strong>（上一轮要重试好几次），印证了那个「时通时断」确实是间歇性的，不是配置错误。</li>
+</ul>
+<p><strong>最终校验结果</strong></p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>网页静态结构（<code>check_v3.py</code>）</td><td>40 个 id 全唯一、30 个 <code>getElementById</code> 目标全存在、CSS 变量全有定义 —— <strong>ALL STATIC CHECKS PASSED</strong></td></tr><tr><td>时序推演（<code>intro_timeline.py</code>）</td><td><strong>21 / 21 PASS</strong></td></tr><tr><td>几何布局（<code>intro_geom.py</code>）</td><td>方向盘桌面 560×382 / 移动 413×282，<strong>居中且不超出视口</strong>；旋转原点实测与理论值吻合</td></tr><tr><td>收尾与降级（<code>intro_rm.py</code>）</td><td><strong>ALL CHECKS PASSED</strong>（含「减少动态效果」直接跳过）</td></tr><tr><td>定格截图（<code>intro_probe.py</code>）</td><td>8 张全部生成，并<strong>实际查看图片</strong>确认赛车与方向盘的渲染细节</td></tr><tr><td>线上端到端（<code>check_live_intro.py</code>）</td><td><strong>18 / 18 PASS</strong></td></tr><tr><td>文档一致性（<code>verify_docs.py</code>）</td><td><strong>ALL DOC CHECKS PASSED</strong></td></tr></tbody></table></div>
+<p><strong>发布结果</strong></p>
+<ul>
+<li>线上 https://bryanhw.github.io/ 与本地文件 <strong>SHA256 字节完全一致</strong>（<code>931148174DABA7A7…</code>，103229 字节）。</li>
+<li>桌面存档 <code>index.html</code> 同步为同一字节。</li>
+<li>工作区提交：<code>79d2c0f</code>（改版）+ <code>aac932d</code>（文档回填）。</li>
+</ul>
+<hr class="rule">
+<h2>附：v3 最终状态速览</h2>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，103229 字节，SHA256 <code>93114817…95F87C4</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
+<blockquote><p>留言数据一行为 2026-09-17 的复核结果（上线时清空为 0，之后收到 2 条访客留言）。留言数会随访客留言变化，需要看当前值时以实时调用 <code>message_count()</code> 为准。</p></blockquote>
+  </article>
+</main>
+
+<footer>
+  <p>本页由 <code>docs/v3对话记录.md</code> 生成 · <a href="/">返回主页</a></p>
+  <p>阎浩文 Bryan · 个人主页 v3</p>
+</footer>
+
+<script>
+  (function () {
+    var KEY = "yhw-theme";
+    var root = document.documentElement;
+    var btn = document.getElementById("themeToggle");
+    var metaTheme = document.getElementById("metaTheme");
+    function paint(t) {
+      root.setAttribute("data-theme", t);
+      if (metaTheme) metaTheme.setAttribute("content", t === "dark" ? "#0a0f22" : "#e4e1f9");
+    }
+    paint(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
+    btn.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      paint(next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>
