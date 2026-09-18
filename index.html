@@ -703,12 +703,12 @@
     .intro-lights i{width:min(60vw,16vh)}
   }
 
-  /* --- 赛车 + 卡通车手（SVG 手绘） --- */
+  /* --- 赛车 + 卡通车手（SVG 手绘 · 车头朝左） --- */
   .intro-car{
-    position:absolute;left:50%;bottom:19%;width:min(330px,58vw);z-index:5;
+    position:absolute;left:50%;bottom:19%;width:min(360px,64vw);z-index:5;
     transform:translateX(-50%);
-    /* 2.55s 才登场（此前完全不可见）-> 2.83s 到位 -> 3.00s 起步冲刺 -> 3.95s 出屏 */
-    animation:carRun 1.4s linear 2.55s both;
+    /* 4.05s 才登场（此前完全不可见）-> 4.33s 到位 -> 4.50s 起步，向左冲刺 -> 5.45s 出屏 */
+    animation:carRun 1.4s linear 4.05s both;
   }
   @keyframes carRun{
     0%{transform:translateX(-50%) translateY(64px) scale(.96);opacity:0;
@@ -717,12 +717,13 @@
         animation-timing-function:linear}
     32%{transform:translateX(-50%) translateY(-2px) scale(1.02);opacity:1;
         animation-timing-function:cubic-bezier(.55,0,.9,.45)}
-    100%{transform:translateX(96%) scale(.72);opacity:0}
+    /* 向左冲出画面：车头朝左，与行驶方向一致（不会倒着开） */
+    100%{transform:translateX(-232%) scale(.66);opacity:0}
   }
   /* 内层负责怠速抖动，与冲刺位移互不干扰 */
   .intro-car .car-shake{
     transform-origin:50% 88%;
-    animation:carShake .16s linear 2.85s infinite;
+    animation:carShake .16s linear 4.35s infinite;
   }
   @keyframes carShake{
     0%{transform:translateY(0) rotate(0)}
@@ -731,10 +732,10 @@
   }
   .intro-car svg{display:block;width:100%;height:auto}
 
-  /* --- 速度线（冲刺阶段拉满，赛车出屏后淡出，给结尾定格留白） --- */
+  /* --- 速度线（冲刺阶段拉满，赛车出屏后淡出，给结尾定格留白；随赛车向左掠过） --- */
   .intro-speed{
     position:absolute;inset:0;z-index:3;opacity:0;
-    animation:speedOn .16s linear 3s both,speedOff .5s linear 3.85s forwards;
+    animation:speedOn .16s linear 4.5s both,speedOff .5s linear 5.35s forwards;
   }
   @keyframes speedOn{to{opacity:1}}
   @keyframes speedOff{from{opacity:1}to{opacity:0}}
@@ -743,23 +744,71 @@
     background:linear-gradient(90deg,transparent,rgba(196,224,255,.92),transparent);
     animation:speedRun .34s linear infinite;
   }
-  .intro-speed i:nth-child(1){top:19%;left:-16%;width:32%}
-  .intro-speed i:nth-child(2){top:31%;left:-24%;width:44%;animation-delay:.06s}
-  .intro-speed i:nth-child(3){top:44%;left:-12%;width:38%;animation-delay:.11s}
-  .intro-speed i:nth-child(4){top:57%;left:-28%;width:48%;animation-delay:.04s}
-  .intro-speed i:nth-child(5){top:69%;left:-18%;width:36%;animation-delay:.09s}
-  .intro-speed i:nth-child(6){top:81%;left:-22%;width:42%;animation-delay:.14s}
+  .intro-speed i:nth-child(1){top:19%;right:-16%;width:32%}
+  .intro-speed i:nth-child(2){top:31%;right:-24%;width:44%;animation-delay:.06s}
+  .intro-speed i:nth-child(3){top:44%;right:-12%;width:38%;animation-delay:.11s}
+  .intro-speed i:nth-child(4){top:57%;right:-28%;width:48%;animation-delay:.04s}
+  .intro-speed i:nth-child(5){top:69%;right:-18%;width:36%;animation-delay:.09s}
+  .intro-speed i:nth-child(6){top:81%;right:-22%;width:42%;animation-delay:.14s}
   @keyframes speedRun{
     from{transform:translateX(0);opacity:0}
     25%{opacity:1}
-    to{transform:translateX(360%);opacity:0}
+    to{transform:translateX(-360%);opacity:0}
   }
+
+  /* --- 方向盘特写（车手视角 · 插在「五灯全灭」之后、「赛车冲刺」之前） --- */
+  /* 2.45s 从下方升起入场 -> 2.95s 方向盘微打方向 + LED 换挡灯逐颗亮起 + 屏幕数据亮起
+     -> 3.60s 放大淡出（4.00s 前彻底退场），把画面让给 4.05s 登场的赛车 */
+  .intro-wheel{
+    position:absolute;left:50%;top:50%;z-index:7;
+    width:min(560px,84vw);opacity:0;
+    /* 居中位移写在基础样式里（关键帧只在此基础上叠加位移/缩放），
+       这样即使动画被禁用，盘面依然居中、不会溢出视口 */
+    transform:translate(-50%,-50%);
+    animation:wheelIn .45s cubic-bezier(.2,.9,.3,1) 2.45s both,
+              wheelOut .4s ease-in 3.6s forwards;
+  }
+  @keyframes wheelIn{
+    from{opacity:0;transform:translate(-50%,-50%) translateY(34px) scale(.9)}
+    to{opacity:1;transform:translate(-50%,-50%) translateY(0) scale(1)}
+  }
+  @keyframes wheelOut{
+    from{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    to{opacity:0;transform:translate(-50%,-50%) scale(1.12)}
+  }
+  .intro-wheel svg{display:block;width:100%;height:auto}
+  /* 整个盘面绕中心微转，模拟车手发车前微调方向 */
+  .intro-wheel .wheel-turn{
+    transform-box:view-box;transform-origin:220px 150px;
+    animation:wheelTurn .5s ease-in-out 2.95s both;
+  }
+  @keyframes wheelTurn{
+    from{transform:rotate(0deg)}
+    38%{transform:rotate(-7deg)}
+    to{transform:rotate(4.5deg)}
+  }
+  /* 顶部换挡提示灯带：由暗逐个点亮（绿 → 黄 → 红） */
+  .intro-wheel .wled{opacity:.16;animation:wledOn .09s linear both}
+  @keyframes wledOn{from{opacity:.16}to{opacity:1}}
+  .intro-wheel .wled:nth-child(1){animation-delay:2.85s}
+  .intro-wheel .wled:nth-child(2){animation-delay:2.9s}
+  .intro-wheel .wled:nth-child(3){animation-delay:2.95s}
+  .intro-wheel .wled:nth-child(4){animation-delay:3s}
+  .intro-wheel .wled:nth-child(5){animation-delay:3.05s}
+  .intro-wheel .wled:nth-child(6){animation-delay:3.1s}
+  .intro-wheel .wled:nth-child(7){animation-delay:3.15s}
+  .intro-wheel .wled:nth-child(8){animation-delay:3.2s}
+  .intro-wheel .wled:nth-child(9){animation-delay:3.25s}
+  .intro-wheel .wled:nth-child(10){animation-delay:3.3s}
+  /* 中央液晶屏的数据（挡位 / LAP / 圈速 / 差值）稍后亮起 */
+  .intro-wheel .wscreen{opacity:0;animation:wscreenIn .35s ease-out 2.95s both}
+  @keyframes wscreenIn{from{opacity:0}to{opacity:1}}
 
   /* --- 终点：卡通人物挥方格旗 --- */
   .intro-finish{
     position:absolute;left:50%;bottom:13%;width:min(215px,40vw);z-index:4;
     transform:translateX(-50%);opacity:0;
-    animation:finishIn .5s cubic-bezier(.2,1,.3,1) 3.95s both;
+    animation:finishIn .5s cubic-bezier(.2,1,.3,1) 5.45s both;
   }
   @keyframes finishIn{
     from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.94)}
@@ -776,7 +825,7 @@
   .intro-title{
     position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:6;
     text-align:center;opacity:0;padding:0 20px;width:100%;max-width:min(94vw,980px);
-    animation:titleIn .78s cubic-bezier(.2,1,.3,1) 4.7s both;
+    animation:titleIn .78s cubic-bezier(.2,1,.3,1) 5.95s both;
   }
   @keyframes titleIn{
     from{opacity:0;transform:translateX(-50%) translateY(18px)}
@@ -805,7 +854,7 @@
   .intro-bar i{
     display:block;height:100%;width:0;
     background:linear-gradient(90deg,#2f7ce0,#8cc4ff);
-    animation:barFill 6.2s linear both;
+    animation:barFill 7.4s linear both;
   }
   @keyframes barFill{to{width:100%}}
 
@@ -831,53 +880,188 @@
     <!-- 五盏发车红灯：占满整屏，逐个亮起 -> 全亮 -> 熄灭（熄灭后赛车才登场） -->
     <div class="intro-lights"><i></i><i></i><i></i><i></i><i></i></div>
 
+    <!-- 方向盘特写：灯灭之后、赛车冲刺之前，一秒车手视角 -->
+    <div class="intro-wheel">
+      <svg viewBox="0 0 440 300">
+        <defs>
+          <!-- 碳纤维斜纹 -->
+          <pattern id="introCarbon" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#181b21"/>
+            <rect width="4" height="4" fill="#22262f"/>
+            <rect x="4" y="4" width="4" height="4" fill="#22262f"/>
+          </pattern>
+        </defs>
+
+        <!-- 盘面整体（发车前微微打方向）；底部中央留出开口 -->
+        <g class="wheel-turn">
+          <!-- 蝶形盘体 -->
+          <path d="M44 84C44 66 58 52 76 52H364C382 52 396 66 396 84V216C396 234 382 248 364 248H286C276 248 268 243 262 236L220 188L178 236C172 243 164 248 154 248H76C58 248 44 234 44 216Z"
+                fill="url(#introCarbon)" stroke="#39414f" stroke-width="2"/>
+
+          <!-- 顶部换挡提示灯带：绿 4 -> 黄 3 -> 红 3，逐颗点亮 -->
+          <g class="wleds">
+            <rect class="wled" x="160" y="60" width="8" height="11" rx="2" fill="#35d46a"/>
+            <rect class="wled" x="172" y="60" width="8" height="11" rx="2" fill="#35d46a"/>
+            <rect class="wled" x="184" y="60" width="8" height="11" rx="2" fill="#35d46a"/>
+            <rect class="wled" x="196" y="60" width="8" height="11" rx="2" fill="#35d46a"/>
+            <rect class="wled" x="208" y="60" width="8" height="11" rx="2" fill="#f4c542"/>
+            <rect class="wled" x="220" y="60" width="8" height="11" rx="2" fill="#f4c542"/>
+            <rect class="wled" x="232" y="60" width="8" height="11" rx="2" fill="#f4c542"/>
+            <rect class="wled" x="244" y="60" width="8" height="11" rx="2" fill="#e8323a"/>
+            <rect class="wled" x="256" y="60" width="8" height="11" rx="2" fill="#e8323a"/>
+            <rect class="wled" x="268" y="60" width="8" height="11" rx="2" fill="#e8323a"/>
+          </g>
+
+          <!-- 中央液晶屏 -->
+          <rect x="152" y="84" width="136" height="86" rx="8" fill="#08111f" stroke="#2b3a52" stroke-width="2"/>
+          <g class="wscreen">
+            <!-- 挡位 -->
+            <text x="180" y="140" font-size="42" font-weight="800" fill="#7ef0a8"
+                  text-anchor="middle" font-family="Consolas,'Courier New',monospace">8</text>
+            <!-- 圈数与圈速 -->
+            <text x="214" y="106" font-size="11" fill="#c9d6e8"
+                  font-family="Consolas,'Courier New',monospace">LAP 88</text>
+            <text x="214" y="123" font-size="11" fill="#eef4ff"
+                  font-family="Consolas,'Courier New',monospace">56.0</text>
+            <text x="214" y="141" font-size="12" font-weight="700" fill="#7ef0a8"
+                  font-family="Consolas,'Courier New',monospace">+1.250</text>
+            <!-- 底部四个数据块 -->
+            <rect x="157" y="150" width="28" height="13" rx="2" fill="#2fbf6a"/>
+            <rect x="190" y="150" width="28" height="13" rx="2" fill="#2fbf6a"/>
+            <rect x="223" y="150" width="28" height="13" rx="2" fill="#2fbf6a"/>
+            <rect x="256" y="150" width="28" height="13" rx="2" fill="#2fbf6a"/>
+            <text x="171" y="160" font-size="9" font-weight="700" fill="#04220f"
+                  text-anchor="middle" font-family="Consolas,'Courier New',monospace">5</text>
+            <text x="204" y="160" font-size="9" font-weight="700" fill="#04220f"
+                  text-anchor="middle" font-family="Consolas,'Courier New',monospace">100</text>
+            <text x="237" y="160" font-size="9" font-weight="700" fill="#04220f"
+                  text-anchor="middle" font-family="Consolas,'Courier New',monospace">100</text>
+            <text x="270" y="160" font-size="9" font-weight="700" fill="#04220f"
+                  text-anchor="middle" font-family="Consolas,'Courier New',monospace">5</text>
+          </g>
+
+          <!-- 屏幕下方：红黄绿蓝四分区多功能旋钮 -->
+          <circle cx="220" cy="196" r="15" fill="#111823" stroke="#39414f" stroke-width="2"/>
+          <path d="M220 196V181A15 15 0 0 1 235 196Z" fill="#e8323a"/>
+          <path d="M220 196H235A15 15 0 0 1 220 211Z" fill="#f4c542"/>
+          <path d="M220 196V211A15 15 0 0 1 205 196Z" fill="#35d46a"/>
+          <path d="M220 196H205A15 15 0 0 1 220 181Z" fill="#3b8cf0"/>
+          <circle cx="220" cy="196" r="5" fill="#0a0f18"/>
+
+          <!-- 左侧按钮区 -->
+          <circle cx="82" cy="112" r="12" fill="#1f6feb"/>
+          <circle cx="118" cy="108" r="12" fill="#7a4fd6"/>
+          <circle cx="82" cy="150" r="12" fill="#f4c542"/>
+          <circle cx="118" cy="150" r="14" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <circle cx="82" cy="188" r="14" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <circle cx="122" cy="190" r="14" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <text x="82" y="117" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">N</text>
+          <text x="118" y="112" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">OV</text>
+          <text x="82" y="156" font-size="16" font-weight="700" fill="#20160a" text-anchor="middle">+</text>
+          <text x="118" y="154" font-size="8" fill="#c9d6e8" text-anchor="middle">FUEL</text>
+          <text x="82" y="192" font-size="8" fill="#c9d6e8" text-anchor="middle">MIX</text>
+          <text x="122" y="194" font-size="7" fill="#9fb0c8" text-anchor="middle">SCEN</text>
+
+          <!-- 右侧按钮区 -->
+          <circle cx="358" cy="108" r="12" fill="#f4c542"/>
+          <circle cx="322" cy="112" r="12" fill="#e8323a"/>
+          <circle cx="358" cy="150" r="12" fill="#f4c542"/>
+          <circle cx="322" cy="150" r="12" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <circle cx="322" cy="190" r="14" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <circle cx="358" cy="188" r="14" fill="#2a3140" stroke="#4a5568" stroke-width="1.5"/>
+          <text x="358" y="112" font-size="9" font-weight="700" fill="#20160a" text-anchor="middle">PIT</text>
+          <text x="358" y="155" font-size="16" font-weight="700" fill="#20160a" text-anchor="middle">+</text>
+          <text x="322" y="154" font-size="11" font-weight="700" fill="#e8eefa" text-anchor="middle">OK</text>
+          <text x="322" y="194" font-size="9" fill="#9fb0c8" text-anchor="middle">PL</text>
+          <text x="358" y="192" font-size="8" fill="#9fb0c8" text-anchor="middle">SOC</text>
+
+          <!-- 两侧握把上的绿色状态指示灯 -->
+          <circle cx="58" cy="120" r="4" fill="#35d46a"/>
+          <circle cx="58" cy="150" r="4" fill="#35d46a"/>
+          <circle cx="58" cy="180" r="4" fill="#35d46a"/>
+          <circle cx="382" cy="120" r="4" fill="#35d46a"/>
+          <circle cx="382" cy="150" r="4" fill="#35d46a"/>
+          <circle cx="382" cy="180" r="4" fill="#35d46a"/>
+        </g>
+      </svg>
+    </div>
+
     <!-- 速度线 -->
     <div class="intro-speed"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
     <!-- 赛车 + 卡通车手 -->
     <div class="intro-car">
       <div class="car-shake">
-        <svg viewBox="0 0 264 132">
+        <svg viewBox="0 0 300 140">
           <defs>
             <linearGradient id="introBodyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#74acf9"/><stop offset="1" stop-color="#1c55a0"/>
+              <stop offset="0" stop-color="#4a86e8"/>
+              <stop offset=".45" stop-color="#1f5aad"/>
+              <stop offset="1" stop-color="#10305e"/>
             </linearGradient>
+            <!-- 车身轮廓，用来把拉花裁在车体内 -->
+            <clipPath id="introCarClip">
+              <path d="M16 100L96 82C108 80 116 74 128 70L150 65C168 62 186 64 202 70L236 82C256 88 272 96 280 106L280 114L16 114Z"/>
+            </clipPath>
           </defs>
 
           <!-- 地面投影 -->
-          <ellipse cx="140" cy="117" rx="110" ry="9" fill="rgba(0,0,0,.42)"/>
+          <ellipse cx="150" cy="124" rx="132" ry="8" fill="rgba(0,0,0,.42)"/>
 
-          <!-- 尾翼 -->
-          <path d="M26 40h34v10H26z" fill="#123061"/>
-          <rect x="40" y="50" width="7" height="18" rx="2" fill="#123061"/>
+          <!-- 尾翼（车尾在右）：主翼 + 上层 DRS + 端板 + 支撑 -->
+          <rect x="252" y="46" width="40" height="8" rx="2" fill="#123061"/>
+          <rect x="256" y="36" width="32" height="6" rx="2" fill="#0e2a52"/>
+          <rect x="288" y="34" width="9" height="42" rx="2" fill="#173c72"/>
+          <rect x="266" y="54" width="7" height="34" rx="2" fill="#123061"/>
 
-          <!-- 车身主体（车头朝右） -->
-          <path d="M32 92V62c0-6 4-10 10-11l92-9c13-11 30-16 48-13l22 4c21 8 36 21 45 32 3 4 3 9 1 13v14z"
+          <!-- 车身主体（车头朝左） -->
+          <path d="M16 100L96 82C108 80 116 74 128 70L150 65C168 62 186 64 202 70L236 82C256 88 272 96 280 106L280 114L16 114Z"
                 fill="url(#introBodyGrad)"/>
-          <!-- 车身下沿暗部 -->
-          <path d="M32 92h226v-6c-40 4-190 6-226 6z" fill="#0f2b52" opacity=".5"/>
+
+          <!-- 涂装：红 / 黄 / 白三色拉花（按现代赛车涂装斜向后掠） -->
+          <g clip-path="url(#introCarClip)">
+            <path d="M8 97L128 71L132 77L12 103Z" fill="#f2f6ff" opacity=".8"/>
+            <path d="M8 104L134 76L138 84L12 112Z" fill="#e0322a"/>
+            <path d="M8 111L138 84L142 92L12 119Z" fill="#f4c542"/>
+          </g>
+
+          <!-- 侧箱进气口 -->
+          <path d="M186 72c11 2 19 7 25 12l-7 8c-6-6-12-10-20-13z" fill="#0c2242" opacity=".85"/>
 
           <!-- 座舱开口 -->
-          <path d="M136 54c14-9 30-12 46-9l14 3c-12 8-27 12-43 11z" fill="#0b1526"/>
+          <path d="M134 70c9-11 32-16 56-10l8 3c-18 7-44 10-64 7z" fill="#0b1526"/>
 
-          <!-- 卡通车手：头盔 + 护目镜 + 微笑 -->
-          <path d="M157 31a15 15 0 0 1 30 0z" fill="#e0322a"/>
-          <circle cx="172" cy="34" r="15" fill="#f4f8ff"/>
-          <path d="M158 32h28v5a5 5 0 0 1-5 5h-18a5 5 0 0 1-5-5z" fill="#1b2a47"/>
-          <circle cx="166" cy="36" r="2.5" fill="#8fc0ff"/>
-          <circle cx="177" cy="36" r="2.5" fill="#8fc0ff"/>
-          <path d="M167 45c3 2.6 7 2.6 10 0" stroke="#1b2a47" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Halo 座舱保护装置（现代 F1 标志性部件） -->
+          <path d="M132 66c11-11 40-14 64-7" stroke="#0b1220" stroke-width="7"
+                fill="none" stroke-linecap="round"/>
+
+          <!-- 卡通车手：头盔 + 护目镜 + 微笑（面朝车头方向） -->
+          <circle cx="168" cy="64" r="13" fill="#f4f8ff"/>
+          <path d="M155 62a13 13 0 0 1 26 0z" fill="#e0322a"/>
+          <path d="M156 61h24v4a4 4 0 0 1-4 4h-16a4 4 0 0 1-4-4z" fill="#1b2a47"/>
+          <circle cx="162" cy="64" r="2.2" fill="#8fc0ff"/>
+          <circle cx="171" cy="64" r="2.2" fill="#8fc0ff"/>
+          <path d="M163 72c2.6 2.2 6 2.2 8.6 0" stroke="#1b2a47" stroke-width="1.8"
+                fill="none" stroke-linecap="round"/>
 
           <!-- 车身无任何文字/号码 -->
 
-          <!-- 后轮 -->
-          <circle cx="78" cy="92" r="23" fill="#151c2d"/>
-          <circle cx="78" cy="92" r="9.5" fill="#93a9c9"/>
-          <circle cx="78" cy="92" r="3.5" fill="#4a5f80"/>
+          <!-- 前翼：现代多层空气动力学套件（车头最左） -->
+          <path d="M12 99h52v5H12z" fill="#1a3f74"/>
+          <path d="M5 106h62v5H5z" fill="#153462"/>
+          <path d="M0 113h68v4H0z" fill="#102a52"/>
+          <rect x="0" y="95" width="8" height="22" rx="2" fill="#1a3f74"/>
+
+          <!-- 后轮：大尺寸轮胎 + 实心轮毂罩 + 黄色中心 -->
+          <circle cx="238" cy="94" r="26" fill="#0e1524"/>
+          <circle cx="238" cy="94" r="17" fill="#1b2a47"/>
+          <circle cx="238" cy="94" r="17" fill="none" stroke="#2e4874" stroke-width="1.6"/>
+          <circle cx="238" cy="94" r="5.5" fill="#f4c542"/>
           <!-- 前轮 -->
-          <circle cx="212" cy="92" r="23" fill="#151c2d"/>
-          <circle cx="212" cy="92" r="9.5" fill="#93a9c9"/>
-          <circle cx="212" cy="92" r="3.5" fill="#4a5f80"/>
+          <circle cx="104" cy="94" r="26" fill="#0e1524"/>
+          <circle cx="104" cy="94" r="17" fill="#1b2a47"/>
+          <circle cx="104" cy="94" r="17" fill="none" stroke="#2e4874" stroke-width="1.6"/>
+          <circle cx="104" cy="94" r="5.5" fill="#f4c542"/>
         </svg>
       </div>
     </div>
@@ -947,7 +1131,7 @@
     var intro = document.getElementById("intro");
     if (!intro) return;
     var root = document.documentElement;
-    var TOTAL = 6200;   /* 与 CSS 进度条 barFill 的 6.2s 对齐 */
+    var TOTAL = 7400;   /* 与 CSS 进度条 barFill 的 7.4s 对齐 */
     var FADE = 620;     /* 与 .intro.is-out 的 0.6s 收尾动画对齐 */
     var done = false, timer = null;
 
