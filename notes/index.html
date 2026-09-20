@@ -165,7 +165,7 @@
 <main class="wrap">
   <article class="doc">
 <h1 class="doc-title">阎浩文个人主页 · v3 对话记录</h1>
-<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~11 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
+<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）；2026-09-20 追加第 12 轮（关注方向子板块）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~12 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
 <hr class="rule">
 <h2>第 1 轮 · 把网页正式发布到网上（2026-09-17）</h2>
 <p><strong>我的需求</strong> 前两版都是存在电脑里、双击才能打开的网页，只能自己看。我想要一个<strong>能直接发链接给同学、老师和未来导师</strong>的网址，手机上也能正常打开。</p>
@@ -383,8 +383,36 @@
 <li>桌面存档新增 <code>notes.html</code>，并同步更新 <code>v3开发记录.md</code> 与本文件。</li>
 </ul>
 <hr class="rule">
+<h2>第 12 轮 · 首页「我关注的方向」细化为 6 个可进入的子板块（2026-09-20）</h2>
+<p><strong>我的需求</strong> 首页「我关注的方向」那一栏列了六个方向，但每张卡只有一句话，访客看完就停住了。我想要<strong>能点进去</strong>：点开任意一个方向，就能看到我具体在关注什么。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>首页六张方向卡本身变成入口，点进去就是各自的子板块，网址形如 <code>#/focus/bci</code>。</li>
+<li>每个子板块里有：面包屑（首页 / 我关注的方向 / 方向名）、我的一段原话，以及「我在关注什么」的具体条目；底部还有一条切换栏，可以直接跳到别的方向或一键返回首页。</li>
+<li>顺带把「个人信息」页里那六个方向标签也做成入口 —— 首页和「个人信息」页，两个地方都能进。</li>
+<li>数字分身「小文」也同步了：现在问它某个方向（例如「脑机接口」），它会<strong>直接读该方向子板块的内容</strong>来回答，而不只是报一个方向名。</li>
+</ul>
+<p><strong>过程中的关键决策</strong></p>
+<ul>
+<li><strong>先对齐再动手</strong>：我用结构化提问和你确认了三件事 —— ① 实现形态选「单文件内新增子页面」（复用现有 hash 路由，不新增文件、不引入任何外部依赖）；② 内容来源限定为「你给素材、我只负责排版」；③ 素材由你直接提供。</li>
+<li>正文全部按你给的素材排版，<strong>没有添加任何你没提过的事实、经历或成果</strong>。只有三处把简称写全：<code>openai</code> → <code>OpenAI</code>、<code>南方医科大</code> → <code>南方医科大学</code>、<code>华科</code> → <code>华中科技大学</code>。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>无头浏览器的「窄屏截图」会骗人。</strong> 请求窗口宽 390px 时，浏览器实际渲染的视口是 <strong>492px</strong>，但截图仍按请求宽度输出 <strong>390px</strong> 宽的图 —— 右侧 102px 被整块丢掉。视觉检查先报了「正文右侧被裁切」，据此一度以为手机端有横向溢出。实测才发现：<strong>所有组合下 <code>scrollWidth == clientWidth</code>、横向溢出都是 0</strong>，问题只出在截图本身。<strong>教训：判定「是否横向溢出」只看 <code>scrollWidth == clientWidth</code>，绝不看截图像素；出窄屏图时请求宽度必须写 492。</strong></li>
+<li><strong>校验脚本的词法器不认识正则字面量，报了一个假警报。</strong> 路由里原本写 <code>.replace(/\//g, "-")</code>，其中转义斜杠后面紧跟一个斜杠，会被词法器误读成 <code>//</code> 行注释，于是吞掉行尾的括号，报出「括号不平衡」。<strong>这不是页面的问题，是校验脚本的盲区。</strong> 已把这处改写成等价的 <code>split("/").join("-")</code>，并给校验脚本加了针对性提示，以后同类写法会被直接指出来。</li>
+<li><strong>让两处内容共用一份数据源。</strong> 数字分身的回答改成「读子页 DOM」之后，以后改子页文案不必再单独同步分身知识库，从源头上避免了「两处文案不一致」。</li>
+</ul>
+<p><strong>最终校验结果</strong></p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>结构校验（<code>check_focus.py</code>）</td><td><strong>69 / 69 PASS</strong></td></tr><tr><td>布局与路由实测（<code>focus_layout.py</code>）</td><td><strong>121 / 121 PASS</strong>：9 个页面 × 桌面 / 窄屏 × 浅色 / 深色，横向溢出均为 0</td></tr><tr><td>改动前后对照（<code>focus_ref.py</code>）</td><td>首页原有的两处元素内溢出，<strong>改动前后数值完全相同</strong>，确认不是这次改出来的</td></tr><tr><td>静态校验（<code>check_v3.py</code> / <code>check_balance.py</code>）</td><td>ALL STATIC CHECKS PASSED / CODE-LEVEL BRACKET BALANCE: OK</td></tr><tr><td>数字分身问答（<code>test_focusanswer.py</code>）</td><td><strong>11 / 11 PASS</strong>：问六个方向里的任意一个都能答出该子板块内容，无关问题仍回落兜底回答</td></tr><tr><td>线上发布</td><td>推送一次成功，线上与本地 <strong>SHA256 逐字节一致</strong></td></tr></tbody></table></div>
+<p><strong>发布结果</strong></p>
+<ul>
+<li>线上 https://bryanhw.github.io/ 与本地 <code>outputs/v3/index.html</code> <strong>SHA256 字节完全一致</strong>（118887 字节）。</li>
+<li>这一轮共发布两次：先发「6 个方向子板块」（提交 <code>cf21ad17</code>，117263 字节），确认无误后，再发「小文同步方向细节」（提交 <code>ef404bd</code>，118887 字节）。</li>
+</ul>
+<hr class="rule">
 <h2>附：v3 最终状态速览</h2>
-<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，103229 字节，SHA256 <code>93114817…95F87C4</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，118887 字节，SHA256 <code>465F9DD5…8FA406B9</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>关注方向子板块</td><td>首页 6 张方向卡可点进 <code>#/focus/*</code>；「个人信息」页 6 个标签同样是入口；数字分身问方向名会返回该子板块内容</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
 <blockquote><p>留言数据一行为 2026-09-17 的复核结果（上线时清空为 0，之后收到 2 条访客留言）。留言数会随访客留言变化，需要看当前值时以实时调用 <code>message_count()</code> 为准。</p></blockquote>
   </article>
 </main>
