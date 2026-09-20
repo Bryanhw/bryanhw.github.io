@@ -391,6 +391,12 @@
   .card h3{font-size:16px;font-weight:800;margin-bottom:6px}
   .card p{font-size:13.5px;color:var(--muted)}
   .card .stripe{position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(180deg,var(--blue-500),var(--blue-300))}
+  /* 可点击的方向卡（首页「我关注的方向」） */
+  a.card{display:block;text-decoration:none;color:inherit}
+  .card .more{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--accent)}
+  a.card:hover .more{text-decoration:underline}
+  .card .more::after{content:" →"}
+  a.card:focus-visible{outline:2px solid var(--blue-400);outline-offset:3px}
 
   /* 获奖 */
   .awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
@@ -436,6 +442,38 @@
   .page-head h2{font-size:28px;font-weight:800;margin-top:10px;display:flex;align-items:center;gap:10px}
   .page-head p{color:var(--muted);font-size:14.5px;margin-top:6px}
 
+  /* ================= 关注方向子页 ================= */
+  .focus-lead{font-size:15px;line-height:1.75;color:var(--body-text)}
+  .focus-block{margin-top:26px}
+  .focus-block h3{font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:9px;margin-bottom:13px}
+  .focus-block h3 .fk-ico{
+    width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;
+    background:var(--icon-bg);flex:none;
+  }
+  .focus-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .focus-list li{position:relative;padding-left:19px;font-size:14px;line-height:1.7;color:var(--body-text)}
+  .focus-list li::before{
+    content:"";position:absolute;left:1px;top:9px;width:6px;height:6px;border-radius:50%;
+    background:linear-gradient(180deg,var(--blue-500),var(--blue-300));
+  }
+  .focus-list li b{color:var(--ink);font-weight:700}
+
+  .focus-switch{
+    margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px 22px;
+  }
+  .focus-switch .fs-title{font-size:12.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  .fs-list{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .fs-pill{
+    display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+    background:var(--field-bg);border:1px solid var(--line);color:var(--ink);
+    padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;transition:.16s;
+  }
+  .fs-pill:hover{border-color:var(--line-hover);transform:translateY(-2px)}
+  .fs-pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .fs-pill:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
+  .focus-back{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+
   .panel{
     margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:26px;position:relative;overflow:hidden;
@@ -450,6 +488,9 @@
   .info-card .v{font-size:15px}
   .tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
   .tag{background:var(--blue-100);color:var(--accent-strong);padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700}
+a.tag{display:inline-block;text-decoration:none;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+a.tag:hover{text-decoration:underline;transform:translateY(-1px);box-shadow:0 3px 10px rgba(28,85,160,.22);filter:brightness(1.06)}
+a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .mail-list{display:flex;flex-direction:column;gap:6px}
   .mail-list a{color:var(--accent);text-decoration:none;font-size:13px;word-break:break-all}
   .mail-list a:hover{text-decoration:underline}
@@ -1262,15 +1303,15 @@
       <div class="block-head">
         <span class="block-eyebrow">Focus</span>
         <h2>我关注的方向</h2>
-        <p>六个我最关心、也最想去深入了解的前沿领域。</p>
+        <p>六个我最关心、也最想去深入了解的前沿领域。点开任意一个，看看我具体在关注什么。</p>
       </div>
       <div class="cards">
-        <div class="card"><span class="stripe"></span><div class="ico">📚</div><h3>AI 辅助学习</h3><p>用 AI 更高效地读书、记笔记、理解概念、整理信息。</p></div>
-        <div class="card"><span class="stripe"></span><div class="ico">🤖</div><h3>AI 应用</h3><p>关注人工智能在真实场景中的落地与实际使用。</p></div>
-        <div class="card"><span class="stripe"></span><div class="ico">🧠</div><h3>脑机接口</h3><p>探索大脑与机器之间的信息通道会带来怎样的可能。</p></div>
-        <div class="card"><span class="stripe"></span><div class="ico">🩺</div><h3>前沿医疗</h3><p>关注新技术如何改变医疗诊断与健康管理。</p></div>
-        <div class="card"><span class="stripe"></span><div class="ico">🚗</div><h3>自动驾驶</h3><p>关注智能出行的安全性、效率与未来形态。</p></div>
-        <div class="card"><span class="stripe"></span><div class="ico">🛩️</div><h3>低空经济</h3><p>关注无人机与低空飞行带来的新产业机会。</p></div>
+        <a class="card" href="#/focus/ai-study"><span class="stripe"></span><div class="ico">📚</div><h3>AI 辅助学习</h3><p>用 AI 更高效地读书、记笔记、理解概念、整理信息。</p><span class="more">了解我在关注什么</span></a>
+        <a class="card" href="#/focus/ai-app"><span class="stripe"></span><div class="ico">🤖</div><h3>AI 应用</h3><p>关注人工智能在真实场景中的落地与实际使用。</p><span class="more">了解我在关注什么</span></a>
+        <a class="card" href="#/focus/bci"><span class="stripe"></span><div class="ico">🧠</div><h3>脑机接口</h3><p>探索大脑与机器之间的信息通道会带来怎样的可能。</p><span class="more">了解我在关注什么</span></a>
+        <a class="card" href="#/focus/medtech"><span class="stripe"></span><div class="ico">🩺</div><h3>前沿医疗</h3><p>关注新技术如何改变医疗诊断与健康管理。</p><span class="more">了解我在关注什么</span></a>
+        <a class="card" href="#/focus/autodrive"><span class="stripe"></span><div class="ico">🚗</div><h3>自动驾驶</h3><p>关注智能出行的安全性、效率与未来形态。</p><span class="more">了解我在关注什么</span></a>
+        <a class="card" href="#/focus/low-altitude"><span class="stripe"></span><div class="ico">🛩️</div><h3>低空经济</h3><p>关注无人机与低空飞行带来的新产业机会。</p><span class="more">了解我在关注什么</span></a>
       </div>
     </div>
 
@@ -1302,6 +1343,207 @@
 
   </section>
 
+  <!-- ================= 视图：关注方向 · AI 辅助学习 ================= -->
+  <section class="view" id="view-focus-ai-study" data-view="focus-ai-study">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / AI 辅助学习</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>AI 辅助学习</h2>
+      <p>用 AI 更高效地读书、记笔记、理解概念、整理信息。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">我关心的是：如何用人工智能工具辅助自己学习新知识。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>语言学习：</b>最近我在尝试借助 AI 工具学习粤语。</li>
+          <li><b>探索新领域知识：</b>近来我在用 AI 帮助自己了解网络安全相关知识。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill on" aria-current="page" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：关注方向 · AI 应用 ================= -->
+  <section class="view" id="view-focus-ai-app" data-view="focus-ai-app">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / AI 应用</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>AI 应用</h2>
+      <p>关注人工智能在真实场景中的落地与实际使用。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">我关心怎么使用 AI 把比较复杂的理论落地，也关心它怎么给我们的生活提速。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>让复杂理论落地：</b>例如 OpenAI 解决数学难题。</li>
+          <li><b>给生活提速、减少重复性的工作：</b>例如用 AI 生成文档。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill on" aria-current="page" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：关注方向 · 脑机接口 ================= -->
+  <section class="view" id="view-focus-bci" data-view="focus-bci">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / 脑机接口</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>脑机接口</h2>
+      <p>探索大脑与机器之间的信息通道会带来怎样的可能。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">我是智能医学工程专业的学生，我关心脑机接口的最新进展。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>临床实验：</b>例如南方医科大学、华中科技大学最近进行的临床实验。</li>
+          <li><b>机构动向：</b>例如海河实验室的新动向。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill on" aria-current="page" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：关注方向 · 前沿医疗 ================= -->
+  <section class="view" id="view-focus-medtech" data-view="focus-medtech">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / 前沿医疗</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>前沿医疗</h2>
+      <p>关注新技术如何改变医疗诊断与健康管理。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">我关注先进的医疗，好奇治疗各种难以治疗疾病的新疗法，也注重联合治疗。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>新疗法：</b>好奇治疗各种难以治疗的疾病有哪些新疗法。</li>
+          <li><b>治疗思路：</b>注重联合治疗。</li>
+          <li><b>了解途径：</b>研究各大医学院的论文。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill on" aria-current="page" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：关注方向 · 自动驾驶 ================= -->
+  <section class="view" id="view-focus-autodrive" data-view="focus-autodrive">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / 自动驾驶</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>自动驾驶</h2>
+      <p>关注智能出行的安全性、效率与未来形态。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">L3 即将到来了，我关心它怎么实现；更让我在意的是——脑控驾驶什么时候可以实现。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>L3 级自动驾驶：</b>即将到来，我关心它怎么实现。</li>
+          <li><b>路线之争：</b>激光辅助方案和纯视觉方案之间的争论。</li>
+          <li><b>脑控驾驶：</b>它什么时候可以实现。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill on" aria-current="page" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
+  <!-- ================= 视图：关注方向 · 低空经济 ================= -->
+  <section class="view" id="view-focus-low-altitude" data-view="focus-low-altitude">
+    <div class="page-head">
+      <div class="crumbs"><a href="#/home">首页</a> / 我关注的方向 / 低空经济</div>
+      <h2><span class="flag-dot" aria-hidden="true"></span>低空经济</h2>
+      <p>关注无人机与低空飞行带来的新产业机会。</p>
+    </div>
+
+    <div class="panel">
+      <p class="focus-lead">我关心脑控无人机的应用，也关心无人机对运输效率的影响。</p>
+      <div class="focus-block">
+        <h3><span class="fk-ico">👀</span>我在关注什么</h3>
+        <ul class="focus-list">
+          <li><b>脑控无人机：</b>关注它的应用。</li>
+          <li><b>运输效率：</b>关注无人机对运输效率的影响。</li>
+          <li><b>关注案例：</b>例如大疆在做的脑控飞行方案。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="focus-switch">
+      <div class="fs-title">看看其他方向</div>
+      <div class="fs-list">
+        <a class="fs-pill" href="#/focus/ai-study">📚 AI 辅助学习</a>
+        <a class="fs-pill" href="#/focus/ai-app">🤖 AI 应用</a>
+        <a class="fs-pill" href="#/focus/bci">🧠 脑机接口</a>
+        <a class="fs-pill" href="#/focus/medtech">🩺 前沿医疗</a>
+        <a class="fs-pill" href="#/focus/autodrive">🚗 自动驾驶</a>
+        <a class="fs-pill on" aria-current="page" href="#/focus/low-altitude">🛩️ 低空经济</a>
+      </div>
+      <div class="focus-back"><a class="btn btn-ghost" href="#/home">← 返回首页 · 我关注的方向</a></div>
+    </div>
+  </section>
+
   <!-- ================= 视图：个人信息 ================= -->
   <section class="view" id="view-info" data-view="info">
     <div class="page-head">
@@ -1327,8 +1569,8 @@
         <div class="info-card">
           <div class="k">关心方向</div>
           <div class="tag-list">
-            <span class="tag">AI 辅助学习</span><span class="tag">AI 应用</span><span class="tag">脑机接口</span>
-            <span class="tag">前沿医疗</span><span class="tag">自动驾驶</span><span class="tag">低空经济</span>
+            <a class="tag" href="#/focus/ai-study">AI 辅助学习</a><a class="tag" href="#/focus/ai-app">AI 应用</a><a class="tag" href="#/focus/bci">脑机接口</a>
+            <a class="tag" href="#/focus/medtech">前沿医疗</a><a class="tag" href="#/focus/autodrive">自动驾驶</a><a class="tag" href="#/focus/low-altitude">低空经济</a>
           </div>
         </div>
       </div>
@@ -1858,14 +2100,21 @@ syncOpinionCount();
 
 /* ================= Hash 路由 ================= */
 const VIEWS = ["home", "info", "traits", "chat", "feedback"];
+/* 关注方向子页：URL 写作 #/focus/<key>，内部视图键为 focus-<key> */
+const FOCUS_VIEWS = [
+  "focus-ai-study", "focus-ai-app", "focus-bci",
+  "focus-medtech", "focus-autodrive", "focus-low-altitude"
+];
+const ALL_VIEWS = VIEWS.concat(FOCUS_VIEWS);
 const viewEls = document.querySelectorAll(".view");
 const linkEls = document.querySelectorAll(".nav-link");
 const navLinks = document.getElementById("navLinks");
 const navToggle = document.getElementById("navToggle");
 
 function currentRoute() {
-  const h = (location.hash || "").replace(/^#\/?/, "");
-  return VIEWS.includes(h) ? h : "home";
+  /* 兼容 #/info 与 #/focus/ai-study 两种写法：斜杠归一化为连字符后再匹配 */
+  const key = (location.hash || "").replace(/^#\/?/, "").replace(/\/+$/, "").replace(/\//g, "-");
+  return ALL_VIEWS.includes(key) ? key : "home";
 }
 
 function activateReveals(root) {
@@ -1881,7 +2130,9 @@ function activateReveals(root) {
 function render() {
   const route = currentRoute();
   viewEls.forEach(v => v.classList.toggle("active", v.dataset.view === route));
-  linkEls.forEach(l => l.classList.toggle("active", l.dataset.view === route));
+  /* 关注方向子页属于首页的下级，导航上的「首页」保持高亮，避免菜单全灭 */
+  const onFocus = route.indexOf("focus-") === 0;
+  linkEls.forEach(l => l.classList.toggle("active", l.dataset.view === route || (onFocus && l.dataset.view === "home")));
   navLinks.classList.remove("open");
   navToggle.setAttribute("aria-expanded", "false");
   activateReveals(document.querySelector(".view.active"));
