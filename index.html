@@ -1723,14 +1723,41 @@ const RULES = [
   { keys: ["兴趣", "爱好", "喜欢", "围棋", "阅读", "书", "羽毛球", "运动"], ans: KNOWLEDGE.traits },
   { keys: ["名字", "叫什么", "姓名", "你是"], ans: "我叫" + KNOWLEDGE.name + "。我是他的数字分身，他本人是" + KNOWLEDGE.occupation + "。" },
   { keys: ["专业", "职业", "学生", "做什么的", "学的", "学院", "大学", "学校"], ans: KNOWLEDGE.occupation },
-  { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术"], ans: "他最关心的方向是：" + KNOWLEDGE.focus + "，也更倾向于把 AI 方法真正用起来。" },
+  { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术"], ans: "他最关心的六个方向是：" + KNOWLEDGE.focus + "。首页「我关注的方向」里，每个方向都可以点进去看到具体在关注什么。" },
   { keys: ["介绍", "简介", "了解一下", "介绍下自己"], ans: "我是" + KNOWLEDGE.name + "，今年刚入学，是一名" + KNOWLEDGE.occupation + "。我的兴趣是围棋、阅读、打羽毛球，乐于助人，目前主要在用 AI 辅助学习。" }
 ];
 
 const FALLBACK = "这个问题我还没学会回答～你可以试着问我：你在做什么？怎么联系你？你有什么特点？";
 
+/* 关注方向详情：直接读「我关注的方向」子页的 DOM，
+   保证数字分身的回答与子板块内容永远一致（单一数据源，不用两处维护） */
+const FOCUS_KEYS = [
+  { key: "ai-study", words: ["ai辅助学习", "ai 辅助学习", "辅助学习"] },
+  { key: "ai-app", words: ["ai应用", "ai 应用", "人工智能应用"] },
+  { key: "bci", words: ["脑机接口", "bci", "脑机"] },
+  { key: "medtech", words: ["前沿医疗", "医疗"] },
+  { key: "autodrive", words: ["自动驾驶", "无人驾驶"] },
+  { key: "low-altitude", words: ["低空经济", "无人机", "低空"] }
+];
+
+function focusAnswer(text) {
+  for (const f of FOCUS_KEYS) {
+    if (!f.words.some(w => text.includes(w))) continue;
+    const el = document.getElementById("view-focus-" + f.key);
+    if (!el) return null;
+    const lead = el.querySelector(".focus-lead");
+    const items = Array.from(el.querySelectorAll(".focus-list li"));
+    let s = lead ? lead.textContent.trim() : "";
+    if (items.length) s += (s ? "\n" : "") + items.map(li => "· " + li.textContent.trim()).join("\n");
+    return s + "\n\n（首页「我关注的方向」里点开这个方向，看到的也是这些内容）";
+  }
+  return null;
+}
+
 function answer(raw) {
   const text = (raw || "").toLowerCase();
+  const detail = focusAnswer(text);
+  if (detail) return detail;
   for (const r of RULES) { if (r.keys.some(k => text.includes(k))) return r.ans; }
   return FALLBACK;
 }
@@ -2112,8 +2139,11 @@ const navLinks = document.getElementById("navLinks");
 const navToggle = document.getElementById("navToggle");
 
 function currentRoute() {
-  /* 兼容 #/info 与 #/focus/ai-study 两种写法：斜杠归一化为连字符后再匹配 */
-  const key = (location.hash || "").replace(/^#\/?/, "").replace(/\/+$/, "").replace(/\//g, "-");
+  /* 兼容 #/info 与 #/focus/ai-study 两种写法：斜杠归一化为连字符后再匹配。
+     ⚠ 这里刻意用 split("/").join("-") 而不是 .replace(/\//g, "-")：
+     后者含 `/\/` + `/` 序列，会被 check_balance.py / check_v3.py 的词法器
+     误读成 `//` 行注释，从而吞掉行尾括号、报出假阳性「括号不平衡」。 */
+  const key = (location.hash || "").replace(/^#\/?/, "").replace(/\/+$/, "").split("/").join("-");
   return ALL_VIEWS.includes(key) ? key : "home";
 }
 
