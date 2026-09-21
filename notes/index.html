@@ -165,7 +165,7 @@
 <main class="wrap">
   <article class="doc">
 <h1 class="doc-title">阎浩文个人主页 · v3 对话记录</h1>
-<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）；2026-09-20 追加第 12 轮（关注方向子板块）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~12 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
+<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）；2026-09-20 追加第 12 轮（关注方向子板块）；2026-09-21 追加第 13~14 轮（全站中英双语 + 两次补修/修复；开场红灯调暗调小 + v3.1 上线）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~14 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
 <hr class="rule">
 <h2>第 1 轮 · 把网页正式发布到网上（2026-09-17）</h2>
 <p><strong>我的需求</strong> 前两版都是存在电脑里、双击才能打开的网页，只能自己看。我想要一个<strong>能直接发链接给同学、老师和未来导师</strong>的网址，手机上也能正常打开。</p>
@@ -411,8 +411,61 @@
 <li>这一轮共发布两次：先发「6 个方向子板块」（提交 <code>cf21ad17</code>，117263 字节），确认无误后，再发「小文同步方向细节」（提交 <code>ef404bd</code>，118887 字节）。</li>
 </ul>
 <hr class="rule">
+<h2>第 13 轮 · 全站中英双语：一键切换中文 / English（2026-09-20）</h2>
+<p><strong>我的需求</strong> 网站现在只有中文。我希望不懂中文的人也能看：顶部放一个切换按钮，一点就能<strong>整页</strong>变成英文 —— 导航、自我介绍、关注方向、数字分身的问答、留言区的提示都要跟着变。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>顶栏右上角新增「<strong>中 / EN</strong>」切换按钮；也可以直接在网址后面加 <code>?lang=en</code> 打开英文版。<strong>选择记在浏览器里</strong>，下次访问还是上次选的语言。</li>
+<li>整页文案双语化：导航、首屏、About、关注方向（6 个方向卡 + 每个方向子页正文）、留言区、页脚，全部有对应英文。</li>
+<li>数字分身「小文」也<strong>能用英文对话</strong>：英文版下提供 8 条英文快捷问题，回答也是英文，并保留原有的兜底回答。</li>
+<li>双语词表单独维护（<strong>167 条文本 + 14 条属性</strong>），另有脚本专门校验「中英两边一条不缺、一条不多」。</li>
+</ul>
+<p><strong>过程中的关键决策</strong></p>
+<ul>
+<li><strong>不做「翻译壳」，做真双语</strong>：英文内容与中文一一对应写成词表，切换时整页重写，不引入任何翻译插件或外部依赖（仍然是单文件、零外部依赖）。</li>
+<li>中文原文始终是<strong>唯一基准</strong>，英文由它现算；因此「切回中文」不会因为来回翻译而漂移。</li>
+<li><strong>先对齐再动手</strong>：AI 先与我确认了切换范围、是否保留中文原文、是否记住选择，然后才改代码。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>无头浏览器在 <code>file://</code> 下不生效 localStorage</strong>：截图必须走本地 http 服务，否则「记住上次语言」这条根本测不出来（截出来的永远是默认语言）。</li>
+</ul>
+<p><strong>最终校验结果</strong></p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>词表对齐（<code>validate_i18n_dict.py</code>）</td><td><strong>0 缺 0 多</strong>（167 条文本 / 14 条属性）</td></tr><tr><td>真实浏览器双语运行时（<code>test_i18n_runtime.py</code>）</td><td><strong>36 / 36 PASS</strong>：切到英文后整页<strong>残留汉字 = 0</strong>，数字分身英文回答里也没有汉字</td></tr><tr><td>子页结构 / 子页布局与路由</td><td>69 / 69 PASS、121 / 121 PASS</td></tr><tr><td>用户输入</td><td>切换语言时<strong>我打的字原样保留</strong>，不会被改写</td></tr></tbody></table></div>
+<p><strong>同轮后续两次补修（都在上线前做完）</strong></p>
+<ul>
+<li><strong>窄屏也要能找到「联系我」</strong>：窗口收窄或手机上时，顶栏原本把「联系我」收进了菜单里，不好找。现在 <strong>≤760px</strong> 顶栏直接显示紧凑按钮，<strong>≤600px</strong> 收成信封图标，<strong>≤430px</strong> 再收紧间距；<strong>320–900px 共 11 档实测中英两版横向溢出均为 0</strong>。</li>
+<li><strong>切回中文后整页仍是英文</strong>（我验收时发现的）：只要点回中文，<strong>只有数字分身那一行</strong>变成中文，其它还是英文。AI 查出的根因是「把中文写回去」的那一步<strong>只认当前含汉字的节点</strong> —— 切到英文后节点里已经没有汉字，于是一个都收不到，实测 <strong>262 个文本节点不复原</strong>；改成「登记表 + 双向还原」后实测 <strong>262 → 0</strong>。同时给运行时门禁补了 3 条断言（36 → 39 项），并<strong>专门拿修复前的备份跑了一遍</strong>，确认这条新断言真的会报红（不是摆设）。</li>
+</ul>
+<hr class="rule">
+<h2>第 14 轮 · 开场红灯调暗调小 + v3.1 一起上线（2026-09-21）</h2>
+<p><strong>我的需求</strong> （1）开场动画里的发车红灯<strong>又亮又大</strong>，手机上尤其大 —— 调暗一点、也调小一点；（2）把做好的这一版<strong>发布到网上</strong>；（3）更新 git 和 markdown；（4）截一张<strong>英文模式主页</strong>的图放进存档文件夹。</p>
+<p><strong>AI 的交付</strong></p>
+<ul>
+<li>红灯按「调暗 + 调小」两个方向都改了，而且是<strong>量出来</strong>的结果（不是凭感觉调）：</li>
+</ul>
+<div class="table-wrap"><table><thead><tr><th>视口</th><th>灯直径</th><th>整组占屏</th><th>最亮像素（RGB）</th><th>亮度≥100 的发光面积</th></tr></thead><tbody><tr><td>桌面 1254×660（横排）</td><td>231px → <strong>178px</strong></td><td>横占屏宽 97.4% → <strong>93.3%</strong></td><td><code>255,214,204</code> → <strong><code>239,176,162</code></strong></td><td>17.67% → <strong>8.20%</strong></td></tr><tr><td>手机 492×704（竖排）</td><td>113px → <strong>70px</strong></td><td>纵占屏高 92.3% → <strong>86.1%</strong></td><td><code>255,213,203</code> → <strong><code>239,175,161</code></strong></td><td>18.10% → <strong>5.41%</strong></td></tr><tr><td>小屏 492×500（竖排）</td><td>80px → <strong>50px</strong></td><td>纵占屏高 90.8% → <strong>84.8%</strong></td><td>—</td><td>—</td></tr></tbody></table></div>
+<ul>
+<li>手机档另加了一档<strong>更暗的光晕</strong>：竖排时五盏灯纵向叠得很近，光晕不压住会更显刺眼。</li>
+<li>除红灯外，开场动画的其它实测项（车身无文字、车头朝左、方向盘居中且不超屏、10 颗换挡灯、结尾一行字与挥旗人物不重叠、绕盘心旋转正确）<strong>全部与改动前一致</strong>。</li>
+<li>英文模式主页截图重出并存进存档（<code>images/v3-lang-en-home.png</code>，1280×1800）。</li>
+<li><strong>v3.1 正式上线</strong>：线上主页与本地文件 <strong>SHA256 逐字节一致</strong>。</li>
+</ul>
+<p><strong>最终校验结果</strong></p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>红灯几何实测（<code>intro_geom.py</code>）</td><td>桌面 231→178px、竖排 113→70px；三档均<strong>互不重叠、无横向溢出</strong></td></tr><tr><td>红灯亮度实测（<code>intro_light_bright.py</code>）</td><td>三档的「最亮像素 <strong>193</strong>」「发光面积」「亮核像素」全部下降（桌面亮核 32066 → 2289 像素）</td></tr><tr><td>开场动画回归（<code>intro_timeline.py</code>）</td><td>21 项全过（含顺序约束，时长仍为 7.4 秒）</td></tr><tr><td>静态校验（<code>check_v3.py</code> / <code>check_balance.py</code>）</td><td>ALL STATIC CHECKS PASSED / CODE-LEVEL BRACKET BALANCE: OK</td></tr><tr><td>双语与内容门禁</td><td>运行时 39/39、子页 69/69、布局与路由 121/121 全过</td></tr><tr><td>线上发布</td><td>推送<strong>一次成功</strong>，线上与本地 <strong>SHA256 逐字节一致</strong></td></tr></tbody></table></div>
+<p><strong>发布结果</strong></p>
+<ul>
+<li>线上 https://bryanhw.github.io/ 与本地 <code>outputs/v3/index.html</code> <strong>SHA256 字节完全一致</strong>（155103 字节，<code>B9E9174C…3439E4</code>）。</li>
+<li>这一版一次把四件事一起发了：<strong>全站中英双语</strong>、窄屏「联系我」补修、切回中文修复，外加<strong>开场红灯调暗调小</strong>。</li>
+<li>发布用的提交是 <code>4c8b5b2</code>；发布前后两次都复核了「对话记录页那份文件没有被顺手改动」。</li>
+</ul>
+<p><strong>过程中的坑</strong></p>
+<ul>
+<li><strong>亮度检查脚本第一版「量错了对象」</strong>：给开场画面定格时只隐藏了开场层的一部分元素，结果右下角「跳过」按钮的白底被当成了「最亮的灯」（<code>maxL</code> 一直卡在 255 附近），看起来像「灯没变暗」。改成「隐藏开场层里除灯之外的<strong>所有</strong>子元素」后，才量到真正的灯，数据也才和肉眼观感对上。</li>
+</ul>
+<hr class="rule">
 <h2>附：v3 最终状态速览</h2>
-<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，118887 字节，SHA256 <code>465F9DD5…8FA406B9</code>（本地 / 存档 / 线上三方一致）</td></tr><tr><td>关注方向子板块</td><td>首页 6 张方向卡可点进 <code>#/focus/*</code>；「个人信息」页 6 个标签同样是入口；数字分身问方向名会返回该子板块内容</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，<strong>155103 字节</strong>，SHA256 <code>B9E9174C…3439E4</code>（本地 / 存档 / 线上三方一致；2026-09-21 发布）</td></tr><tr><td>关注方向子板块</td><td>首页 6 张方向卡可点进 <code>#/focus/*</code>；「个人信息」页 6 个标签同样是入口；数字分身问方向名会返回该子板块内容</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过；2026-09-21 按要求把红灯<strong>调暗调小</strong>（桌面灯直径 231→178px、竖排 113→70px，手机档另加更暗光晕）</td></tr><tr><td>中英双语</td><td>顶栏「<strong>中 / EN</strong>」一键切换（也支持网址加 <code>?lang=en</code>），语言选择记在浏览器里；数字分身「小文」可用英文问答（8 条英文快捷问题）</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED；双语运行时 39/39、词表 0 缺 0 多、子页 69/69、布局与路由 121/121</td></tr></tbody></table></div>
 <blockquote><p>留言数据一行为 2026-09-17 的复核结果（上线时清空为 0，之后收到 2 条访客留言）。留言数会随访客留言变化，需要看当前值时以实时调用 <code>message_count()</code> 为准。</p></blockquote>
   </article>
 </main>
