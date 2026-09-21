@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="阎浩文（Bryan）的个人主页 —— 天津大学·香港理工大学·深圳未来技术学院 智能医学工程大一学生，含数字分身「小文」。" />
 <meta name="theme-color" content="#e4e1f9" id="metaTheme" />
-<title>阎浩文 Bryan · 个人主页</title>
+<title>阎浩文 Bryan · 个人主页 v3.1</title>
 <meta name="author" content="阎浩文 Bryan" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231c55a0'/><text x='32' y='46' font-family='system-ui,sans-serif' font-size='40' font-weight='700' fill='%23ffffff' text-anchor='middle'>B</text></svg>" />
 <script>
@@ -16,6 +16,10 @@
       var dark = saved ? saved === "dark"
         : (window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches);
       document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      /* 语言：默认中文；只有带 ?lang=en 或上次手动切过英文时才用英文 */
+      var qlang = location.search.indexOf("lang=en") >= 0;
+      var lang = qlang ? "en" : localStorage.getItem("yhw-lang");
+      document.documentElement.setAttribute("data-lang", lang === "en" ? "en" : "zh");
     } catch (e) {}
   })();
 </script>
@@ -204,6 +208,13 @@
     transition:.15s;
   }
   .nav-cta:hover{filter:brightness(1.1)}
+  /* 窄屏专用的紧凑「联系我」（右上角，图标 + 短文字；只在 ≤760px 出现），
+     保证收窄窗口或手机上依然有显眼的联系方式入口 */
+  .nav-cta-sm{display:none;text-decoration:none;color:#fff;font-weight:700;font-size:13px;
+    white-space:nowrap;transition:.15s}
+  .nav-cta-sm svg{width:16px;height:16px;flex:0 0 auto;fill:none;stroke:currentColor;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .nav-cta-sm:hover{filter:brightness(1.1)}
   .nav-toggle{
     display:block;flex:0 0 auto;width:42px;height:38px;border:1px solid var(--line);
     border-radius:10px;background:var(--card);color:var(--accent-strong);font-size:18px;cursor:pointer;transition:.15s;
@@ -220,6 +231,16 @@
   .theme-toggle .ic-light{display:none}
   :root[data-theme="dark"] .theme-toggle .ic-light{display:block}
   :root[data-theme="dark"] .theme-toggle .ic-dark{display:none}
+  /* 语言切换按钮：中文界面显示「EN」，英文界面显示「中文」 */
+  .lang-toggle{
+    display:grid;place-items:center;flex:0 0 auto;min-width:46px;height:38px;padding:0 9px;cursor:pointer;
+    border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent-strong);
+    font-size:12.5px;font-weight:800;letter-spacing:.5px;line-height:1;transition:.15s;
+  }
+  .lang-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
+  .lang-toggle .lg-zh{display:none}
+  :root[data-lang="en"] .lang-toggle .lg-en{display:none}
+  :root[data-lang="en"] .lang-toggle .lg-zh{display:block}
   .nav-speed{height:3px;background:linear-gradient(90deg,var(--blue-700),var(--blue-400),var(--blue-700));opacity:.9}
 
   /* ================= 视图切换 ================= */
@@ -646,8 +667,31 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
     .nav-links{left:14px;right:14px;min-width:0}
     .nav-link{padding:12px 14px}
     .nav-cta{display:none}
-    .theme-toggle{margin-left:auto}
+    /* 窄屏：把「联系我」收成紧凑按钮，保证手机上联系入口不丢 */
+    .nav-cta-sm{
+      display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:8px 15px;border-radius:10px;
+      background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+      clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+    }
+    /* 窄屏：语言按钮顶到最右，主题与汉堡按钮跟在它后面 */
+    .lang-toggle{margin-left:auto}
+    .theme-toggle{margin-left:0}
     .nav-toggle{margin-left:8px}
+  }
+  /* 中等窄屏（手机横屏 / 小窗口）：紧凑按钮只留信封图标，省出横向空间 */
+  @media (max-width:600px){
+    .nav-cta-sm{width:38px;height:38px;padding:0;justify-content:center;gap:0}
+    .nav-cta-sm .cta-sm-t{display:none}
+  }
+  /* 手机：品牌名去掉英文后缀、间距与按钮再收紧，保证顶栏永不溢出 */
+  @media (max-width:430px){
+    .brand-en{display:none}
+    .brand{min-width:0}
+    .brand > span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .nav-inner{gap:6px;padding:0 14px}
+    .lang-toggle{padding:0 6px}
+    .theme-toggle{width:38px}
+    .nav-toggle{width:38px}
   }
   @media (max-width:600px){
     .wrap{padding:18px 14px 40px}
@@ -713,9 +757,11 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   }
   @keyframes startlineIn{from{opacity:0;transform:scaleX(.7)}to{opacity:.9;transform:scaleX(1)}}
 
-  /* --- 五盏发车红灯：占满整个屏幕 --- */
+  /* --- 五盏发车红灯：铺满视口（2026-09-21 按用户要求调小 + 调暗，手机端再小一档） --- */
   /* 灯组铺满视口（宽屏横排五盏 / 窄屏竖排五盏），
-     0.40s 起每隔 0.35s 亮一盏 -> 1.80s 全亮 -> 2.25s 一起熄灭 -> 2.40s 整组淡出 */
+     0.40s 起每隔 0.35s 亮一盏 -> 1.80s 全亮 -> 2.25s 一起熄灭 -> 2.40s 整组淡出
+     亮度/尺寸三个可调点：① width 里的两个值（灯直径）② background 的红色渐变
+     ③ box-shadow 两层光晕的不透明度 —— 窄屏那一档在下面的 @media 里单独覆盖 */
   .intro-lights{
     position:absolute;inset:0;z-index:4;
     display:grid;grid-template-columns:repeat(5,1fr);
@@ -726,9 +772,9 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   @keyframes lightsIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
   @keyframes lightsOut{to{opacity:0}}
   .intro-lights i{
-    width:min(18.4vw,54vmin);aspect-ratio:1;border-radius:50%;opacity:.07;
-    background:radial-gradient(circle at 36% 30%,#ffd6cc,#ff5240 42%,#d11f16 72%,#7a0e0b);
-    box-shadow:0 0 9vmin rgba(255,64,44,.65),0 0 2.4vmin rgba(255,150,120,.55);
+    width:min(14.2vw,40vmin);aspect-ratio:1;border-radius:50%;opacity:.05;
+    background:radial-gradient(circle at 36% 30%,#efb0a2,#df4733 42%,#9d150c 72%,#4f0906);
+    box-shadow:0 0 5vmin rgba(206,48,32,.32),0 0 1.5vmin rgba(226,110,88,.26);
     animation:lightOn .12s linear both,lightOff .18s linear 2.25s forwards;
   }
   .intro-lights i:nth-child(1){animation-delay:.40s,2.25s}
@@ -738,10 +784,13 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .intro-lights i:nth-child(5){animation-delay:1.80s,2.25s}
   @keyframes lightOn{to{opacity:1}}
   @keyframes lightOff{from{opacity:1}to{opacity:0}}
-  /* 窄屏改成竖排，让五盏灯同样撑满屏幕 */
+  /* 窄屏改成竖排；手机端再小一档、也再暗一档（用户 2026-09-21 反馈） */
   @media (max-width:560px){
     .intro-lights{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr);gap:1.2vmin;padding:4vmin 0}
-    .intro-lights i{width:min(60vw,16vh)}
+    .intro-lights i{
+      width:min(40vw,10vh);
+      box-shadow:0 0 5.5vmin rgba(206,48,32,.26),0 0 1.6vmin rgba(226,110,88,.2);
+    }
   }
 
   /* --- 赛车 + 卡通车手（SVG 手绘 · 车头朝左） --- */
@@ -1227,6 +1276,14 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
       <a class="nav-link" data-view="feedback" href="#/feedback">留言反馈</a>
     </nav>
     <a class="nav-cta" href="mailto:yhw20070910@outlook.com">联系我</a>
+    <a class="nav-cta-sm" href="mailto:yhw20070910@outlook.com" aria-label="联系我" title="联系我">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.6" y="4.8" width="18.8" height="14.4" rx="2.6"/><path d="M3.4 6.7 12 13.1l8.6-6.4"/></svg>
+      <span class="cta-sm-t">联系我</span>
+    </a>
+    <button class="lang-toggle" id="langToggle" type="button" aria-label="切换语言（快捷键 T）" title="切换语言（快捷键 T）">
+      <span class="lg-en" aria-hidden="true">EN</span>
+      <span class="lg-zh" aria-hidden="true">中文</span>
+    </button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换深色 / 浅色主题" title="切换深色 / 浅色主题">
       <span class="ic-dark" aria-hidden="true">☾</span>
       <span class="ic-light" aria-hidden="true">☀</span>
@@ -1691,7 +1748,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
       <a href="#/feedback">留言反馈</a>
       <a href="mailto:yhw20070910@outlook.com">联系我</a>
     </div>
-    <p>阎浩文 · 个人主页 v3</p>
+    <p>阎浩文 · 个人主页 v3.1</p>
     <div class="copyright">
       <p>© 2026 阎浩文（Bryan） All Rights Reserved.</p>
       <p>本页面所有内容（包括文字、排版、设计及数字分身信息）均为本人原创，仅用于个人展示，不侵犯任何第三方知识产权。本网站含有 AI 生成内容。如需转载或引用，请先征得本人同意。</p>
@@ -1701,55 +1758,462 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
 </div>
 
 <script>
-/* ================= 数字分身知识库（沿用 v1） ================= */
-const KNOWLEDGE = {
-  name: "阎浩文",
-  alias: "小文",
-  occupation: "天津大学-香港理工大学-深圳未来技术学院 智能医学工程专业的大一新生（学生）",
-  focus: "AI 辅助学习、AI 应用、脑机接口、前沿医疗、自动驾驶与低空经济",
-  doing: "我目前是一名大一新生，专业是智能医学工程。主要在做的事情是：学习专业知识，同时探索如何用 AI 辅助自己更高效地读书、做笔记、理解复杂概念、整理信息。我会把我学到的 AI 方法应用到日常学习和未来的科研里。",
-  contact: "想联系我可以发邮件：\n常见邮箱 yhw20070910@outlook.com\n天津大学邮箱 3026445056@tju.edu.cn\n香港理工大学邮箱 26130039d@connect.polyu.hk\n也可以直接在校内找我——毕竟我是乐于助人的阎浩文 :)",
-  traits: "我的兴趣是围棋、阅读和打羽毛球。性格上一个明显特点是乐于助人，我很乐意帮同学解决问题；做事比较有条理，喜欢先把事情理清楚再动手。如果要用几个词形容我，那就是：乐于助人、有条理、爱学习。",
-  awards: "我的获奖经历：\n· 外研社杯口语比赛 国家级一等奖\n· 广东省生物科普论文大赛 特等奖\n· 深圳市高级中学（集团）中心校区 优秀毕业生",
-  greeting: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系，或者他最近在忙什么。"
+/* ================= 中英双语（i18n） =================
+   设计取舍：中文原文写在 HTML 里（默认语言，无 JS 时页面仍然完整可读），
+   英译集中放在 I18N_EN 字典里。切到英文时按「文本节点原文」查表替换，
+   切回中文时用节点上保存的原值还原（不是反向查表），所以中文一定不会走样。
+
+   字典的键 ＝ 节点文本 trim 后的原文，值 ＝ 英文。
+   漏译有两道客观检查兜底：
+     · check_i18n_static.py —— 页面里每个中文文本节点 / 属性都必须在字典里
+     · shoot_lang.py        —— 英文模式下渲染出的页面不应再出现汉字 */
+const I18N_EN = {
+  "阎浩文 Bryan · 个人主页 v3.1": "Yan Haowen (Bryan) · Personal Homepage v3.1",
+  "跳过": "Skip",
+  "阎浩文": "Yan Haowen",
+  "首页": "Home",
+  "个人信息": "Profile",
+  "我的特点": "Traits",
+  "数字分身": "Digital Twin",
+  "留言反馈": "Feedback",
+  "联系我": "Contact",
+  "天津大学 · 香港理工大学 · 深圳未来技术学院": "Tianjin University · The Hong Kong Polytechnic University · Shenzhen Future Technology Institute",
+  "你好，我是": "Hi, I'm",
+  "一名智能医学工程专业的大一学生，正在探索如何用 AI 辅助自己更高效地获取和掌握知识。性格乐于助人，喜欢围棋、阅读和打羽毛球。": "A first-year Intelligent Medical Engineering student, exploring how AI can help me gain and master knowledge more efficiently. I'm glad to help others, and I enjoy Go, reading and badminton.",
+  "认识我 →": "About me →",
+  "💬 和数字分身「小文」聊聊": "💬 Chat with my digital twin “Xiaowen”",
+  "✍️ 给我留言": "✍️ Leave me a message",
+  "🤖 小文 · 数字分身": "🤖 Xiaowen · Digital Twin",
+  "在线": "Online",
+  "你好呀！我是小文，阎浩文的数字分身 👋": "Hi there! I'm Xiaowen, Yan Haowen's digital twin 👋",
+  "你平时在忙什么？": "What are you usually working on?",
+  "在学智能医学工程，也在研究怎么用 AI 让学习更高效～": "Studying Intelligent Medical Engineering, and looking into how AI can make learning more efficient~",
+  "问问小文 →": "Ask Xiaowen →",
+  "所院校联合培养": "universities in a joint programme",
+  "项省级以上获奖": "awards at provincial level or above",
+  "个前沿关注方向": "frontier fields I follow",
+  "关于我": "About me",
+  "简单介绍一下我自己，以及我正在做的事。": "A short introduction to me and what I'm working on.",
+  "我是阎浩文（Bryan），来自深圳，目前是一名智能医学工程专业的大一新生，就读于天津大学香港理工大学深圳未来技术学院。": "I'm Yan Haowen (Bryan), from Shenzhen. I'm a first-year student of Intelligent Medical Engineering at the Tianjin University–PolyU Shenzhen Future Technology Institute.",
+  "我对「AI 如何帮助人更好地学习」这件事特别感兴趣：正在尝试用 AI 辅助我读书、做笔记、理解复杂概念、整理信息，并把这些方法用到日常学习里。": "I'm especially interested in how AI can help people learn better: I use AI to help me read, take notes, understand complex ideas and organise information, and I put these methods to work in my daily study.",
+  "除了学习，我喜欢下围棋、阅读和打羽毛球。性格上乐于助人、做事有条理，喜欢先把事情理清楚再动手。未来我希望把 AI 真正用到医疗健康等前沿领域。": "Besides studying, I enjoy playing Go, reading and playing badminton. I like to help others and to keep things organised — I prefer to think things through before I start. In the future I hope to apply AI in frontier areas such as healthcare.",
+  "阎": "Yan",
+  "Bryan · 智能医学工程": "Bryan · Intelligent Medical Engineering",
+  "深圳": "Shenzhen",
+  "大一新生": "First-year student",
+  "AI 学习者": "AI learner",
+  "我关注的方向": "What I focus on",
+  "六个我最关心、也最想去深入了解的前沿领域。点开任意一个，看看我具体在关注什么。": "Six frontier fields I care about most and want to explore further. Open any one to see exactly what I'm following.",
+  "AI 辅助学习": "AI-Assisted Learning",
+  "用 AI 更高效地读书、记笔记、理解概念、整理信息。": "Using AI to read, take notes, grasp concepts and organise information more efficiently.",
+  "了解我在关注什么": "See what I'm following",
+  "AI 应用": "AI Applications",
+  "关注人工智能在真实场景中的落地与实际使用。": "Following how AI lands in real scenarios and how it is actually used.",
+  "脑机接口": "Brain-Computer Interfaces",
+  "探索大脑与机器之间的信息通道会带来怎样的可能。": "Exploring what a channel between brain and machine could make possible.",
+  "前沿医疗": "Frontier Medicine",
+  "关注新技术如何改变医疗诊断与健康管理。": "Following how new technology changes medical diagnosis and health management.",
+  "自动驾驶": "Autonomous Driving",
+  "关注智能出行的安全性、效率与未来形态。": "Following the safety, efficiency and future shape of intelligent mobility.",
+  "低空经济": "Low-Altitude Economy",
+  "关注无人机与低空飞行带来的新产业机会。": "Following the new industry opportunities created by drones and low-altitude flight.",
+  "获奖与荣誉": "Awards & Honours",
+  "一路走来的一些小成绩。": "A few small results along the way.",
+  "外研社杯口语比赛": "FLTRP Cup Speaking Competition",
+  "国家级一等奖": "National First Prize",
+  "广东省生物科普论文大赛": "Guangdong Biology Popular-Science Essay Competition",
+  "特等奖": "Grand Prize",
+  "深圳市高级中学（集团）中心校区": "Shenzhen Senior High School (Group) Central Campus",
+  "优秀毕业生": "Outstanding Graduate",
+  "想和我聊聊，或是有合作想法？": "Want to talk, or have an idea to work on together?",
+  "欢迎通过以下任意邮箱联系我，也随时可以在数字分身处先问两句。": "Reach me at any of the email addresses below — or ask Xiaowen a couple of questions first.",
+  "常用": "Personal",
+  "天津大学": "Tianjin University",
+  "香港理工大学": "The Hong Kong Polytechnic University",
+  "先找小文聊聊 →": "Ask Xiaowen first →",
+  "/ 我关注的方向 / AI 辅助学习": "/ What I focus on / AI-Assisted Learning",
+  "/ 我关注的方向 / AI 应用": "/ What I focus on / AI Applications",
+  "/ 我关注的方向 / 脑机接口": "/ What I focus on / Brain-Computer Interfaces",
+  "/ 我关注的方向 / 前沿医疗": "/ What I focus on / Frontier Medicine",
+  "/ 我关注的方向 / 自动驾驶": "/ What I focus on / Autonomous Driving",
+  "/ 我关注的方向 / 低空经济": "/ What I focus on / Low-Altitude Economy",
+  "/ 个人信息": "/ Profile",
+  "/ 我的特点": "/ Traits",
+  "/ 数字分身": "/ Digital Twin",
+  "/ 留言反馈": "/ Feedback",
+  "我关心的是：如何用人工智能工具辅助自己学习新知识。": "What I care about: how AI tools can help me learn new knowledge.",
+  "我在关注什么": "What I'm following",
+  "语言学习：": "Language learning:",
+  "最近我在尝试借助 AI 工具学习粤语。": "Lately I've been trying to learn Cantonese with the help of AI tools.",
+  "探索新领域知识：": "Exploring new fields:",
+  "近来我在用 AI 帮助自己了解网络安全相关知识。": "Recently I've been using AI to learn about cybersecurity.",
+  "看看其他方向": "See other fields",
+  "📚 AI 辅助学习": "📚 AI-Assisted Learning",
+  "🤖 AI 应用": "🤖 AI Applications",
+  "🧠 脑机接口": "🧠 Brain-Computer Interfaces",
+  "🩺 前沿医疗": "🩺 Frontier Medicine",
+  "🚗 自动驾驶": "🚗 Autonomous Driving",
+  "🛩️ 低空经济": "🛩️ Low-Altitude Economy",
+  "← 返回首页 · 我关注的方向": "← Back to home · What I focus on",
+  "我关心怎么使用 AI 把比较复杂的理论落地，也关心它怎么给我们的生活提速。": "I care about how AI can put fairly complex theory into practice, and how it speeds up everyday life.",
+  "让复杂理论落地：": "Making complex theory practical:",
+  "例如 OpenAI 解决数学难题。": "For example, OpenAI solving mathematical problems.",
+  "给生活提速、减少重复性的工作：": "Speeding up daily life and cutting repetitive work:",
+  "例如用 AI 生成文档。": "For example, generating documents with AI.",
+  "我是智能医学工程专业的学生，我关心脑机接口的最新进展。": "I'm an Intelligent Medical Engineering student, and I follow the latest progress in brain-computer interfaces.",
+  "临床实验：": "Clinical trials:",
+  "例如南方医科大学、华中科技大学最近进行的临床实验。": "For example, the clinical trials recently carried out by Southern Medical University and Huazhong University of Science and Technology.",
+  "机构动向：": "Institutional moves:",
+  "例如海河实验室的新动向。": "For example, the latest from Haihe Laboratory.",
+  "我关注先进的医疗，好奇治疗各种难以治疗疾病的新疗法，也注重联合治疗。": "I follow advanced medicine: I'm curious about new therapies for diseases that are hard to treat, and I pay attention to combination therapy.",
+  "新疗法：": "New therapies:",
+  "好奇治疗各种难以治疗的疾病有哪些新疗法。": "Curious about which new therapies exist for diseases that are hard to treat.",
+  "治疗思路：": "Treatment approaches:",
+  "注重联合治疗。": "Paying attention to combination therapy.",
+  "了解途径：": "How I learn about it:",
+  "研究各大医学院的论文。": "Reading papers from major medical schools.",
+  "L3 即将到来了，我关心它怎么实现；更让我在意的是——脑控驾驶什么时候可以实现。": "L3 is arriving soon and I care about how it will be achieved; what interests me even more is when brain-controlled driving will become possible.",
+  "L3 级自动驾驶：": "L3 autonomous driving:",
+  "即将到来，我关心它怎么实现。": "It is coming soon, and I care about how it will be implemented.",
+  "路线之争：": "The debate over approaches:",
+  "激光辅助方案和纯视觉方案之间的争论。": "The argument between lidar-assisted and camera-only approaches.",
+  "脑控驾驶：": "Brain-controlled driving:",
+  "它什么时候可以实现。": "When it can become reality.",
+  "我关心脑控无人机的应用，也关心无人机对运输效率的影响。": "I care about brain-controlled drones, and about how drones affect transport efficiency.",
+  "脑控无人机：": "Brain-controlled drones:",
+  "关注它的应用。": "Following how they are applied.",
+  "运输效率：": "Transport efficiency:",
+  "关注无人机对运输效率的影响。": "Following how drones affect transport efficiency.",
+  "关注案例：": "Cases I follow:",
+  "例如大疆在做的脑控飞行方案。": "For example, the brain-controlled flight work DJI is doing.",
+  "我的基本情况、联系方式与关注方向。": "My basic information, contact details and the fields I follow.",
+  "姓名": "Name",
+  "阎浩文（Bryan）": "Yan Haowen (Bryan)",
+  "身份": "Role",
+  "学生 · 智能医学工程专业": "Student · Intelligent Medical Engineering",
+  "学校": "School",
+  "城市": "City",
+  "兴趣": "Interests",
+  "围棋 · 阅读 · 羽毛球": "Go · Reading · Badminton",
+  "联系": "Contact",
+  "· 常用": "· Personal",
+  "· 天津大学": "· Tianjin University",
+  "· 香港理工大学": "· The Hong Kong Polytechnic University",
+  "关心方向": "Fields I follow",
+  "认识我的人，大概会用这几个词形容我。": "People who know me would probably describe me with these words.",
+  "乐于助人": "Helpful",
+  "同学有困难我很乐意搭把手，遇到问题主动帮大家解决。": "I'm glad to lend a hand when classmates are stuck, and I like to step in and solve problems.",
+  "有条理": "Organised",
+  "喜欢把事情理清楚再动手，先规划后执行。": "I like to get things clear first — plan, then act.",
+  "爱学习": "Keen to learn",
+  "热衷用 AI 辅助获取知识，保持对新事物的好奇。": "I enjoy using AI to gain knowledge and staying curious about new things.",
+  "数字分身 · 小文": "Digital Twin · Xiaowen",
+  "基于我本人的信息，回答关于我的问题。": "Answers questions about me, based on my own information.",
+  "基于我本人的信息，回答关于我的问题": "Answers questions about me, based on my own information",
+  "发送": "Send",
+  "欢迎写下你的建议与意见。带上昵称、你和我的关系、访问设备，我会更容易理解你的反馈。": "You're welcome to leave your suggestions and comments. Adding your nickname, how you know me and the device you're using helps me understand your feedback better.",
+  "你的昵称": "Your nickname",
+  "必填": "Required",
+  "你和我的关系": "How you know me",
+  "朋友": "Friend",
+  "同学": "Classmate",
+  "家人": "Family",
+  "老师": "Teacher",
+  "其他": "Other",
+  "你正在用什么设备访问": "Which device are you using?",
+  "手机": "Phone",
+  "平板": "Tablet",
+  "电脑": "Computer",
+  "你的意见": "Your comments",
+  "0 / 300 字": "0 / 300 characters",
+  "提交留言": "Submit",
+  "留言会直接提交到站主自己的数据库（Supabase），只有站主能看到，不会公开显示。": "Your message goes straight into the site owner's own database (Supabase). Only the owner can see it — it is never shown publicly.",
+  "已收到你的留言": "Your message has been received",
+  "谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。": "Thank you for taking the time to write this. Your message is now in the site owner's database, and only the owner can see it.",
+  "再写一条": "Write another",
+  "中文": "中文",
+  "阎浩文 · 个人主页 v3.1": "Yan Haowen · Personal Homepage v3.1",
+  "© 2026 阎浩文（Bryan） All Rights Reserved.": "© 2026 Yan Haowen (Bryan). All Rights Reserved.",
+  "本页面所有内容（包括文字、排版、设计及数字分身信息）均为本人原创，仅用于个人展示，不侵犯任何第三方知识产权。本网站含有 AI 生成内容。如需转载或引用，请先征得本人同意。": "All content on this page (including text, layout, design and the digital twin's information) is my own original work. It is for personal presentation only and infringes no third-party intellectual property. This site contains AI-generated content. Please ask for my permission before republishing or quoting anything."
 };
 
+const ATTR_EN = {
+  "阎浩文（Bryan）的个人主页 —— 天津大学·香港理工大学·深圳未来技术学院 智能医学工程大一学生，含数字分身「小文」。": "The personal homepage of Yan Haowen (Bryan) — a first-year Intelligent Medical Engineering student at the Tianjin University–PolyU Shenzhen Future Technology Institute, with his digital twin “Xiaowen”.",
+  "阎浩文 Bryan": "Yan Haowen (Bryan)",
+  "开场动画": "Intro animation",
+  "主导航": "Main navigation",
+  "联系我": "Contact",
+  "切换深色 / 浅色主题": "Switch between dark and light theme",
+  "展开菜单": "Open menu",
+  "切换语言（快捷键 T）": "Switch language (shortcut T)",
+  "和数字分身「小文」聊聊": "Chat with my digital twin “Xiaowen”",
+  "头像占位": "Avatar placeholder",
+  "问问关于阎浩文的事，例如：你在做什么？": "Ask about Yan Haowen, e.g. what are you working on?",
+  "我该怎么称呼你？": "What should I call you?",
+  "请写下具体关系，比如亲戚、室友、网友": "Please specify, e.g. relative, roommate, online friend",
+  "请写下设备种类，比如智能手表、游戏机": "Please specify the device, e.g. smartwatch, game console",
+  "请尽量写具体：在哪个页面、哪个位置，你的体验如何，遇到了什么问题。例如「首页顶部那排按钮在手机上挤在一起，点起来不太方便」": "Please be as specific as you can: which page, where on it, how it felt and what went wrong. For example, “the row of buttons at the top of the home page is cramped on a phone and hard to tap”."
+};
+
+const LANG_KEY = "yhw-lang";
+const ATTRS_I18N = ["placeholder", "aria-label", "title", "alt", "content"];
+
+function initialLang() {
+  try {
+    if (location.search.indexOf("lang=en") >= 0) return "en";
+    return localStorage.getItem(LANG_KEY) === "en" ? "en" : "zh";
+  } catch (e) { return "zh"; }
+}
+
+let curLang = initialLang();
+
+/* 取当前语言的文案：L(中文, 英文) */
+const L = (zh, en) => (curLang === "en" ? en : zh);
+
+/* 取知识库字段的当前语言值 */
+const k = field => {
+  const f = KNOWLEDGE[field];
+  return f ? (curLang === "en" ? f.en : f.zh) : "";
+};
+
+/* 动态容器里的文案由脚本按语言现算，静态替换不碰它们 */
+const SKIP_SEL = "#typed,#chatBody,#quick,#fbStat";
+
+/* 关键词命中：纯英文关键词要求单词边界，
+   否则 "hi" 会命中 "which"、"ai" 会命中 "said"、"email" 里也会蹦出 "ai"。
+
+   长度 >= 4 的英文关键词额外容忍常见词形变化（sports / awards / studies / classmates），
+   否则访客问 "What sports does he like?" 会掉进兜底。
+   短关键词（hi / ai / f1）不放开后缀，不然 "his" 会被当成打招呼、"aids" 会被当成 ai。 */
+const EN_SUFFIX = ["s", "es", "ed", "ing", "ies", "'s"];
+
+function hit(text, key) {
+  if (!key) return false;
+  if (key.charCodeAt(0) >= 128) return text.includes(key);
+  const len = key.length;
+  let i = text.indexOf(key);
+  while (i >= 0) {
+    const pre = i === 0 ? "" : text.charAt(i - 1);
+    const rest = text.slice(i + len);
+    let okPre = !/[a-z0-9]/.test(pre);
+    let okPost = !rest || !/[a-z0-9]/.test(rest.charAt(0));
+    if (!okPost && len >= 4) {
+      for (const suf of EN_SUFFIX) {
+        if (rest.indexOf(suf) === 0) {
+          const after = rest.slice(suf.length);
+          if (!after || !/[a-z0-9]/.test(after.charAt(0))) { okPost = true; break; }
+        }
+      }
+    }
+    if (okPre && okPost) return true;
+    i = text.indexOf(key, i + 1);
+  }
+  return false;
+}
+
+/* 遍历「当前含汉字」的文本节点。
+   注意：这个筛选只适用于「中文 → 英文」这一个方向。一旦切成英文，这些节点里
+   就没有汉字了，再靠它找节点会一个都找不到 —— 切回中文必须走下面的登记表，
+   否则整页会留在英文（实测 262 个静态节点不复原，只有 js 现算的数字分身会回到中文）。 */
+function walkCjkTextNodes(root, fn) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      const p = n.parentNode;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      const tag = p.nodeName;
+      if (tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT") return NodeFilter.FILTER_REJECT;
+      if (!/[\u4e00-\u9fa5]/.test(n.nodeValue || "")) return NodeFilter.FILTER_REJECT;
+      if (p.closest && p.closest(SKIP_SEL)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const list = [];
+  while (w.nextNode()) list.push(w.currentNode);
+  list.forEach(fn);
+}
+
+/* 已被翻译过的文本节点登记表：首次见到时留底（__zh）并登记，切回中文按它还原。
+   只靠「当前值含汉字」判断语言是行不通的，见 walkCjkTextNodes 上的说明。 */
+const TEXT_NODES = [];
+
+function applyText(lang) {
+  /* 1) 登记 / 刷新中文原文：含汉字的节点就是「还没被翻成英文」的节点 */
+  walkCjkTextNodes(document.documentElement, node => {
+    if (node.__zh === undefined) {
+      node.__zh = node.nodeValue;                 /* 首次见到时留底 */
+      TEXT_NODES.push(node);
+    } else if (node.nodeValue !== node.__zh) {
+      node.__zh = node.nodeValue;                 /* 脚本更新过（如留言字数）：以最新中文为准 */
+    }
+  });
+  /* 2) 按目标语言逐节点重算。切到英文从中文原文重算（可反复执行），
+        切回中文就是把留底写回去 —— 与节点当前是不是英文无关。 */
+  TEXT_NODES.forEach(node => {
+    const raw = node.__zh;
+    if (raw === undefined) return;
+    if (lang !== "en") { if (node.nodeValue !== raw) node.nodeValue = raw; return; }
+    const key = raw.trim();
+    const en = I18N_EN[key];
+    if (en === undefined) return;                              /* 漏译：静态检查会抓出来 */
+    const at = raw.indexOf(key);
+    node.nodeValue = raw.slice(0, at) + en + raw.slice(at + key.length);
+  });
+}
+
+function applyAttrs(lang) {
+  document.querySelectorAll("[placeholder],[aria-label],[title],[alt],[content]").forEach(el => {
+    if (!el.__zhAttr) {
+      el.__zhAttr = {};
+      ATTRS_I18N.forEach(a => {
+        const v = el.getAttribute(a);
+        /* 只把「含汉字」的值当原文留底，避免把主题/语言按钮上脚本写的英文误当原文 */
+        if (v && /[\u4e00-\u9fa5]/.test(v)) el.__zhAttr[a] = v;
+      });
+    }
+    ATTRS_I18N.forEach(a => {
+      const zh = el.__zhAttr[a];
+      if (zh === undefined) return;
+      if (lang !== "en") { if (el.getAttribute(a) !== zh) el.setAttribute(a, zh); return; }
+      const en = ATTR_EN[zh];
+      if (en !== undefined) el.setAttribute(a, en);
+    });
+  });
+}
+
+function applyLang(lang) {
+  curLang = lang === "en" ? "en" : "zh";
+  const root = document.documentElement;
+  root.setAttribute("data-lang", curLang);
+  root.setAttribute("lang", curLang === "en" ? "en" : "zh-CN");
+  applyText(curLang);
+  applyAttrs(curLang);
+  renderChat();                                              /* 历史对话按新语言重算 */
+  renderQuick();
+  restartTyped();
+  syncThemeChrome(root.getAttribute("data-theme") || "light");
+  syncLangChrome();
+  syncOpinionCount();
+  renderFbStat();
+}
+
+const langToggle = document.getElementById("langToggle");
+
+function syncLangChrome() {
+  if (!langToggle) return;
+  const label = L("切换语言：英文（快捷键 T）", "Switch language: Chinese (shortcut T)");
+  langToggle.setAttribute("aria-label", label);
+  langToggle.setAttribute("title", label);
+}
+
+function setLang(lang, persist) {
+  applyLang(lang);
+  if (persist) { try { localStorage.setItem(LANG_KEY, curLang); } catch (e) {} }
+}
+
+if (langToggle) {
+  langToggle.addEventListener("click", () => setLang(curLang === "en" ? "zh" : "en", true));
+}
+
+/* 快捷键 T 切换中英：输入框里打字时不抢键，带修饰键的组合留给浏览器 */
+document.addEventListener("keydown", e => {
+  if (e.key !== "t" && e.key !== "T") return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  setLang(curLang === "en" ? "zh" : "en", true);
+});
+
+/* ================= 数字分身知识库（沿用 v1） ================= */
+const KNOWLEDGE = {
+  name: { zh: "阎浩文", en: "Yan Haowen" },
+  alias: { zh: "小文", en: "Xiaowen" },
+  occupation: { zh: "天津大学-香港理工大学-深圳未来技术学院 智能医学工程专业的大一新生（学生）", en: "a first-year Intelligent Medical Engineering student at the Tianjin University-PolyU Shenzhen Future Technology Institute (a student)" },
+  focus: { zh: "AI 辅助学习、AI 应用、脑机接口、前沿医疗、自动驾驶与低空经济", en: "AI-assisted learning, AI applications, brain-computer interfaces, frontier medicine, autonomous driving and the low-altitude economy" },
+  doing: { zh: "我目前是一名大一新生，专业是智能医学工程。主要在做的事情是：学习专业知识，同时探索如何用 AI 辅助自己更高效地读书、做笔记、理解复杂概念、整理信息。我会把我学到的 AI 方法应用到日常学习和未来的科研里。", en: "I'm a first-year university student majoring in Intelligent Medical Engineering. My main work right now is studying my field, while exploring how AI can help me read, take notes, understand complex concepts and organise information more efficiently. I apply the AI methods I learn to my daily study and to the research I want to do later." },
+  contact: { zh: "想联系我可以发邮件：\\n常见邮箱 yhw20070910@outlook.com\\n天津大学邮箱 3026445056@tju.edu.cn\\n香港理工大学邮箱 26130039d@connect.polyu.hk\\n也可以直接在校内找我——毕竟我是乐于助人的阎浩文 :)", en: "You can reach me by email:\\nPersonal  yhw20070910@outlook.com\\nTianjin University  3026445056@tju.edu.cn\\nPolyU  26130039d@connect.polyu.hk\\nYou can also just find me on campus - I'm Yan Haowen, always glad to help :)" },
+  traits: { zh: "我的兴趣是围棋、阅读和打羽毛球。性格上一个明显特点是乐于助人，我很乐意帮同学解决问题；做事比较有条理，喜欢先把事情理清楚再动手。如果要用几个词形容我，那就是：乐于助人、有条理、爱学习。", en: "I enjoy playing Go, reading and playing badminton. One obvious trait is that I'm glad to help others: I really like solving problems for my classmates. I'm also fairly organised and prefer to get things clear before I start. If you had to describe me in a few words: helpful, organised, keen to learn." },
+  awards: { zh: "我的获奖经历：\\n· 外研社杯口语比赛 国家级一等奖\\n· 广东省生物科普论文大赛 特等奖\\n· 深圳市高级中学（集团）中心校区 优秀毕业生", en: "My awards:\\n- FLTRP Cup Speaking Competition: National First Prize\\n- Guangdong Biology Popular-Science Essay Competition: Grand Prize\\n- Shenzhen Senior High School (Group) Central Campus: Outstanding Graduate" },
+  sport: { zh: "体育运动里我最关注的是 F1 赛车。我喜欢红牛车队，也支持维斯塔潘、阿隆索和勒克莱尔。", en: "In sports I follow Formula 1 the most. I like the Red Bull team, and I support Max Verstappen, Fernando Alonso and Charles Leclerc." },
+  campus: { zh: "我的校园生活挺充实的：交到了许多朋友，正在学新的东西，也在努力让自己每天都进步一点。", en: "Campus life is full: I've made a lot of friends, I'm learning new things, and I try to improve a little every day." },
+  highschool: { zh: "我的高中生活很充实，遇见了许多好友和好老师。特别感谢高一九班、高二四班、高三四班的同学和老师；也感谢那些没有和我同班、却一直给我力量的老师和同学。", en: "My high school years were rich and full - I met many good friends and great teachers. My special thanks go to the classmates and teachers of Class 9, Grade 10; Class 4, Grade 11; and Class 4, Grade 12. And also to the teachers and classmates who were never in my class but kept giving me strength." },
+  greeting: { zh: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系，或者他最近在忙什么。", en: "Hi there! I'm Xiaowen, Yan Haowen's digital twin. You can ask me about his studies, interests, traits, awards, how to contact him, or what he's been up to lately." }
+};
+
+/* 按当前语言取知识库字段（新增事实只要在这里补一对 zh/en） */
+
 const RULES = [
-  { keys: ["你好", "hi", "hello", "嗨", "在吗", "你是谁"], ans: KNOWLEDGE.greeting + "\n\n你也可以点下面的快捷问题直接问我。" },
-  { keys: ["你干什么", "你在干什么", "在做什么", "在干嘛", "忙什么", "最近", "学习"], ans: KNOWLEDGE.doing },
-  { keys: ["联系", "联系方式", "邮箱", "怎么找到", "微信", "电话", "找谁"], ans: KNOWLEDGE.contact },
-  { keys: ["特点", "性格", "是什么样", "怎么样的人", "为人", "擅长"], ans: KNOWLEDGE.traits },
-  { keys: ["获奖", "奖项", "荣誉", "奖", "经历", "比赛", "一等奖", "特等奖", "优秀毕业生", "外研社", "论文"], ans: KNOWLEDGE.awards },
-  { keys: ["兴趣", "爱好", "喜欢", "围棋", "阅读", "书", "羽毛球", "运动"], ans: KNOWLEDGE.traits },
-  { keys: ["名字", "叫什么", "姓名", "你是"], ans: "我叫" + KNOWLEDGE.name + "。我是他的数字分身，他本人是" + KNOWLEDGE.occupation + "。" },
-  { keys: ["专业", "职业", "学生", "做什么的", "学的", "学院", "大学", "学校"], ans: KNOWLEDGE.occupation },
-  { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术"], ans: "他最关心的六个方向是：" + KNOWLEDGE.focus + "。首页「我关注的方向」里，每个方向都可以点进去看到具体在关注什么。" },
-  { keys: ["介绍", "简介", "了解一下", "介绍下自己"], ans: "我是" + KNOWLEDGE.name + "，今年刚入学，是一名" + KNOWLEDGE.occupation + "。我的兴趣是围棋、阅读、打羽毛球，乐于助人，目前主要在用 AI 辅助学习。" }
+  /* 顺序即优先级，首个命中即返回。
+     「高中生活」「校园生活」「体育运动」必须排在「兴趣 / 专业」这类宽泛关键词之前，
+     否则「运动」「大学」会把它们抢走。关键词中英并列：英文访客用英文提问也能命中。 */
+  { keys: ["你好", "hi", "hello", "嗨", "在吗", "你是谁", "who are you"],
+    ans: () => k("greeting") + L("\n\n你也可以点下面的快捷问题直接问我。",
+                                 "\n\nYou can also tap one of the quick questions below.") },
+  { keys: ["高中生活", "高中", "高一", "高二", "高三", "九班", "四班", "高中同学", "high school"],
+    ans: () => k("highschool") },
+  { keys: ["校园生活", "大学生活", "学校生活", "校园", "朋友", "同学", "室友", "交到", "campus", "classmate", "friend"],
+    ans: () => k("campus") },
+  { keys: ["体育运动", "体育", "运动", "f1", "赛车", "红牛", "维斯塔潘", "阿隆索", "勒克莱尔",
+           "sport", "formula 1", "racing", "verstappen", "alonso", "leclerc"],
+    ans: () => k("sport") },
+  { keys: ["你干什么", "你在干什么", "在做什么", "在干嘛", "忙什么", "最近", "学习",
+           "what are you doing", "working on", "busy", "study", "studies", "studying", "learning"],
+    ans: () => k("doing") },
+  { keys: ["联系", "联系方式", "邮箱", "怎么找到", "微信", "电话", "找谁", "contact", "email", "reach"],
+    ans: () => k("contact") },
+  { keys: ["特点", "性格", "是什么样", "怎么样的人", "为人", "擅长", "traits", "personality"],
+    ans: () => k("traits") },
+  { keys: ["获奖", "奖项", "荣誉", "奖", "经历", "比赛", "一等奖", "特等奖", "优秀毕业生", "外研社", "论文",
+           "award", "prize", "competition"],
+    ans: () => k("awards") },
+  { keys: ["兴趣", "爱好", "喜欢", "围棋", "阅读", "书", "羽毛球", "interest", "hobby", "reading", "badminton"],
+    ans: () => k("traits") },
+  { keys: ["名字", "叫什么", "姓名", "你是", "your name"],
+    ans: () => L("我叫" + KNOWLEDGE.name.zh + "。我是他的数字分身，他本人是" + KNOWLEDGE.occupation.zh + "。",
+                 "I'm Xiaowen, his digital twin. He is " + KNOWLEDGE.occupation.en + ".") },
+  { keys: ["专业", "职业", "学生", "做什么的", "学的", "学院", "大学", "学校", "school", "university", "major", "student", "study"],
+    ans: () => k("occupation") },
+  { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术", "focus", "field", "research", "technology"],
+    ans: () => L("他最关心的六个方向是：" + KNOWLEDGE.focus.zh +
+                 "。首页「我关注的方向」里，每个方向都可以点进去看到具体在关注什么。",
+                 "The six fields he cares about most: " + KNOWLEDGE.focus.en +
+                 ". On the home page, under \u201cWhat I focus on\u201d, you can open each one to see exactly what he's following.") },
+  { keys: ["介绍", "简介", "了解一下", "介绍下自己", "introduce"],
+    ans: () => L("我是" + KNOWLEDGE.name.zh + "，今年刚入学，是一名" + KNOWLEDGE.occupation.zh +
+                 "。我的兴趣是围棋、阅读、打羽毛球，乐于助人，目前主要在用 AI 辅助学习。",
+                 "I'm Xiaowen, his digital twin. He just started university this year as " +
+                 KNOWLEDGE.occupation.en + ". He enjoys Go, reading and badminton, likes helping others, " +
+                 "and right now he is mainly using AI to help him study.") }
 ];
 
-const FALLBACK = "这个问题我还没学会回答～你可以试着问我：你在做什么？怎么联系你？你有什么特点？";
+const FALLBACK = {
+  zh: "感谢您，若有其他问题请用各种方式（如邮箱，各个社交软件，线下）私聊我。",
+  en: "Thank you! If you have anything else to ask, feel free to message me privately in any way "
+      + "- by email, on any social app, or in person."
+};
 
 /* 关注方向详情：直接读「我关注的方向」子页的 DOM，
    保证数字分身的回答与子板块内容永远一致（单一数据源，不用两处维护） */
 const FOCUS_KEYS = [
-  { key: "ai-study", words: ["ai辅助学习", "ai 辅助学习", "辅助学习"] },
-  { key: "ai-app", words: ["ai应用", "ai 应用", "人工智能应用"] },
-  { key: "bci", words: ["脑机接口", "bci", "脑机"] },
-  { key: "medtech", words: ["前沿医疗", "医疗"] },
-  { key: "autodrive", words: ["自动驾驶", "无人驾驶"] },
-  { key: "low-altitude", words: ["低空经济", "无人机", "低空"] }
+  { key: "ai-study", words: ["ai辅助学习", "ai 辅助学习", "辅助学习", "ai assisted learning", "assisted learning"] },
+  { key: "ai-app", words: ["ai应用", "ai 应用", "人工智能应用", "ai application", "ai applications"] },
+  { key: "bci", words: ["脑机接口", "bci", "脑机", "brain computer", "brain-computer"] },
+  { key: "medtech", words: ["前沿医疗", "医疗", "frontier medicine", "advanced medicine"] },
+  { key: "autodrive", words: ["自动驾驶", "无人驾驶", "autonomous driving", "self driving", "self-driving"] },
+  { key: "low-altitude", words: ["低空经济", "无人机", "低空", "low altitude", "low-altitude", "drone"] }
 ];
 
 function focusAnswer(text) {
   for (const f of FOCUS_KEYS) {
-    if (!f.words.some(w => text.includes(w))) continue;
+    if (!f.words.some(w => hit(text, w))) continue;
     const el = document.getElementById("view-focus-" + f.key);
     if (!el) return null;
     const lead = el.querySelector(".focus-lead");
     const items = Array.from(el.querySelectorAll(".focus-list li"));
     let s = lead ? lead.textContent.trim() : "";
     if (items.length) s += (s ? "\n" : "") + items.map(li => "· " + li.textContent.trim()).join("\n");
-    return s + "\n\n（首页「我关注的方向」里点开这个方向，看到的也是这些内容）";
+    return s + L("\n\n（首页「我关注的方向」里点开这个方向，看到的也是这些内容）",
+                 "\n\n(You can see the same content by opening this field on the home page, "
+                 + "under \u201cWhat I focus on\u201d.)");
   }
   return null;
 }
@@ -1758,8 +2222,8 @@ function answer(raw) {
   const text = (raw || "").toLowerCase();
   const detail = focusAnswer(text);
   if (detail) return detail;
-  for (const r of RULES) { if (r.keys.some(k => text.includes(k))) return r.ans; }
-  return FALLBACK;
+  for (const r of RULES) { if (r.keys.some(x => hit(text, x))) return r.ans(); }
+  return L(FALLBACK.zh, FALLBACK.en);
 }
 
 /* ================= 聊天 UI ================= */
@@ -1767,37 +2231,77 @@ const chatBody = document.getElementById("chatBody");
 const chatInput = document.getElementById("chatInput");
 const quick = document.getElementById("quick");
 
+/* 对话记录只存「谁问的、问题原文」，回答在渲染时按当前语言现算：
+   切成英文时历史回答会自动重算成英文，不用两处维护，也不会中英混杂。 */
+const chatLog = [{ who: "ai", greeting: true }];
+
+function greetingText() {
+  return k("greeting") + L("\n\n你也可以点下面的快捷问题直接问我。",
+                           "\n\nYou can also tap one of the quick questions below.");
+}
+
 function addMsg(content, who) {
   const m = document.createElement("div");
   m.className = "msg " + who;
-  m.innerHTML = (who === "ai" ? '<div class="who">小文 · 数字分身</div>' : '<div class="who">我</div>') + content;
+  m.innerHTML = (who === "ai"
+    ? '<div class="who">' + L("小文 · 数字分身", "Xiaowen · Digital Twin") + '</div>'
+    : '<div class="who">' + L("我", "Me") + '</div>') + content;
   chatBody.appendChild(m);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
+/* 快捷问题：中英各一份，问英文也会命中同一套规则 */
+const QUICK_QS = [
+  { zh: "你在做什么？", en: "What are you working on?" },
+  { zh: "怎么联系你？", en: "How can I contact you?" },
+  { zh: "你有什么特点？", en: "What are your traits?" },
+  { zh: "你的获奖经历？", en: "What awards has he won?" },
+  { zh: "你关心什么方向？", en: "Which fields do you focus on?" },
+  { zh: "你的高中生活怎么样？", en: "How was his high school life?" },
+  { zh: "校园生活怎么样？", en: "How is campus life?" },
+  { zh: "你喜欢什么运动？", en: "What sports does he like?" }
+];
+
+function renderQuick() {
+  quick.innerHTML = "";
+  QUICK_QS.forEach(q => {
+    const text = curLang === "en" ? q.en : q.zh;
+    const b = document.createElement("button");
+    b.textContent = text;
+    b.addEventListener("click", () => ask(text));
+    quick.appendChild(b);
+  });
+}
+
+function renderChat() {
+  chatBody.innerHTML = "";
+  chatLog.forEach(e => {
+    if (e.who === "user") addMsg(e.text, "user");
+    else if (e.greeting) addMsg(greetingText(), "ai");
+    else addMsg(answer(e.q), "ai");
+  });
+}
+
 function ask(text) {
   if (!text || !text.trim()) return;
-  addMsg(text.trim(), "user");
+  const q = text.trim();
+  chatLog.push({ who: "user", text: q });
+  addMsg(q, "user");
   chatInput.value = "";
   const typing = document.createElement("div");
   typing.className = "msg ai typing";
   typing.innerHTML = "<span></span><span></span><span></span>";
   chatBody.appendChild(typing);
   chatBody.scrollTop = chatBody.scrollHeight;
-  setTimeout(() => { typing.remove(); addMsg(answer(text), "ai"); }, 550);
+  const reply = { who: "ai", q: q };
+  setTimeout(() => { typing.remove(); chatLog.push(reply); addMsg(answer(q), "ai"); }, 550);
 }
 
 document.getElementById("sendBtn").addEventListener("click", () => ask(chatInput.value));
 chatInput.addEventListener("keydown", e => { if (e.key === "Enter") ask(chatInput.value); });
 
-["你在做什么？", "怎么联系你？", "你有什么特点？", "你的获奖经历？", "你关心什么方向？"].forEach(q => {
-  const b = document.createElement("button");
-  b.textContent = q;
-  b.addEventListener("click", () => ask(q));
-  quick.appendChild(b);
-});
-
-addMsg(KNOWLEDGE.greeting, "ai");
+renderQuick();
+addMsg(greetingText(), "ai");
 
 /* ================= 留言反馈 ================= */
 /* 本站是纯静态单文件（双击即可打开、零外部依赖），没有自己的服务器。
@@ -1856,7 +2360,7 @@ const MAILTO_SAFE_LIMIT = 1800;
 function syncOpinionCount() {
   if (!fbOpinionCount) return;
   const n = fbOpinion.value.length;
-  fbOpinionCount.textContent = n + " / " + FB_OPINION_MAX + " 字";
+  fbOpinionCount.textContent = n + " / " + FB_OPINION_MAX + L(" 字", " characters");
   fbOpinionCount.classList.toggle("near", n >= FB_OPINION_MAX - 10);
 }
 
@@ -1893,31 +2397,31 @@ function validateFeedback() {
   let ok = true;
 
   const nick = fbNick.value.trim();
-  if (!nick) { fbNickErr.textContent = "请先写下你的昵称。"; fbNick.classList.add("invalid"); ok = false; }
+  if (!nick) { fbNickErr.textContent = L("请先写下你的昵称。", "Please write your nickname first."); fbNick.classList.add("invalid"); ok = false; }
   else { fbNickErr.textContent = ""; fbNick.classList.remove("invalid"); }
 
   const rel = pickedRadio("fbRelation");
   if (!rel) {
-    fbRelErr.textContent = "请选择你和站主的关系。"; fbRelChips.classList.add("invalid"); ok = false;
+    fbRelErr.textContent = L("请选择你和站主的关系。", "Please choose how you know the site owner."); fbRelChips.classList.add("invalid"); ok = false;
   } else if (rel === "其他" && !fbRelOther.value.trim()) {
-    fbRelErr.textContent = "请写下具体关系。"; fbRelOther.classList.add("invalid"); ok = false;
+    fbRelErr.textContent = L("请写下具体关系。", "Please write the specific relationship."); fbRelOther.classList.add("invalid"); ok = false;
   } else {
     fbRelErr.textContent = ""; fbRelChips.classList.remove("invalid"); fbRelOther.classList.remove("invalid");
   }
 
   const dev = pickedRadio("fbDevice");
   if (!dev) {
-    fbDevErr.textContent = "请选择你正在使用的设备。"; fbDevChips.classList.add("invalid"); ok = false;
+    fbDevErr.textContent = L("请选择你正在使用的设备。", "Please choose the device you are using."); fbDevChips.classList.add("invalid"); ok = false;
   } else if (dev === "其他" && !fbDeviceOther.value.trim()) {
-    fbDevErr.textContent = "请写下设备种类。"; fbDeviceOther.classList.add("invalid"); ok = false;
+    fbDevErr.textContent = L("请写下设备种类。", "Please write the device type."); fbDeviceOther.classList.add("invalid"); ok = false;
   } else {
     fbDevErr.textContent = ""; fbDevChips.classList.remove("invalid"); fbDeviceOther.classList.remove("invalid");
   }
 
   const opinion = fbOpinion.value.trim();
 
-  if (!opinion) { fbOpinionErr.textContent = "请写下你的意见。"; fbOpinion.classList.add("invalid"); ok = false; }
-  else if (opinion.length < 4) { fbOpinionErr.textContent = "再多写一点吧，方便我理解你的意思。"; fbOpinion.classList.add("invalid"); ok = false; }
+  if (!opinion) { fbOpinionErr.textContent = L("请写下你的意见。", "Please write your comments."); fbOpinion.classList.add("invalid"); ok = false; }
+  else if (opinion.length < 4) { fbOpinionErr.textContent = L("再多写一点吧，方便我理解你的意思。", "Please write a bit more so I can understand you."); fbOpinion.classList.add("invalid"); ok = false; }
   else { fbOpinionErr.textContent = ""; fbOpinion.classList.remove("invalid"); }
 
   return ok;
@@ -1927,13 +2431,15 @@ function validateFeedback() {
 function showFeedbackDone(nick, viaMail) {
   if (fbDoneTitle) {
     fbDoneTitle.textContent = viaMail
-      ? "邮件草稿已为你打开"
-      : (nick ? "谢谢你的留言，" + nick + "！" : "已收到你的留言");
+      ? L("邮件草稿已为你打开", "Your email draft is ready")
+      : (nick ? L("谢谢你的留言，" + nick + "！", "Thank you, " + nick + "!") : L("已收到你的留言", "Your message has been received"));
   }
   if (fbDoneMsg) {
     fbDoneMsg.textContent = viaMail
-      ? "请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。"
-      : "谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。";
+      ? L("请在刚打开的邮件窗口里点一下「发送」，留言才会真正送达站主。如果没有弹出邮件窗口，说明这台设备还没配置邮件应用 —— 你可以直接发邮件到 " + OWNER_EMAIL + "。",
+          "Please click \u201cSend\u201d in the email window that just opened - only then will your message reach the owner. If no email window appeared, this device has no mail app set up, and you can email " + OWNER_EMAIL + " directly.")
+      : L("谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。",
+          "Thank you for taking the time to write this. Your message is now in the site owner's database, and only the owner can see it.");
   }
   fbForm.hidden = true;
   fbDone.hidden = false;
@@ -1970,6 +2476,25 @@ async function postToSupabase(row) {
 /* ---------- 读取留言总数 ----------
    只调用数据库里的 message_count() 函数，拿回一个数字。
    留言内容匿名访客一条也读不到 —— 读取策略已经在数据库层面撤掉了。 */
+/* 记住已取回的总数，切换语言时按当前语言重绘，而不是重新发请求 */
+let lastCount = null;
+
+function renderFbStat() {
+  const box = document.getElementById("fbStat");
+  if (!box || lastCount === null) return;
+  box.textContent = "";
+  if (typeof lastCount !== "number" || !isFinite(lastCount) || lastCount <= 0) {
+    box.appendChild(document.createTextNode(L("还没有收到留言，欢迎你做第一个。",
+      "No messages yet - be the first to write one.")));
+  } else {
+    box.appendChild(document.createTextNode(L("已收到 ", "Received ")));
+    const num = document.createElement("b");
+    num.textContent = String(lastCount);
+    box.appendChild(num);
+    box.appendChild(document.createTextNode(L(" 条留言", " messages")));
+  }
+}
+
 async function loadCount() {
   const box = document.getElementById("fbStat");
   if (!box) return;
@@ -1990,17 +2515,8 @@ async function loadCount() {
     if (!res.ok) throw new Error("HTTP " + res.status);
 
     const n = await res.json();
-    box.textContent = "";
-
-    if (typeof n !== "number" || !isFinite(n) || n <= 0) {
-      box.appendChild(document.createTextNode("还没有收到留言，欢迎你做第一个。"));
-    } else {
-      box.appendChild(document.createTextNode("已收到 "));
-      const num = document.createElement("b");
-      num.textContent = String(n);
-      box.appendChild(num);
-      box.appendChild(document.createTextNode(" 条留言"));
-    }
+    lastCount = n;
+    renderFbStat();
     box.hidden = false;
   } catch (err) {
     box.hidden = true;                  /* 统计失败不报错，静默隐藏即可 */
@@ -2018,11 +2534,11 @@ fbForm.addEventListener("submit", async e => {
   const device = pickedRadio("fbDevice");
   const deviceText = device === "其他" ? "其他：" + fbDeviceOther.value.trim() : device;
   const opinion = fbOpinion.value.trim();
-  const time = new Date().toLocaleString("zh-CN");
+  const time = new Date().toLocaleString(L("zh-CN", "en-GB"));
 
   fbSubmit.disabled = true;
-  fbSubmit.textContent = "提交中…";
-  const restore = () => { fbSubmit.disabled = false; fbSubmit.textContent = "提交留言"; };
+  fbSubmit.textContent = L("提交中…", "Submitting…");
+  const restore = () => { fbSubmit.disabled = false; fbSubmit.textContent = L("提交留言", "Submit"); };
 
   /* 第一优先：写进站主自己的 Supabase 数据库 */
   if (SUPABASE_ANON_KEY) {
@@ -2039,7 +2555,8 @@ fbForm.addEventListener("submit", async e => {
     } catch (err) {
       if (err && err.duplicate) {
         restore();
-        fbOpinionErr.textContent = "这条留言刚刚已经提交过了，不用重复发送。";
+        fbOpinionErr.textContent = L("这条留言刚刚已经提交过了，不用重复发送。",
+          "This message was just submitted - there is no need to send it again.");
         return;
       }
       /* 其余错误不打断，继续往下走兜底通道 */
@@ -2061,7 +2578,7 @@ fbForm.addEventListener("submit", async e => {
           /* 下面三个下划线开头的是 FormSubmit 保留字段：
              分别控制邮件标题、正文排版，以及关掉它默认的验证码中转页
              （AJAX 模式必须关闭，否则拿不到 JSON 响应）。 */
-          _subject: "[个人主页留言] " + nick + "（" + relationText + "）",
+          _subject: L("[个人主页留言] ", "[Personal homepage message] ") + nick + "（" + relationText + "）",
           _template: "table",
           _captcha: "false"
         })
@@ -2077,12 +2594,12 @@ fbForm.addEventListener("submit", async e => {
   }
 
   /* 最后兜底：打开访客本机的邮件草稿 */
-  const subject = "[个人主页留言] " + nick + "（" + relationText + "）";
-  const body = "昵称：" + nick +
-               "\n关系：" + relationText +
-               "\n访问设备：" + deviceText +
-               "\n\n你的意见：\n" + opinion +
-               "\n\n提交时间：" + time;
+  const subject = L("[个人主页留言] ", "[Personal homepage message] ") + nick + "（" + relationText + "）";
+  const body = L("昵称：", "Nickname: ") + nick +
+               L("\n关系：", "\nRelationship: ") + relationText +
+               L("\n访问设备：", "\nDevice: ") + deviceText +
+               L("\n\n你的意见：\n", "\n\nComments:\n") + opinion +
+               L("\n\n提交时间：", "\n\nSubmitted at: ") + time;
   const mailtoUrl = "mailto:" + OWNER_EMAIL +
                     "?subject=" + encodeURIComponent(subject) +
                     "&body=" + encodeURIComponent(body);
@@ -2090,7 +2607,10 @@ fbForm.addEventListener("submit", async e => {
   /* 超长会被邮件客户端静默截断，宁可拦下来让访客精简，也不要悄悄丢内容 */
   if (mailtoUrl.length > MAILTO_SAFE_LIMIT) {
     restore();
-    fbOpinionErr.textContent = "留言偏长（约 " + mailtoUrl.length + " 字符，上限 " + MAILTO_SAFE_LIMIT + "），可能被邮件客户端截断，请把「你的意见」精简一些。";
+    fbOpinionErr.textContent = L("留言偏长（约 " + mailtoUrl.length + " 字符，上限 " + MAILTO_SAFE_LIMIT +
+      "），可能被邮件客户端截断，请把「你的意见」精简一些。",
+      "Your message is rather long (about " + mailtoUrl.length + " characters, limit " +
+      MAILTO_SAFE_LIMIT + ") and may be truncated by the mail app. Please shorten \u201cYour comments\u201d.");
     return;
   }
 
@@ -2116,7 +2636,7 @@ document.getElementById("fbAgain").addEventListener("click", () => {
   fbForm.hidden = false;
   fbDone.hidden = true;
   fbSubmit.disabled = false;
-  fbSubmit.textContent = "提交留言";
+  fbSubmit.textContent = L("提交留言", "Submit");
   fbNick.focus();
 });
 
@@ -2217,21 +2737,28 @@ document.addEventListener("keydown", e => {
 
 /* ================= 打字机 ================= */
 const PHRASES = [
-  "用 AI 让学习更高效",
-  "一名智能医学工程大一学生",
-  "喜欢围棋、阅读和羽毛球",
-  "乐于助人 · 有条理 · 爱学习"
+  { zh: "用 AI 让学习更高效", en: "Using AI to learn more efficiently" },
+  { zh: "一名智能医学工程大一学生", en: "A first-year Intelligent Medical Engineering student" },
+  { zh: "喜欢围棋、阅读和羽毛球", en: "Into Go, reading and badminton" },
+  { zh: "乐于助人 · 有条理 · 爱学习", en: "Helpful · Organised · Keen to learn" }
 ];
 const typedEl = document.getElementById("typed");
-let pi = 0, ci = PHRASES[0].length, deleting = false;
+let pi = 0, ci = 0, deleting = false;
+function phraseAt(i) {
+  const p = PHRASES[i % PHRASES.length];
+  return curLang === "en" ? p.en : p.zh;
+}
+/* 切换语言后从头开始打字，避免中英两句混在同一次删除动画里 */
+function restartTyped() { ci = 0; deleting = false; typedEl.textContent = ""; }
 function typeLoop() {
-  const full = PHRASES[pi];
+  const full = phraseAt(pi);
   typedEl.textContent = full.slice(0, ci);
   if (!deleting && ci < full.length) { ci++; setTimeout(typeLoop, 90); }
   else if (!deleting && ci === full.length) { deleting = true; setTimeout(typeLoop, 1500); }
   else if (deleting && ci > 0) { ci--; setTimeout(typeLoop, 40); }
   else { deleting = false; pi = (pi + 1) % PHRASES.length; setTimeout(typeLoop, 260); }
 }
+ci = phraseAt(0).length;      /* 首屏保持「已打完」的静态观感，与原版一致 */
 typeLoop();
 
 /* ================= 深色 / 浅色主题 ================= */
@@ -2273,7 +2800,8 @@ if (window.matchMedia) {
 }
 syncThemeChrome(rootEl.getAttribute("data-theme") || "light");
 
-/* 初始化 */
+/* 初始化：语言放在最后应用，此时所有函数与常量都已就绪 */
+applyLang(curLang);
 render();
 </script>
 </body>
