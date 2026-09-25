@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="阎浩文个人主页 v3 开发对话记录 —— 从发布上线到留言系统、开场动画的完整过程，含踩坑与验证记录。" />
+<meta name="description" content="阎浩文个人主页 v4 开发对话记录 —— 视觉与交互精致化的完整过程，含设计令牌、踩坑与验证记录。" />
 <meta name="theme-color" content="#e4e1f9" id="metaTheme" />
-<title>阎浩文个人主页 · v3 对话记录</title>
+<title>阎浩文个人主页 · v4 对话记录</title>
 <meta name="author" content="阎浩文 Bryan" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231c55a0'/><text x='32' y='46' font-family='system-ui,sans-serif' font-size='40' font-weight='700' fill='%23ffffff' text-anchor='middle'>B</text></svg>" />
 <script>
@@ -21,37 +21,51 @@
 </script>
 <style>
   :root{
-    --blue-900:#0b1e3f; --blue-800:#10294f; --blue-700:#143a6b; --blue-600:#1c55a0;
+    /* 品牌蓝阶（两套主题共用） */
+    --blue-800:#10294f; --blue-700:#143a6b; --blue-600:#1c55a0;
     --blue-500:#2f7ce0; --blue-400:#4f9af5; --blue-300:#86bdfb; --blue-100:#e7f0fd;
-    --ink:#102a4c; --muted:#5b6f8c; --bg:#e4e1f9; --card:#fff; --line:#d6e3f5;
-    --radius:18px; --shadow:0 10px 30px rgba(20,58,107,.10);
+    /* 语义色 */
+    --ink:#102a4c; --muted:#5b6f8c; --card:#fff; --line:#d6e3f5;
+    --radius:18px;
     --nav-h:64px;
+    /* 阴影：多层叠加（贴地细影 + 大范围柔影） */
+    --shadow:0 1px 2px rgba(20,58,107,.04),0 12px 32px rgba(20,58,107,.10);
+    /* v4 精致化令牌：焦点环 / 品牌渐变 / 文字渐变 / 光晕 / 统一缓动 */
+    --ring-soft:0 0 0 3px rgba(79,154,245,.16);
+    --brand-grad:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    --grad-text:linear-gradient(135deg,var(--blue-600),var(--blue-800));
+    --glow-blue:rgba(79,154,245,.30);
+    --ease:cubic-bezier(.2,.7,.2,1);
     --accent:#1c55a0; --accent-strong:#143a6b;
-    --field-bg:#fff;
+    --surface-chat:#fbfcff;
+    --line-hover:var(--blue-300);
     --body-text:#2a3f5e;
-    --nav-bg:rgba(255,255,255,.72); --nav-bg-solid:rgba(255,255,255,.94);
+    --nav-bg-solid:rgba(255,255,255,.94);
     --nav-shadow:0 6px 22px rgba(20,58,107,.09);
     --body-bg:
       radial-gradient(1200px 620px at 12% -12%,#dcd8f9 0%,transparent 58%),
       radial-gradient(1000px 600px at 100% 0%,#cecaf5 0%,transparent 52%),
       linear-gradient(180deg,#eae8fb 0%,#dcd9f7 100%);
-    --sh-card:0 6px 18px rgba(20,58,107,.06);
     color-scheme:light;
 }
   :root[data-theme="dark"]{
-    --ink:#e8edfb; --muted:#95a4c6; --bg:#0a0f22; --card:#141b34; --line:#28324f;
-    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --ink:#e8edfb; --muted:#95a4c6; --card:#141b34; --line:#28324f;
+    --shadow:0 1px 2px rgba(0,0,0,.42),0 14px 36px rgba(0,0,0,.46);
+    --ring-soft:0 0 0 3px rgba(127,180,249,.20);
+    /* 深色下文字渐变更亮，否则深底上的深蓝渐变字看不清 */
+    --grad-text:linear-gradient(135deg,#8cc4ff,#dbe9ff);
+    --glow-blue:rgba(79,154,245,.24);
     --blue-100:#1c2545;
     --accent:#7fb4f9; --accent-strong:#a9cdfd;
-    --field-bg:#0f1526;
+    --surface-chat:#111730;
+    --line-hover:#35507f;
     --body-text:#c5d1ea;
-    --nav-bg:rgba(12,17,34,.72); --nav-bg-solid:rgba(12,17,34,.94);
+    --nav-bg-solid:rgba(12,17,34,.94);
     --nav-shadow:0 6px 22px rgba(0,0,0,.50);
     --body-bg:
       radial-gradient(1200px 620px at 12% -12%,#161d3c 0%,transparent 58%),
       radial-gradient(1000px 600px at 100% 0%,#131a38 0%,transparent 52%),
       linear-gradient(180deg,#0b1126 0%,#080c1a 100%);
-    --sh-card:0 6px 18px rgba(0,0,0,.35);
     color-scheme:dark;
 }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -60,58 +74,85 @@
     font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
     color:var(--ink);background:var(--body-bg);background-attachment:fixed;
     line-height:1.75;-webkit-font-smoothing:antialiased;
-    padding-top:var(--nav-h);transition:color .3s ease;
+    padding-top:calc(var(--nav-h) + 3px);transition:color .3s var(--ease);
   }
   code{
     font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
     font-size:.9em;background:var(--blue-100);color:var(--accent-strong);
     padding:2px 6px;border-radius:6px;word-break:break-word;
+    transition:background .2s var(--ease),color .2s var(--ease);
   }
   a{color:var(--accent)}
+  /* v4：统一键盘焦点环（仅键盘导航出现，鼠标点击不显示） */
+  :where(a,button):focus-visible{outline:2px solid var(--blue-400);outline-offset:2px;box-shadow:var(--ring-soft)}
 
-  /* ===== 导航（与主页同款） ===== */
+  /* ===== 导航（与主页同款：玻璃质感 + 速度条） ===== */
   .nav{
-    position:fixed;top:0;left:0;right:0;z-index:50;height:var(--nav-h);
-    background:var(--nav-bg);border-bottom:1px solid var(--line);
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:var(--nav-bg-solid);border-bottom:1px solid var(--line);
     box-shadow:var(--nav-shadow);
-    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(16px) saturate(1.35);-webkit-backdrop-filter:blur(16px) saturate(1.35);
   }
   .nav-inner{
     max-width:1080px;margin:0 auto;height:var(--nav-h);padding:0 20px;
     display:flex;align-items:center;gap:14px;
   }
-  .brand{font-weight:700;letter-spacing:.3px;color:var(--ink);text-decoration:none}
+  .brand{font-weight:800;letter-spacing:.3px;color:var(--ink);text-decoration:none;white-space:nowrap}
   .brand span{color:var(--accent)}
+  .brand .ver{
+    font-size:11px;font-weight:800;color:var(--accent-strong);background:var(--blue-100);
+    padding:2px 8px;border-radius:999px;margin-left:8px;letter-spacing:.5px;
+  }
   .nav-link{
-    color:var(--muted);text-decoration:none;font-size:14px;padding:8px 12px;
-    border-radius:10px;border:1px solid transparent;transition:.2s;
+    color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:8px 12px;
+    border-radius:10px;border:1px solid transparent;
+    transition:background .18s var(--ease),color .18s,border-color .18s,transform .18s var(--ease);
   }
-  .nav-link:hover{color:var(--accent);background:var(--blue-100);border-color:var(--blue-300)}
+  .nav-link:hover{color:var(--accent);background:var(--blue-100);border-color:var(--blue-300);transform:translateY(-1px)}
   .theme-toggle{
-    margin-left:auto;width:40px;height:40px;border-radius:50%;
-    border:1px solid var(--line);background:var(--card);color:var(--ink);
-    cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center;transition:.2s;
+    margin-left:auto;width:42px;height:38px;border-radius:10px;
+    border:1px solid var(--line);background:var(--card);color:var(--accent-strong);
+    cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center;
+    transition:background .18s var(--ease),border-color .18s,transform .18s var(--ease),box-shadow .18s;
   }
-  .theme-toggle:hover{background:var(--blue-100);border-color:var(--blue-300)}
+  .theme-toggle:hover{background:var(--blue-100);border-color:var(--line-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,58,107,.10)}
+  .theme-toggle:active{transform:translateY(0)}
   .theme-toggle .ic-light{display:none}
   :root[data-theme="dark"] .theme-toggle .ic-light{display:block}
   :root[data-theme="dark"] .theme-toggle .ic-dark{display:none}
+  /* 顶部速度条：呼应主页赛车主题（本页无动效，静态渐变） */
+  .nav-speed{height:3px;opacity:.92;
+    background:linear-gradient(90deg,var(--blue-700),var(--blue-400),var(--blue-700))}
 
   /* ===== 正文 ===== */
   .wrap{max-width:820px;margin:0 auto;padding:32px 20px 72px}
   .doc{
     background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--sh-card);padding:34px 34px 30px;
+    box-shadow:var(--shadow);padding:34px 34px 30px;position:relative;overflow:hidden;
+  }
+  /* 卡片底部一条斜纹，与主页各分区面板同一语言 */
+  .doc::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:5px;opacity:.55;
+    background:repeating-linear-gradient(-55deg,var(--blue-500) 0 18px,var(--blue-300) 18px 36px);
   }
   .doc-title{
     font-size:26px;line-height:1.4;margin-bottom:18px;padding-bottom:16px;
     border-bottom:2px solid var(--line);
+    /* 标题用品牌渐变文字，呼应主页数据区；极老旧浏览器回退为纯品牌色 */
+    background-image:var(--grad-text);-webkit-background-clip:text;background-clip:text;
+    color:transparent;-webkit-text-fill-color:transparent;
+  }
+  @supports not ((-webkit-background-clip:text) or (background-clip:text)){
+    .doc-title{color:var(--accent);-webkit-text-fill-color:var(--accent)}
   }
   h2{
-    font-size:20px;margin:36px 0 14px;padding-left:12px;
-    border-left:4px solid var(--accent);line-height:1.45;
+    font-size:20px;margin:36px 0 14px;padding-left:14px;position:relative;line-height:1.45;
   }
-  h3{font-size:16px;margin:24px 0 10px}
+  h2::before{
+    content:"";position:absolute;left:0;top:.18em;bottom:.18em;width:4px;border-radius:999px;
+    background:var(--brand-grad);box-shadow:0 0 10px var(--glow-blue);
+  }
+  h3{font-size:16px;margin:24px 0 10px;color:var(--accent-strong)}
   .doc > h2:first-of-type{margin-top:26px}
   p{margin:10px 0;color:var(--body-text)}
   .doc strong{color:var(--ink)}
@@ -120,20 +161,29 @@
   hr.rule{border:0;border-top:1px dashed var(--line);margin:30px 0}
   blockquote{
     margin:16px 0;padding:14px 18px;background:var(--blue-100);
-    border-left:4px solid var(--blue-300);border-radius:0 12px 12px 0;
+    border-left:4px solid var(--blue-400);border-radius:0 12px 12px 0;
+    box-shadow:0 6px 18px rgba(20,58,107,.05);
   }
   blockquote p{margin:6px 0;color:var(--body-text);font-size:14.5px}
   .table-wrap{overflow-x:auto;margin:16px 0}
   table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
   th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-  th{background:var(--blue-100);color:var(--ink);font-weight:600;white-space:nowrap}
+  th{background:var(--blue-100);color:var(--ink);font-weight:800;white-space:nowrap}
   td{color:var(--body-text)}
+  tbody tr{transition:background .18s var(--ease)}
   tbody tr:nth-child(even){background:var(--blue-100)}
   footer{
     max-width:820px;margin:0 auto;padding:0 20px 56px;
     color:var(--muted);font-size:13px;text-align:center;line-height:2;
   }
   footer a{color:var(--muted)}
+  /* 版权条：与主页 .copyright 同款 */
+  .copyright{
+    max-width:760px;margin:18px auto 0;padding:16px 20px;background:var(--surface-chat);
+    border:1px solid var(--line);border-radius:14px;line-height:1.8;text-align:left;
+  }
+  .copyright p:first-child{font-weight:800;color:var(--accent-strong);letter-spacing:.3px}
+  .copyright p + p{margin-top:6px}
 
   @media (max-width:560px){
     .wrap{padding:20px 14px 56px}
@@ -141,11 +191,18 @@
     .doc-title{font-size:21px}
     h2{font-size:17.5px;margin:28px 0 12px}
     body{line-height:1.7}
-    .brand{display:none}
+    .brand span{display:none}
+    .brand .ver{margin-left:6px}
     /* 手机上卡片本就窄，取消表格最小宽度，让两列正好铺满、不留多余的横向滚动 */
     table{min-width:0}
     th,td{padding:8px 10px}
     th{white-space:normal}
+  }
+
+  /* 尊重"减少动态效果"系统偏好 */
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{animation:none !important;transition:none !important}
   }
 </style>
 </head>
@@ -153,326 +210,184 @@
 
 <header class="nav">
   <div class="nav-inner">
-    <a class="brand" href="/">阎浩文 <span>Bryan</span></a>
+    <a class="brand" href="/">阎浩文 <span>Bryan</span><span class="ver">v4.0</span></a>
     <a class="nav-link" href="/">← 返回主页</a>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换深色 / 浅色主题" title="切换深色 / 浅色主题">
       <span class="ic-dark" aria-hidden="true">☾</span>
       <span class="ic-light" aria-hidden="true">☀</span>
     </button>
   </div>
+  <div class="nav-speed" aria-hidden="true"></div>
 </header>
 
 <main class="wrap">
   <article class="doc">
-<h1 class="doc-title">阎浩文个人主页 · v3 对话记录</h1>
-<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 3 版（v3）<br><strong>产出文件</strong>：<code>outputs/v3/index.html</code>（单文件、零外部依赖）+ <code>outputs/v3/notes.html</code>（对话记录页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ （对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-17（第 1~8 轮）；2026-09-18 追加第 9~10 轮（开场动画）、第 11 轮（对话记录页）；2026-09-20 追加第 12 轮（关注方向子板块）；2026-09-21 追加第 13~14 轮（全站中英双语 + 两次补修/修复；开场红灯调暗调小 + v3.1 上线）</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序还原 v3 阶段「我 ↔ AI」的对话过程。<br>第 1~8 轮的原话未逐字留存，其「我的需求」依据同步维护的《v3开发记录》与工作区交接文档整理还原，<strong>非逐字引用</strong>；<br>第 9~14 轮为<strong>当次会话的实录</strong>，细节更完整。<br>文中的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v3-handoff.md</code>。<br>本文件同时是线上对话记录页 https://bryanhw.github.io/notes/ 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v1 的对话记录见《v1开发记录》，v2 的对话记录见桌面存档《v2对话记录.md》（工作区中该文件名为 <code>docs/对话记录.md</code>，未改名）。</p></blockquote>
+<h1 class="doc-title">阎浩文个人主页 · v4 对话记录</h1>
+<blockquote><p><strong>项目</strong>：个人主页（含数字分身「小文」）<br><strong>当前版本</strong>：第 4 版（v4.0），<strong>本地已完成，尚未发布上线</strong><br><strong>产出文件</strong>：<code>outputs/v4/index.html</code>（单文件、零外部依赖）+ <code>outputs/v4/notes.html</code>（本页）<br><strong>线上地址</strong>：https://bryanhw.github.io/ —— <strong>线上当前已是 v4.0</strong>（对话记录页：https://bryanhw.github.io/notes/ ）<br><strong>整理日期</strong>：2026-09-24</p><p><strong>关于本文件的说明</strong><br>本文件按时间顺序记录 v4 阶段的「我 ↔ AI」对话与交付过程，是 v4 开发过程的实录。<br>本轮的技术细节、验证数据与踩坑记录均为实况。<br>如需逐条改动细节，见 <code>docs/v4-handoff.md</code>。<br>本文件同时是线上对话记录页 <code>/notes/</code> 的唯一内容源（由脚本生成，改这里即可）。</p><p><strong>版本说明</strong>：v3 的对话记录见 <code>docs/v3对话记录.md</code>，v2 的见桌面存档《v2对话记录.md》，v1 的见《v1开发记录》。</p></blockquote>
 <hr class="rule">
-<h2>第 1 轮 · 把网页正式发布到网上（2026-09-17）</h2>
-<p><strong>我的需求</strong> 前两版都是存在电脑里、双击才能打开的网页，只能自己看。我想要一个<strong>能直接发链接给同学、老师和未来导师</strong>的网址，手机上也能正常打开。</p>
-<p><strong>AI 的交付</strong></p>
+<h2>第 1 轮 · 定方向：v4 到底要做成什么样（2026-09-24）</h2>
+<h3>我的需求</h3>
+<p>v3 已经上线并且功能齐全了，但我觉得它「能用了」和「好看、好用」之间还有距离。所以 v4 我不打算加功能，我要的是<strong>把现有的东西做精致</strong>——同样还是我这个人、同样还是蓝色科技感加赛车风，但每个细节都要更耐看。具体我想清楚四件事：</p>
 <ul>
-<li>网页托管到 <strong>GitHub Pages</strong> —— 免费静态托管、自带 HTTPS，不需要买服务器和域名。</li>
-<li>新建代码仓库 <code>Bryanhw/bryanhw.github.io</code>，线上地址 <strong>https://bryanhw.github.io/</strong>。</li>
-<li>补上浏览器标签页图标（favicon：蓝底圆角白字「B」）与作者信息、页面描述等 meta。</li>
-<li>补上 <code>.nojekyll</code> 与 <code>README.md</code>，确保 Pages 能正确构建。</li>
+<li><strong>核心目标</strong>：视觉 / 交互全面升级，不加新功能。</li>
+<li><strong>风格方向</strong>：延续蓝色科技感 + 赛车风，做精致化，品牌识别不能丢。</li>
+<li><strong>动效力度</strong>：适度增强就好，要滚动进场、悬停微动、按钮和卡片的反馈、平滑过渡；但<strong>要考虑看不惯动效的人</strong>，得能降级。</li>
+<li><strong>代码起点</strong>：在 v3 上增量演进，不要推倒重写——我不想为了好看把已经验证过的功能弄坏。</li>
 </ul>
-<p><strong>过程中的坑</strong></p>
+<p>还有一条是我自己定的：<strong>功能全保留</strong>。主题切换、数字分身「小文」、Supabase 留言、赛车开场动画、中英双语、6 个关注方向子页、对话记录页，一个都不能少、不能坏。</p>
+<h3>AI 的交付</h3>
+<p>AI 把我的要求落成了可执行的方案：</p>
 <ul>
-<li>本机的 <code>github.com:443</code> HTTPS 传输间歇性被阻断，普通 <code>git push</code> 会失败。最终改为<strong>走 SSH，并把端口换成 443</strong>（在 <code>~/.ssh/config</code> 里把 <code>HostName</code> 指向 <code>ssh.github.com</code>、<code>Port 443</code>），推送通道才稳定下来。</li>
-<li>GitHub Pages 构建有 30~60 秒延迟，<strong>「推上去了」不等于「线上已更新」</strong>。为避免自欺，验证一律用 <strong>SHA256 字节级比对</strong>，确认线上拿到的确实是本地那一份。</li>
+<li>先<strong>建一个 v4 基线</strong>：把 <code>outputs/v3/index.html</code> 逐字节复制成 <code>outputs/v4/index.html</code>。这样做的意义是——<strong>任何时候都能干净回退</strong>，v3 的线上版本原封不动躺在那里。</li>
+<li>把「精致化」限定在<strong>样式层</strong>：只动 CSS（设计令牌、组件样式），不碰 HTML 结构、不碰 JS 逻辑、不碰中英文案。因为结构一动，风险就不可控了。</li>
+<li>提出了<strong>分阶段推进</strong>的建议：先做「设计令牌 + 导航 + 全局组件 + 首页」，出浅色和深色的首页截图给我看；我认可之后再推广到其余视图。这样不至于等全部做完才发现方向不对。</li>
 </ul>
+<p>我采纳了这个节奏。</p>
 <hr class="rule">
-<h2>第 2 轮 · 深色 / 浅色主题一键切换</h2>
-<p><strong>我的需求</strong> 晚上看这个页面太亮了，希望能切换成深色；而且<strong>要记住我的选择</strong>，下次打开还是上次那个主题，不要每次都重新点。</p>
-<p><strong>AI 的交付</strong></p>
+<h2>第 2 轮 · 先做首页：设计令牌 + 导航 + 组件（2026-09-24）</h2>
+<h3>我的需求</h3>
+<p>按上面定的节奏，第一刀只切「设计令牌 + 导航 + 全局组件 + 首页」，做完出截图给我验收。</p>
+<h3>AI 的交付</h3>
+<p><strong>1）先把「设计令牌」这一层做扎实</strong></p>
+<p>AI 的解释是：与其在每个组件上单独调阴影和过渡，不如先把「一套尺子」定下来，后面所有组件都引用它。所以先改 <code>:root</code>：</p>
 <ul>
-<li>右上角新增主题切换按钮，浅色（蓝白）↔ 深色（深夜蓝）。</li>
-<li>所有颜色统一改用 <strong>CSS 变量</strong>定义在 <code>:root</code>，深色模式通过 <code>:root[data-theme="dark"]</code> 整体覆盖 —— 切换主题不用改任何一处样式代码。</li>
-<li>访客的选择存在浏览器本地（<code>localStorage</code>，键名 <code>yhw-theme</code>），下次自动沿用。</li>
-<li>第一次访问、还没手动选过时，<strong>自动跟随电脑或手机的深色模式设置</strong>。</li>
-<li><code>&lt;head&gt;</code> 内置一段内联脚本，在页面渲染前就确定主题，<strong>避免「先白闪一下再变黑」</strong>。</li>
-<li>手机上连浏览器地址栏颜色也会跟着变（<code>theme-color</code> meta 动态更新）。</li>
+<li>阴影从「一层」改成<strong>多层叠加</strong>（贴地细影 + 大范围柔影），说这样更接近真实光照，卡片才不会像浮在纸上的贴纸。</li>
+<li>新增了几个令牌：<code>--ring-soft</code>（统一的键盘焦点环）、<code>--brand-grad</code>（品牌渐变，所有主按钮的底色都从这里取）、<code>--grad-text</code>（文字渐变）、<code>--glow-blue</code>（品牌蓝光晕）、<code>--ease</code>（统一缓动曲线 <code>cubic-bezier(.2,.7,.2,1)</code>）。</li>
+<li>深色主题同步这一整套。其中文字渐变在深色下自动换成更亮的色阶，否则深色背景上的深蓝渐变字会看不清。</li>
+<li>顺手做了一次清理：中途加过 <code>--hair</code> / <code>--edge</code> / <code>--plinth</code> 三个令牌，后来发现用不上，<strong>又删掉了</strong>，避免留下「定义了但没人用」的死代码。</li>
 </ul>
-<hr class="rule">
-<h2>第 3 轮 · 做留言板（第一版：转发到我的邮箱）</h2>
-<p><strong>我的需求</strong> 首页只有我的信息，别人看完没法跟我说点什么。我想加一个留言入口，让访客能留个话给我。</p>
-<p><strong>AI 的交付</strong></p>
+<p><strong>2）导航</strong></p>
+<p>玻璃质感加强（<code>blur(16px) saturate(1.35)</code>）；当前页的链接加了品牌渐变底色和顶部内高光；「联系我」「主题」「语言」「汉堡」几个按钮统一加了内高光、悬停轻微浮起和按下反馈。</p>
+<p>顶部那条「速度条」还加了一道缓慢的斜向扫光（4.2 秒一轮），呼应赛车主题——但这个扫光在不希望有动效的系统设置下会自动停掉。</p>
+<p><strong>3）首页</strong></p>
+<p>Hero 卡片渐变加深、加顶部内高光；数据条上面加了一条品牌色「速度条」，数字改成<strong>品牌渐变文字</strong>，同时保留纯色回退（防止老浏览器上数字直接看不见）；分区标题「关于我 / 我关注的方向 / 获奖与荣誉」加了品牌色短横线。</p>
+<p><strong>4）意外发现：一个从 v3 就一直没生效的效果</strong></p>
+<p>这是这轮最有价值的发现，AI 主动报了上来：</p>
+<blockquote><p>页面上那些「斜切按钮」（联系我、认识我、给我留言、发送、提交留言等）都是用一个叫 <code>clip-path</code> 的 CSS 属性切出来的斜角。问题在于——<strong><code>clip-path</code> 会把 <code>box-shadow</code> 一并裁掉</strong>。</p></blockquote>
+<p>也就是说，v3 里这些按钮的悬停阴影、以及「给我留言」按钮那个呼吸光晕（<code>@keyframes leaveGlow</code>），<strong>实际上从来就没有显示出来过</strong>。因为只是"少了一点阴影"，所以一直没人发现。</p>
+<p>v4 把这类元素统一改成 <code>filter: drop-shadow()</code>——它作用在裁剪之后的轮廓上，因此会贴合斜角形状。那个呼吸光晕现在才真正可见。</p>
+<p><strong>5）验证</strong></p>
+<p>AI 说它没法直接"看"图（这个环境里它读不了图片内容），所以视觉结论只能靠<strong>程序化的像素体检</strong>，最终好不好看必须我自己拿眼睛判断。它跑了两件事：</p>
 <ul>
-<li>首页顶部新增「✍️ 给我留言」按钮，点进去是留言表单，也可以用网址 <code>#/feedback</code> 直达。</li>
-<li>表单 4 项：昵称（最多 24 字）、与我的关系（朋友 / 同学 / 家人 / 老师 / 其他，选「其他」才出现补充输入框）、正在使用的设备（手机 / 平板 / 电脑 / 其他，按访客当前设备<strong>自动预选</strong>）、留言内容（最多 300 字，右下角<strong>实时字数提示</strong>）。</li>
-<li>提交通道用 <strong>FormSubmit</strong> 把留言转发到我的邮箱，并保留 <code>mailto:</code> 作为最后兜底（三级：FormSubmit → 打开邮件客户端）。</li>
-<li>加上防重复提交与提交结果提示。</li>
+<li>静态校验（<code>check_v4.py</code>）：结果 <strong>ALL STATIC CHECKS PASSED</strong>——47 个 id 全唯一、31 个 <code>getElementById</code> 目标全部存在、5 个代码块的括号在<strong>跳过注释和字符串之后</strong>完全平衡、51 个 CSS 变量全部有定义（没有悬空引用）、留言和反馈的关键接线完好、v3 遗留的留言墙标识符 0 处残留。</li>
+<li>本地截图体检（<code>shoot_v4.py</code>）：用无头 Edge 直接截本地文件，6 张图<strong>全部 OK</strong>，浅色首页和深色首页的亮度比 5.34 倍（确认主题确实区分开了）。</li>
 </ul>
-<p><strong>过程中的坑</strong></p>
+<h3>过程中的坑</h3>
 <ul>
-<li>最早的方案只有 <code>mailto:</code> 链接。实测发现：<code>mailto:</code> 能不能用，完全取决于访客电脑装没装邮件软件、有没有配好账号 —— 本机就出现<strong>「邮件窗口弹出来了，但里面是空的」</strong>，访客以为提交成功，我这边却什么都收不到。所以改成了以服务端转发为主、<code>mailto:</code> 只做最后兜底。</li>
-</ul>
-<hr class="rule">
-<h2>第 4 轮 · 换成我自己的数据库</h2>
-<p><strong>我的需求</strong> 留言只变成我邮箱里的一封邮件，<strong>留不住、没法统计、也没法管理</strong>；而且完全依赖第三方的免费转发服务，总觉得不踏实。我想让留言真正存进我自己的地方。</p>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>接入 <strong>Supabase</strong>（免费版 PostgreSQL 数据库），新建数据表 <code>messages</code>：昵称、关系、访问设备、留言内容、提交时间（服务器时间，访客无法伪造），以及一个仅给我自己参考的标记列 <code>approved</code>。</li>
-<li><strong>数据库层面</strong>写死三条规则，而不是靠前端自觉：</li>
-<ol>
-<li>匿名访客<strong>只能新增</strong>留言；</li>
-<li>新增时<strong>只能标为「未审核」</strong>（即使有人改前端代码也没用，数据库会直接拒绝）；</li>
-<li>匿名访客<strong>完全读不到留言内容</strong>。</li>
-</ol>
-<li>网页源码里<strong>只放一把可公开的 publishable key</strong>（它从设计上就是给公开网页用的）；<strong>真正的管理者密钥 <code>service_role</code> 绝不进网页</strong>。</li>
-<li>为了保持「单文件、零依赖」的设计，<strong>没有引入官方 JS 库</strong>，直接用浏览器原生 <code>fetch</code> 调用接口。</li>
-<li>三级兜底保留：<strong>数据库 → 邮箱转发（FormSubmit） → 打开邮件客户端</strong>，前一级失败才用下一级。</li>
+<li><strong>控制台中文乱码</strong>：脚本输出的中文在 PowerShell 里显示成乱码。一开始我以为是文件写坏了，后来确认只是<strong>控制台编码（GBK）问题</strong>，文件本身没问题。脚本里加 <code>sys.stdout.reconfigure(encoding="utf-8")</code> 能缓解。</li>
+<li><strong>模型读不了图</strong>：AI 明确说了它无法读取图片内容。这点很重要——它给出的「渲染正常」是从像素统计推出来的（宽度、平均亮度、内容底部位置、品牌蓝像素数量），<strong>不是</strong>它"看到"了页面。观感判断必须由我来做。</li>
 </ul>
 <hr class="rule">
-<h2>第 5 轮 · 公开留言墙 → 改为只站主可见 + 显示真实留言总数</h2>
-<p><strong>我的需求</strong> 一开始我设想的是把留言<strong>审核后公开</strong>展示在页面上（留言墙）。后来觉得不行：访客留言时默认是「说给我一个人听」，公开出去未必是他们想要的；而且公开内容一旦出现不合适的话，我还得盯着删。所以<strong>留言墙不要了，只有我能看</strong>。但是 —— 一条都不显示的话，页面会显得没人来过，我希望访客能知道这里<strong>确实有人在留言</strong>，所以想显示一个真实的留言条数。</p>
-<p><strong>AI 的交付</strong></p>
+<h2>第 3 轮 · 首页验收通过，推广到其余视图（2026-09-24）</h2>
+<h3>我的需求</h3>
+<p>我看了浅色和深色的首页截图，<strong>通过</strong>，让它按同一套风格推广到其余视图。</p>
+<h3>AI 的交付</h3>
+<p>这次是把上一轮定下的那套「尺子」用到了所有剩下的页面：</p>
 <ul>
-<li>移除留言墙相关的前端代码（<code>loadWall()</code> / <code>wallCard()</code> / <code>formatWallTime()</code> / 刷新按钮等全部删除，静态校验确认这些标识符出现次数为 <strong>0</strong>）。</li>
-<li>数据库新增函数 <code>message_count()</code>：<code>security definer</code> + <code>stable</code>，<strong>只返回一个数字</strong>，访客拿不到任何一条留言内容。</li>
-<li>留言页新增 <code>loadCount()</code>：进入留言页才去请求这个数字（首页不产生该请求，避免浪费）。</li>
-<li><strong>一条留言都没有时</strong>显示：「还没有收到留言，欢迎你做第一个。」；有留言时显示「已收到 <strong>N</strong> 条留言」（N 加粗）。</li>
-<li>万一数据库连不上、或返回的东西不是数字，<strong>这一行安静地隐藏</strong>，绝不在页面上弹报错。</li>
-<li>读取权限整体撤销，只单独放开「读总数」这一个函数 —— 防垃圾留言从「靠审核」变成「<strong>根本读不到</strong>」。</li>
+<li><strong>二级页骨架</strong>：个人信息卡片、特点卡片加了悬停时轻微浮起（2px）和阴影。</li>
+<li><strong>6 个方向子页</strong>：小节图标加了投影；列表前面的圆点加了品牌蓝光晕。</li>
+<li><strong>数字分身页</strong>：聊天头部加内高光，我发出去的气泡加了投影，快捷问题按钮悬停会浮起来，输入框统一焦点环，发送按钮改成品牌渐变 + 真实投影。</li>
+<li><strong>留言反馈页</strong>：输入框和意见框的焦点环统一，单选胶囊选中态改成品牌渐变 + 内高光，提交按钮换成真实投影，提交成功的对勾图标加内高光。</li>
+<li><strong>页脚</strong>：链接悬停的下划线加了偏移，颜色加深一点。</li>
+<li><strong>版本号</strong>：<code>v3.1</code> → <strong><code>v4.0</code></strong>。这里有个细节——一共 4 处要一起改：<code>&lt;head&gt;</code> 里的 <code>&lt;title&gt;</code>、页脚可见文字、以及中英文字典里的两个 key。<strong>字典的 key 必须和页面上的文本逐字一致</strong>，否则切到英文时这条就换不过去。所以是四处一起换的。</li>
+<li><strong>触屏降级</strong>：新增了一条 <code>@media (hover:none)</code> 规则。原因是手机上没有真正的「悬停」这个概念，不加这条的话，手指点完按钮后那个"浮起"状态会卡住不退。现在在触屏设备上直接取消所有浮起反馈。</li>
+</ul>
+<h3>验证</h3>
+<ul>
+<li>静态校验：<strong>ALL STATIC CHECKS PASSED</strong>（这次是 162183 字节 / 2909 行）。</li>
+<li>全站截图：<strong>13 张全部通过</strong>——首页（浅/深）、个人信息（浅/深）、我的特点、数字分身、留言反馈，以及 6 个方向子页。</li>
+<li>窄屏截图：<strong>3 张全部通过</strong>，宽度没有被强制缩放，说明顶栏在手机宽度下不溢出。</li>
+</ul>
+<p>这里要记一个<strong>局限</strong>：无头 Edge 的最小窗口宽度约 492px，比这更窄会被强制放大，所以手机断点里「小于 430px」那一档（隐藏英文后缀、按钮收窄）<strong>没有被截图覆盖</strong>。这是 v3 阶段就确认过的老问题。</p>
+<h3>过程中的坑</h3>
+<ul>
+<li><strong>PowerShell 不支持 heredoc</strong>：我让 AI 跑一段 <code>python - &lt;&lt;'PY' ... PY</code> 的临时脚本，结果 PowerShell 直接报语法错误。结论是：这个环境里临时脚本一律<strong>写成 <code>.py</code> 文件再执行</strong>，不要用管道/heredoc 传内联代码。</li>
+<li><strong>自己写的检查脚本自己误报</strong>：AI 写了个定点检查脚本，把「斜切元素不允许有 <code>box-shadow</code>」当硬规则，结果把 v3 本来就有的 <code>inset</code> 内高光也判成了问题。后来把规则改成「允许 <code>inset</code>，禁止外投影」才对。教训是——<strong>检查脚本本身的规则也得审查</strong>，否则会追着假问题跑。</li>
 </ul>
 <hr class="rule">
-<h2>第 6 轮 · 新留言自动邮件提醒</h2>
-<p><strong>我的需求</strong> 留言虽然存住了，但我总不能天天登录后台去看有没有新留言。<strong>有留言就主动告诉我</strong>。</p>
-<p><strong>AI 的交付</strong></p>
+<h2>第 4 轮 · 存档同步与 v4 记录页（2026-09-24）</h2>
+<h3>我的需求</h3>
+<p>v4 先不发布，我要自己在本地先看一遍。但<strong>桌面存档要更新</strong>：直接用 v4 覆盖存档里的主页，旧版给我留个备份。另外，<strong>v4 的对话记录页也要做出来</strong>。</p>
+<h3>AI 的交付</h3>
+<p><strong>1）桌面存档同步</strong>（存档目录：<code>桌面\cst ai 个人主页作业\</code>）</p>
 <ul>
-<li>在数据库内部装一个能发网络请求的扩展（<code>pg_net</code>），在 <code>messages</code> 表上挂触发器：<strong>每写进一行，就异步发一封提醒邮件</strong>到 <code>yhw20070910@outlook.com</code>。</li>
-<li>邮件标题形如 <code>[个人主页新留言] 昵称（关系）</code>，正文是一张表格：昵称、关系、访问设备、留言全文、提交时间。</li>
-<li><strong>整个提醒过程不含任何前端代码</strong>，因此前端不需要放任何额外密钥。</li>
-<li>提醒是<strong>异步</strong>的：邮件服务万一出问题，<strong>不会影响留言本身的保存</strong>，留言一定存得住。</li>
-<li>即使访客提交完立刻关掉页面，邮件照样会发出。</li>
+<li>先把存档里现存的 v3 版主页<strong>备份</strong>成 <code>index-v3.html.bak</code>（155103 字节，SHA256 与原 v3 基线逐字节一致）；旧的记录页也一并备份成 <code>notes-v3.html.bak</code>（53744 字节）。</li>
+<li>再把 v4 主页覆盖为存档的 <code>index.html</code>（162183 字节）。</li>
+<li>13 张全站截图 + 3 张窄屏截图一并同步到存档的 <code>images/</code>。</li>
+<li><code>docs/v4-handoff.md</code> 同步到存档。</li>
+<li>每一步都做 <strong>SHA256 逐字节复核</strong>，全部通过。</li>
 </ul>
-<p><strong>过程中的坑</strong></p>
+<p><strong>2）v4 对话记录页</strong></p>
+<p>把本文档转成 <code>outputs/v4/notes.html</code>——单文件、零外部依赖、和主页共用同一套设计令牌和同一个主题键（<code>yhw-theme</code>），所以两个页面的深浅主题是<strong>互通</strong>的：在主页切了深色，进记录页也还是深色。</p>
+<p>生成用 <code>.deepworks\tmp\build_notes_v4.py</code>（本文档是唯一内容源），产物 28800 字节 / 367 行 / SHA256 <code>06F9A560…5914732C</code>，<strong>20 项内置校验全部 PASS</strong>（标题与章节数、章节编号连续、4 个表格全部转换、代码段转义、无 Markdown 记号泄漏、版本号、主题令牌已定义且被引用、动效降级等）。</p>
+<p>随后又给记录页做了截图体检：整页含页脚完整拍到（页面高 7440px）、品牌蓝像素 127653、浅色/深色亮度比 9.00×，<strong>ALL CHECKS PASSED</strong>。这 3 张记录页截图也同步进了存档。</p>
+<p><strong>3）关于发布</strong></p>
+<p>按我之前定的规矩（<strong>没我同意不许 push</strong>），v4 现在只在本地和桌面存档里，线上仍然是 v3.1。等我看完本地效果、点头之后才会发布，发布时还要做<strong>线上与本地 SHA256 逐字节比对</strong>来确认真的同步了。</p>
+<h3>过程中的坑</h3>
 <ul>
-<li>创建 <code>pg_net</code> 时按常规写法指定 schema 会报 <code>schema "net" does not exist</code> —— 原因是 <code>pg_net</code> 自己会创建名为 <code>net</code> 的命名空间，而「指定存放 schema」的语法要求该 schema 事先存在。正确写法是把它装到已存在的 <code>extensions</code> schema 下，装完仍然用 <code>net.http_post</code> 调用。</li>
-</ul>
-<hr class="rule">
-<h2>第 7 轮 · 提交前自查 + 清理测试数据 + 修正历史文档 + 线上核验</h2>
-<p><strong>我的需求</strong> 这份网页是作业，要交出去了。我希望：<strong>文件干净</strong>（不要夹带脚本、临时文件、密钥）、<strong>数据干净</strong>（开发时我自己发的测试留言不要留在数据库里）、<strong>文档准确</strong>（前面几版文档里已经改过的文件名、文件夹名别再是错的），而且这些都要<strong>有据可查</strong>，不能靠「我觉得应该没问题」。</p>
-<p><strong>AI 的交付</strong></p>
-<p><strong>① 提交前自查（全部通过）</strong></p>
-<ul>
-<li>确认页面真正<strong>单文件自包含</strong>：外部 URL 0 个、相对路径引用 0 个、<code>file://</code> 0 个。</li>
-<li>扫描密钥：<strong>没有</strong>数据库密码、连接串、私钥、<code>service_role</code>、<code>sb_secret_</code> —— 那 3 处「命中」经人工核对，都是「<strong>绝对不要</strong>把 service_role key 放进去」这类警示注释的误报。</li>
-<li>确认页面<strong>不泄露任何访客留言内容</strong>；确认历史文档保留不删（只修正错的引用）。</li>
-<li>确认工作区仓库 <code>git remote -v</code> 为空，<strong>不可能被误推</strong>。</li>
-</ul>
-<p><strong>② 静态校验</strong>（<code>check_v3.py</code>） 35 个 id 全唯一、28 个 <code>getElementById</code> 目标全部存在、括号平衡、46 个 CSS 变量全部有定义、字数上限 <code>maxlength</code> 与常量 <code>FB_OPINION_MAX</code> 一致；留言墙遗留标识符 <strong>0 处</strong>。结果：<strong>ALL STATIC CHECKS PASSED</strong>。</p>
-<p><strong>③ 数据库测试数据归零</strong> 开发期间留下的测试留言（最后一条是我自己发的 <code>333333</code>）与误建的空表全部清理。收尾核验：匿名调用 <code>message_count()</code> 返回 <strong><code>0</code></strong>，匿名读取留言返回<strong>空</strong>。</p>
-<p><strong>④ 修正历史文档里的失效引用</strong> 前面几版的文档里提到了后来已改名的文件与文件夹，逐处修正（工作区版与桌面存档版都改）：<code>开发对话记录.md</code> → <code>v1开发记录.md</code>、文件夹名 <code>cst ai 智能网页作业</code> → <code>cst ai 个人主页作业</code>、文件名自指错误等。历史文档<strong>保留不删</strong>，只把错的引用改对。</p>
-<p><strong>⑤ 线上核验</strong> 用无头浏览器抓取线上 <code>#/feedback</code> 页面的 DOM，确认留言计数那一行实际渲染为「还没有收到留言，欢迎你做第一个。」，并且对访客可见。 线上文件与本地存档、工作区三方 <strong>SHA256 完全一致</strong>：<code>612A8FDA…C2FE3</code>，75582 字节。</p>
-<p><strong>过程中的坑（值得记下来）</strong></p>
-<ul>
-<li><strong>Supabase SQL Editor 的结果面板只显示最后一条语句的结果。</strong> 多条语句一起跑，前面语句的明细会被盖住；要单独看某条，得在编辑器里<strong>选中那一段</strong>再按 <code>Ctrl+Enter</code>。</li>
-<li><strong>结果面板可能是上一次查询的残留。</strong> 面板显示「1 row」并不代表我刚跑的那条语句真的执行了 —— 我用 <code>delete</code> 删了两次都没生效，最后是去 <strong>Dashboard → Table Editor</strong> 里勾选那行删掉的（表格变成「No rows found」这种看得见的反馈最可靠）。</li>
-<li>教训：<strong>判断一次写入是否生效，必须以独立的只读查询返回值为准</strong>，不能依赖「我点了 Run / 看到 Success」。</li>
-<li>排查过程中还顺手排除了三个看似可疑、其实无关的原因：不是缓存（<code>CF-Cache-Status: DYNAMIC</code>）、不是项目搞错（页面与后台是同一个项目）、不是 RLS（<code>rls_forced = false</code>，且本就没有 DELETE 策略）。</li>
+<li><strong>PowerShell 会把中文文件写坏</strong>：我图省事用 <code>Get-Content</code> / <code>Set-Content</code> 给脚本做字符串替换，结果 PowerShell 5.1 默认按 GBK 读 UTF-8，把中文写成了 <code>U+E1ED</code> 这类非法字符，Python 直接报 <code>SyntaxError: invalid non-printable character</code>。改文件必须用编辑工具，或用 Python 显式指定 <code>encoding="utf-8"</code>。</li>
+<li><strong>自写的检查指标差点骗了自己</strong>：我给记录页加了一条"文字行占比不得低于 v3 基准"，结果 v4 是 0.346、v3 基准是 0.524，"失败"了。查下去才发现这个指标衡量的是"页面非不非空"，而两页源文体量差 2.6 倍（v3 有 13621 个可见字符，v4 只有 5189 个），本来就不该横向比。判断"渲染是否正常"要靠结构校验和"整页是否拍到页脚"，不是靠这个比例——<strong>指标要想清楚它到底在量什么</strong>。</li>
+<li><strong>独立视觉模型的描述不能当真</strong>：过程中有个视觉模型帮忙看图，它把 v4 说成"暖色系、纸感风格"，还说"用 Playwright 做了验证"、页面上有"文章列表和文章详情页"——这些全都不存在。它只能用来粗判（有没有报错、浅深主题切没切），具体结论必须回到程序化校验和我自己的眼睛。</li>
 </ul>
 <hr class="rule">
-<h2>第 8 轮 · 把网址发给我 + 整理归档</h2>
-<p><strong>我的需求</strong> 把网站发给我看一下；另外把这次的东西<strong>更新到 git</strong>，并把我们这段对话<strong>整理成 markdown 文件</strong>。</p>
-<p><strong>AI 的交付</strong></p>
+<h2>第 5 轮 · 数字分身「小文」扩面与去机械感（2026-09-24）</h2>
+<h3>我的需求</h3>
+<p>访客留言里反复出现同一类反馈（分析见 <code>outputs/feedback-analysis.md</code>）：<strong>问不太到自己想知道的事</strong>，而答不上来的时候往往是一句「私聊我」，把话头直接堵死了。所以这一轮的目标就两条：<strong>能答的尽量答全</strong>，<strong>答不上的别再机械地甩联系方式</strong>。</p>
+<h3>AI 的交付</h3>
+<p><strong>1）知识库扩容</strong>——新增 3 条事实，全部取自页面上本来就有的信息，一个字都没编：</p>
+<div class="table-wrap"><table><thead><tr><th>新增字段</th><th>内容</th></tr></thead><tbody><tr><td><code>city</code></td><td>城市：深圳</td></tr><tr><td><code>twin</code></td><td>身份自述：我是数字分身、不是本人；不确定的事不编</td></tr><tr><td><code>site</code></td><td>这个网站是怎么做出来的：单文件零依赖、留言存在 Supabase、另有一页对话记录</td></tr></tbody></table></div>
+<p><strong>2）新增 4 条问答规则</strong>：身份自述、留言怎么留、住哪、网站本身。顺序上把「身份自述」排在名字规则<strong>之前</strong>，否则「你是……」会被名字那条抢答。</p>
+<p><strong>3）同义归一化</strong>：新增 <code>SYNONYMS</code>（12 组）+ <code>normalize()</code>，并把匹配改成<strong>两遍</strong>——第一遍按原文匹配，全部落空才归一化重试。这样只做加法，<strong>绝不会改变原本命中的回答</strong>（原来的答案不会因为这一轮改动而变差）。</p>
+<p><strong>4）兜底重写</strong>：答不上来时不再甩一句「私聊我」，而是<strong>坦白说答不上来 + 说清边界 + 给两种可以直接照抄的问法 + 一个能点的「留言反馈」链接</strong>（指向 <code>#/feedback</code>）。</p>
+<p><strong>5）快捷问题 8 条 → 10 条</strong>（新增「你住在哪？」「你是真人吗？」）。</p>
+<p><strong>6）打字停顿不再固定 550ms</strong>，改成随问题长度在 420–950ms 之间变化（短问快答、长问稍等），少一点机械感。</p>
+<p><strong>7）顺手修掉两个真 bug</strong>：</p>
 <ul>
-<li>在内置浏览器中打开 https://bryanhw.github.io/ ，并给出留言页 <code>#/feedback</code> 与代码仓库地址。</li>
-<li>把 v3 的文档、SQL 脚本与网页工作版纳入 git 版本管理；同时把会话上传目录（临时截图）排除出版本管理，避免临时文件混进仓库。</li>
-<li>生成本文件 <code>docs/v3对话记录.md</code>，并同步一份到桌面存档文件夹，使 v1 / v2 / v3 三版的「开发记录 + 对话记录」都齐全。</li>
+<li><strong>一个从 v1 起就存在的显示 bug（线上 v3 也有）</strong>：联系方式和获奖两条回答里的换行，写成了<strong>字面 <code>\n</code>（反斜杠加 n）共 14 处</strong>；而聊天窗口是 <code>white-space:pre-wrap</code>，访客看到的就是一串反斜杠。这两条恰好是<strong>最需要排版</strong>的文本（三个邮箱、三个奖项）。已全部改成真正的换行。</li>
+<li><strong>一个本轮自己引入的语义误答</strong>：「你有女朋友吗」被校园生活规则的「朋友」关键词命中，答成了校园生活。已加一条私人问题规则（不代答、也不编），排在校园规则之前。</li>
+</ul>
+<h3>验证</h3>
+<div class="table-wrap"><table><thead><tr><th>检查</th><th>命令</th><th>结果</th></tr></thead><tbody><tr><td>静态校验</td><td><code>.deepworks\tmp\check_v4.py</code></td><td>ALL STATIC CHECKS PASSED（170852 字节 / 3009 行）</td></tr><tr><td>问答实测</td><td><code>.deepworks\tmp\test_twin_v4.py</code></td><td>ALL TWIN ANSWER CHECKS PASSED（32 问 / 40 项断言）</td></tr><tr><td>UI 实测</td><td><code>.deepworks\tmp\test_twin_ui.py</code></td><td>ALL TWIN UI CHECKS PASSED（14 项断言，连跑 3 次全过）</td></tr><tr><td>全站截图 13 张</td><td><code>.deepworks\tmp\shoot_v4.py</code></td><td>ALL CHECKS PASSED</td></tr><tr><td>窄屏截图 3 张</td><td><code>.deepworks\tmp\shoot_v4_mobile.py</code></td><td>ALL CHECKS PASSED</td></tr><tr><td>改动取证</td><td><code>.deepworks\tmp\diff_round5.py</code></td><td>8 个 hunk、+109/-9 行，全在数字分身段（2231–2499）</td></tr></tbody></table></div>
+<p>问答实测是真跑代码：用无头 Edge 打开本地页面，把 <code>answer()</code> 的返回值取回来逐条断言，不是一个一个肉眼点。覆盖了全部新增问法（城市 4 种问法 + 2 个英文问法、「你是真人/机器人吗」、网站说明、留言指向），也覆盖了全部回归项（招呼语、大一新生、三个邮箱、三个特点、三个奖项、六个方向、三个班级、校园生活、F1 和红牛、兴趣爱好不被抢走、学校→专业、两个子页问答、英文运动/获奖）。</p>
+<p>UI 实测测的是"点下去会怎样"：兜底里的「留言反馈」确实渲染成可点链接；点下去路由切到留言视图、数字分身视图失去激活；切英文后历史回答会现算成英文、链接文字变成 <code>feedback</code>、快捷问题仍是 10 条。这一项<strong>连跑三次都一样</strong>才算过——中间发现过"只有第一次跑才过"的问题，是测试自己把语言写进了 <code>localStorage</code> 造成的，已修掉。</p>
+<p><strong>这一轮没有升版本号</strong>：v4 还没发布，所以仍然是 <code>v4.0</code>，改动按"第 5 轮"记在本文档里。</p>
+<h3>过程中的坑</h3>
+<ul>
+<li><strong><code>--dump-dom</code> 会把标签里的 <code>&lt;</code> <code>&gt;</code> 转义成 <code>&amp;lt;</code> <code>&amp;gt;</code></strong>：我断言"兜底里有可点链接"，第一轮直接失败——其实页面里链接是好的，是取数那一步把 <code>&amp;</code> 转义了。<strong>断言含 HTML 的返回值前必须先反转义</strong>。这类"假故障"最危险的地方在于：如果当时顺手把链接改成纯文字来"修 bug"，就把真功能改坏了。（本轮新增结论）</li>
+<li><strong>测试脚本自己写错了，却看起来像代码错了</strong>：3 个"英文提问"的断言用了英文标志词（<code>digital twin</code> / <code>single-file</code> / <code>feedback page</code>），但站点的设计是<strong>中文界面下用英文提问、回答仍是中文</strong>，所以必然落空。改成中文标志词后全过。教训：<strong>断言失败先怀疑断言</strong>。</li>
+<li><strong>字面 <code>\n</code> 这个坑藏了四轮</strong>：它只出现在"三个邮箱 / 三个奖项"这两条回答里，正好是最需要排版的文本，而且线上 v3 也有同样的 14 处。教训是——<strong>光看截图不够，要把字符串转义扫一遍</strong>。</li>
+<li><strong>测试自己会"污染"下一次测试</strong>：UI 实测里我点了语言按钮，语言被记进 <code>localStorage</code>；而浏览器 profile 目录是复用的，所以<strong>第二次跑的时候页面直接以英文启动</strong>，7 条中文断言集体失败。这跟代码一点关系都没有。修法是：每次跑用<strong>全新的 profile</strong>，并且开跑前先把语言归一到中文。修完连跑三次全过——<strong>只过一次的测试等于没测</strong>。（本轮新增结论）</li>
+<li><strong>归一化判断写成严格相等，方向就反了</strong>：页面 <code>lang</code> 属性的实际值是 <code>zh-CN</code>，我按 <code>=== 'zh'</code> 判断"现在是不是中文"，结论是"不是"，于是把中文<strong>切成</strong>了英文，断言全部反向失败。改成<strong>按前缀判断</strong>（<code>indexOf('zh') === 0</code>）才对。这类错误看起来完全像功能 bug，其实是断言写错了。（本轮新增结论）</li>
 </ul>
 <hr class="rule">
-<h2>第 9 轮 · 开场动画：五盏发车灯 → 赛车冲刺 → 结尾一行字（2026-09-18）</h2>
-<p><strong>我的需求</strong> 希望打开网站时先来一段<strong>赛车主题的开场动画</strong>，有点仪式感，不要一进来就是干巴巴的信息页；但要保留「跳过」按钮，别让人干等。</p>
-<p><strong>AI 的交付（含一次改版）</strong></p>
+<h2>附：v4 改动速览</h2>
+<h3>一句话总结</h3>
+<p>v4 是<strong>纯样式层的精致化</strong>：HTML 结构、JS 逻辑、中英文案一个字没动，只重做了「设计令牌 + 组件样式」，另外<strong>顺手修掉了一个从 v3 起就一直没生效的阴影/光晕效果</strong>。</p>
+<h3>改了什么</h3>
+<div class="table-wrap"><table><thead><tr><th>层面</th><th>内容</th></tr></thead><tbody><tr><td>设计令牌</td><td>多层阴影；新增 <code>--brand-grad</code> / <code>--grad-text</code> / <code>--glow-blue</code> / <code>--ring-soft</code> / <code>--ease</code>；深浅双主题同步</td></tr><tr><td>导航</td><td>玻璃质感加强；当前页高亮；按钮悬停浮起 + 按下反馈；顶部速度条斜向扫光</td></tr><tr><td>首页</td><td>Hero 加深 + 内高光；统计条品牌速度条；数字改文字渐变（带回退）；分区标题品牌短横线</td></tr><tr><td>其他视图</td><td>信息卡 / 特点卡悬停浮起；子页图标与圆点加光影；聊天气泡与快捷问；留言表单与胶囊；页脚链接</td></tr><tr><td>可达性</td><td>新增统一键盘焦点环 <code>:focus-visible</code></td></tr><tr><td>触屏</td><td>新增 <code>@media (hover:none)</code>，取消浮起反馈避免状态残留</td></tr><tr><td>修复</td><td>斜切元素（<code>clip-path</code>）上的阴影/光晕改用 <code>filter: drop-shadow()</code>——<strong>v3 起就没显示出来的效果，现在才真的显示</strong></td></tr><tr><td>版本号</td><td><code>v3.1</code> → <code>v4.0</code>（4 处一起改）</td></tr></tbody></table></div>
+<h3>没改什么</h3>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>状态</th></tr></thead><tbody><tr><td>HTML 结构 / 视图路由</td><td>未改</td></tr><tr><td>JS 逻辑（数字分身、留言、主题、i18n、数字滚动、开场动画）</td><td>未改</td></tr><tr><td>中英文案</td><td>未改（只改了版本号那一处）</td></tr><tr><td>功能清单</td><td>全部保留</td></tr></tbody></table></div>
+<h3>验证数据</h3>
+<div class="table-wrap"><table><thead><tr><th>检查</th><th>命令</th><th>结果</th></tr></thead><tbody><tr><td>静态校验</td><td><code>python .deepworks\tmp\check_v4.py</code></td><td>ALL STATIC CHECKS PASSED（170852 bytes / 3009 lines，第 5 轮后）</td></tr><tr><td>问答实测 40 项</td><td><code>python .deepworks\tmp\test_twin_v4.py</code></td><td>ALL TWIN ANSWER CHECKS PASSED（第 5 轮新增）</td></tr><tr><td>UI 实测 14 项</td><td><code>python .deepworks\tmp\test_twin_ui.py</code></td><td>ALL TWIN UI CHECKS PASSED ×3 次（第 5 轮新增）</td></tr><tr><td>第二阶段定点检查</td><td><code>python .deepworks\tmp\verify_phase2.py</code></td><td>ALL OK</td></tr><tr><td>死变量排查</td><td><code>python .deepworks\tmp\unused_vars_v4.py</code></td><td>仅剩 v3 遗留的 <code>--bg</code></td></tr><tr><td>全站截图 13 张</td><td><code>python .deepworks\tmp\shoot_v4.py</code></td><td>ALL CHECKS PASSED</td></tr><tr><td>窄屏截图 3 张</td><td><code>python .deepworks\tmp\shoot_v4_mobile.py</code></td><td>ALL CHECKS PASSED</td></tr><tr><td>记录页生成</td><td><code>python .deepworks\tmp\build_notes_v4.py</code></td><td>20 项校验全 PASS（体量与 SHA256 见 <code>v4-handoff.md</code>：本页由本文档生成，写死字节数会自相矛盾）</td></tr><tr><td>记录页截图 3 张</td><td><code>python .deepworks\tmp\shoot_notes_v4.py</code></td><td>NOTES ALL CHECKS PASSED</td></tr><tr><td>桌面存档同步</td><td><code>python .deepworks\tmp\sync_desktop_v4.py</code></td><td>SYNC OK · 全部逐字节一致</td></tr><tr><td>记录页/文档同步</td><td><code>python .deepworks\tmp\sync_desktop_notes_v4.py</code></td><td>SYNC OK · 全部逐字节一致</td></tr></tbody></table></div>
+<h3>v4 最终状态速览</h3>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody><tr><td>网页文件</td><td><code>outputs/v4/index.html</code>，170852 字节 / 3009 行，SHA256 <code>40F0536B…D5FD77B9</code>（第 5 轮后）</td></tr><tr><td>记录页文件</td><td><code>outputs/v4/notes.html</code>（由本文件生成，字节数与 SHA256 见 <code>v4-handoff.md</code>）</td></tr><tr><td>桌面存档</td><td><code>桌面\cst ai 个人主页作业\index.html</code>（170852）+ <code>notes.html</code>；旧版已备份为 <code>index-v3.html.bak</code> / <code>notes-v3.html.bak</code></td></tr><tr><td>线上状态</td><td><strong>v4.0 已上线</strong>（见下「上线记录」）</td></tr><tr><td>回退方式</td><td><code>outputs/v3/</code> 完整保留；存档里也有 <code>index-v3.html.bak</code> / <code>notes-v3.html.bak</code></td></tr></tbody></table></div>
+<h3>上线记录（v4.0）</h3>
+<p>到这里我点了头，v4 正式发布。发布不是"把文件覆盖过去"就完事，而是一串带校验的动作：</p>
+<div class="table-wrap"><table><thead><tr><th>步骤</th><th>做法</th><th>结果</th></tr></thead><tbody><tr><td>1. 地基检查</td><td>确认发布仓库 <code>core.autocrlf=false</code>、无 <code>.gitattributes</code>、工作区干净</td><td>逐字节比对可信（换行不会被偷偷改写）</td></tr><tr><td>2. 发布主页</td><td><code>publish.ps1 -SourceFile outputs\v4\index.html</code></td><td>复制后字节一致 → 提交 <code>7f4a67b</code> → 推送第 1 次成功</td></tr><tr><td>3. 线上比对</td><td>把线上页面下载回来做 <strong>SHA256 逐字节比对</strong></td><td>第 3 次探测拿到新版本：<strong>170852 字节，与本地完全一致</strong></td></tr><tr><td>4. 发布记录页</td><td><code>scripts\publish_notes.py --src outputs\v4\notes.html</code></td><td>只动 <code>notes/index.html</code>，发布前后各校验一次根目录主页未被改动</td></tr></tbody></table></div>
+<p>两点值得记下来：</p>
 <ul>
-<li>初版做的是「发车灯<strong>倒数 3-2-1</strong> → 赛车冲刺 → 卡通车手挥方格旗」。</li>
-<li>看过之后我提出改版，最终定稿为： <strong>五盏红灯铺满整屏、逐个点亮 → 五盏同时熄灭（这才是真实的 F1 发车信号）→ 赛车才登场冲刺 → 终点车手挥方格旗 → 定格一行字 <code>It's all to drive for with Bryan</code></strong>，全程约 6.2 秒。</li>
-<li>灯、赛车、车手、方格旗、速度线全部是<strong>手写的 SVG + CSS</strong>，不是图片 —— 不增加任何外部依赖，放大也不模糊。</li>
-<li>手机上五盏灯自动改成竖排，同样铺满屏幕；电脑上保持横排（更接近真实 F1 发车灯）。</li>
-<li>沿用我此前的要求：<strong>车身不含任何文字或号码</strong>。</li>
-<li>点「跳过」、或系统开启了「减少动态效果」，都会不播放直接进主页。</li>
-<li>已于 2026-09-18 上线（提交 <code>885b117</code>）。</li>
+<li><strong>发布前 2 次探测都还是旧版（155103 字节）</strong>，第 3 次才变成新版。这就是"Pages 构建需要时间"的真实样子——所以发布脚本坚持<strong>按字节比对</strong>、而不是"看页面上有没有某个关键词"。新旧两版共享绝大部分 HTML，关键词探针会在<strong>旧版上直接命中</strong>，报出一个假的"已上线"。</li>
+<li><strong>主页与记录页是两个文件，要分两次发布</strong>，而且记录页发布脚本必须保证<strong>不碰根目录主页</strong>。这次特意把这条做成了硬校验（发布前后各比对一次主页哈希），避免"更新记录页反而把主页退回旧版"这类事故。</li>
 </ul>
-<p><strong>AI 是怎么保证「顺序对」的</strong> 动画顺序不能靠肉眼看截图来判断。AI 写了一个时序推演脚本 <code>intro_timeline.py</code>：从浏览器 CSSOM 里直接读出每个动画的延迟、时长、填充模式与关键帧，按 CSS 规则<strong>算出</strong>每一毫秒各元素的不透明度，再断言编排顺序。这个脚本第一次运行就抓到了两个真 bug（见下）。</p>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>CSS 隐式 <code>from</code> 的陷阱（真 bug）</strong>：写 <code>@keyframes fadeOut{to{opacity:0}}</code> 时，隐式 <code>from</code> 取的是<strong>元素基础样式的值</strong>，而不是上一帧的值。如果基础值本来就是 0，整段动画就退化成 <code>0 → 0</code> 的<strong>空动画</strong>，元素会<strong>直接跳变</strong>而不是淡出。<code>lightOff</code> 与 <code>speedOff</code> 都中招了，修法是显式写出 <code>from{opacity:1}</code>。这个问题肉眼极难发现，是时序脚本抓出来的。</li>
-<li><strong>虚拟时间不推进 CSS 动画时钟</strong>：无头浏览器的 <code>--virtual-time-budget</code> 只推进 <code>setTimeout</code>，CSS 动画的 <code>currentTime</code> 恒为 0。所以「第 3 秒画面长什么样」不能用它来判断，只能靠 CSSOM 推演 + 强制定格的截图探针。</li>
-<li><strong>GitHub 的 SSH 通道（443 端口）这次也时通时断</strong>，大约三次才能成功一次（失败串是 <code>port 443: Connection timed out</code>）。解决办法是把「提交」和「上传」解耦，只对上传做反复重试，避免留下「已提交但没推上去」的半成品状态。</li>
-</ul>
-<hr class="rule">
-<h2>第 10 轮 · 开场动画第三轮改版：赛车现代化 + 车头朝左 + 方向盘特写（2026-09-18）</h2>
-<p><strong>我的需求</strong> 我找了两张参考图，提了三点要求：</p>
-<ol>
-<li><strong>赛车造型要更现代</strong> —— 参考 FIA 2026 概念车渲染图：深蓝渐变车身 + 红/黄/白拉花、Halo 座舱保护结构、大轮毂罩、多层前翼、宽大尾翼。</li>
-<li><strong>车头方向调转</strong> —— 原来车头是朝右冲的，改成<strong>整体镜像朝左</strong>，速度线方向也要跟着反过来。</li>
-<li><strong>新增一个方向盘特写镜头</strong> —— 参考真实 F1 方向盘：碳纤维蝶形盘体、顶部换挡灯带、中间液晶屏显示挡位与数据、左右多功能按钮、握把指示灯。</li>
-</ol>
-<p><strong>AI 先问了我三个问题（这点很好）</strong></p>
-<ul>
-<li>赛车方向怎么调？→ 我选了<strong>整体镜像，车头朝左</strong>（而不是只翻转车头）。</li>
-<li>方向盘插在哪一段？→ 我选了<strong>「灯灭之后、赛车冲刺之前」</strong>。</li>
-<li>方向盘屏幕上显示什么？→ 我选了<strong>显示挡位与数据</strong>。</li>
-</ul>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>赛车按「车头朝左」<strong>整张重画</strong>：前翼在最左、尾翼在最右，深蓝渐变车身 + 三色拉花 + Halo + 大轮毂罩 + 卡通车手；冲刺关键帧终点改为向左的 <code>translateX(-232%)</code>；速度线定位由 <code>left</code> 改成 <code>right</code>，飞行方向同步反向。</li>
-<li>新增方向盘特写：碳纤维斜纹底、顶部 10 颗换挡灯<strong>逐颗亮起</strong>（绿 4 / 黄 3 / 红 3）、中央屏幕显示挡位 <code>8</code> 与 <code>LAP 88</code> / <code>56.0</code> / <code>+1.250</code> 及 4 组数据、左右按钮区（<code>N</code>/<code>OV</code>/<code>FUEL</code>/<code>MIX</code>/<code>SCEN</code> 与 <code>PIT</code>/<code>OK</code>/<code>PL</code>/<code>SOC</code> 等）、底部四色旋钮、两侧握把指示灯；盘面还会绕盘心<strong>微微打一下方向</strong>。</li>
-<li>因为多了方向盘这一段，<strong>总时长从 6.2 秒延长到 7.4 秒</strong>（给方向盘留出约 1.1 秒的可读时间，结尾保留约 1 秒定格）。</li>
-<li>已发布上线（提交 <code>aded24f</code>）。</li>
-</ul>
-<p><strong>AI 主动加的两条顺序硬约束</strong></p>
-<ul>
-<li>方向盘必须在<strong>灯灭之后</strong>才出现；</li>
-<li>方向盘必须在<strong>赛车出现之前</strong>完全退场（否则赛车会穿过方向盘）。</li>
-</ul>
-<p>这两条都写进了时序脚本做断言：实测方向盘 2.50s 出现、2.90s 全亮、4.00s 淡出，赛车 4.05s 才登场。</p>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>方向盘一开始没有居中（真 bug）。</strong> 居中位移 <code>translate(-50%,-50%)</code> 原本只写在动画关键帧里，于是「动画一旦被禁用」，盘面就贴在屏幕中心、右侧溢出屏幕。这是几何探针用 <code>animation:none</code> 定格元素时暴露出来的。<strong>教训：居中这类基础定位要写在元素的基础样式里，动画只负责在其之上叠加位移和缩放。</strong></li>
-<li><strong>校验脚本自己也有 bug。</strong> 时序脚本里嵌套函数用 <code>global ok</code> 只能改模块级变量，改不动 <code>main()</code> 里的局部变量，导致 <strong>FAIL 根本没计入退出码</strong> —— 脚本报「通过」其实是假的。改用可变容器 <code>state = {"ok": True}</code> 才修好。<strong>这说明校验脚本本身也要被质疑。</strong></li>
-<li><strong>收尾检查的虚拟时间预算必须跟着总时长走。</strong> 总时长改成 7.4s 后，原来卡 8s 的收尾检查会失败（7.4s + 0.62s 收尾 ≈ 8.1s 才移除），已改成 9s。</li>
-<li><strong>B 站参考视频打不开</strong>（返回 412），参考图之外的细节只能靠公开资料和自己的判断。</li>
-<li><strong>这次推送一次就成功了</strong>（上一轮要重试好几次），印证了那个「时通时断」确实是间歇性的，不是配置错误。</li>
-</ul>
-<p><strong>最终校验结果</strong></p>
-<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>网页静态结构（<code>check_v3.py</code>）</td><td>40 个 id 全唯一、30 个 <code>getElementById</code> 目标全存在、CSS 变量全有定义 —— <strong>ALL STATIC CHECKS PASSED</strong></td></tr><tr><td>时序推演（<code>intro_timeline.py</code>）</td><td><strong>21 / 21 PASS</strong></td></tr><tr><td>几何布局（<code>intro_geom.py</code>）</td><td>方向盘桌面 560×382 / 移动 413×282，<strong>居中且不超出视口</strong>；旋转原点实测与理论值吻合</td></tr><tr><td>收尾与降级（<code>intro_rm.py</code>）</td><td><strong>ALL CHECKS PASSED</strong>（含「减少动态效果」直接跳过）</td></tr><tr><td>定格截图（<code>intro_probe.py</code>）</td><td>8 张全部生成，并<strong>实际查看图片</strong>确认赛车与方向盘的渲染细节</td></tr><tr><td>线上端到端（<code>check_live_intro.py</code>）</td><td><strong>18 / 18 PASS</strong></td></tr><tr><td>文档一致性（<code>verify_docs.py</code>）</td><td><strong>ALL DOC CHECKS PASSED</strong></td></tr></tbody></table></div>
-<p><strong>发布结果</strong></p>
-<ul>
-<li>线上 https://bryanhw.github.io/ 与本地文件 <strong>SHA256 字节完全一致</strong>（<code>931148174DABA7A7…</code>，103229 字节）。</li>
-<li>桌面存档 <code>index.html</code> 同步为同一字节。</li>
-<li>工作区提交：<code>79d2c0f</code>（改版）+ <code>aac932d</code>（文档回填）。</li>
-</ul>
-<hr class="rule">
-<h2>第 11 轮 · 把开发过程做成能直接发链接的对话记录页（2026-09-18）</h2>
-<p><strong>我的需求</strong></p>
-<ul>
-<li>先把 git 更新一下，把这次的对话追加进 markdown；</li>
-<li>然后<strong>发布到网上</strong>。</li>
-</ul>
-<p>（我选了「主页保持现状 + 新增一个对话记录页」这个范围：主页已经很稳、不想再动，只要多一个可以直接发给别人的链接。）</p>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>新增生成脚本，把 <code>docs/v3对话记录.md</code> 转成网页 <code>outputs/v3/notes.html</code>：</li>
-<ul>
-<li>自己写了个<strong>迷你 markdown 解析器</strong>（标题 / 段落 / 引用 / 有序无序列表 / 表格 / 分隔线 / 行内代码与加粗），<strong>不引入任何第三方库</strong>，继续维持「单文件、零外部依赖」；</li>
-<li>直接沿用主页那套 CSS 变量与渐变背景，所以两页看起来是同一个网站；</li>
-<li>两页<strong>主题互通</strong>：同一个 <code>localStorage</code> 键 <code>yhw-theme</code>、同一段防闪白脚本、同一个 favicon、同一个手机地址栏颜色；</li>
-<li>页面左上角有「← 返回主页」，页脚也有返回链接。</li>
-</ul>
-<li>发布到<strong>独立路径</strong> <code>notes/index.html</code> → https://bryanhw.github.io/notes/ ，<strong>主页文件一个字节都没动</strong>。</li>
-<li>生成脚本<strong>自带 14 条自检</strong>：任何一条不过就<strong>不写盘</strong>，从流程上保证不会产出半成品页面。</li>
-</ul>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>编辑器报「文件写锁超时」，但系统层根本没有锁。</strong> 中途要对交接文档做较大改动时，编辑工具连续报写锁超时，后来连很小的改动也失败；单独去查系统层文件锁却显示<strong>谁都没有占用</strong>。最后绕开的办法是：<strong>先用「新建文件」写一段待追加的内容 + 一个拼接脚本，再用脚本直接改文件</strong>——新路径不受影响，问题也就绕过去了。</li>
-<li><strong>加粗横跨行内代码，导致页面上漏出字面的 <code>**</code>。</strong> 源文里有「<code>**…</code>代码<code>…**</code>」这种写法。第一版解析器按反引号把一行切成几块、<strong>每块各自</strong>处理加粗，结果加粗标记被切在两块里、永远配不成对。<strong>是自检先把它拦下来了</strong>（没写出坏文件），随后改成：先把代码段抽成占位符 → 整体转义 → 做加粗替换 → 最后还原代码段，加粗就能跨过代码段。</li>
-<li><strong>自检本身也会写错。</strong> 第一版表格数量的断言拿「以 <code>| </code> 开头的行数」去比 <code>&lt;table&gt;</code> 个数，逻辑根本不对（一个表格有多行）；还有一处把「轮次标题 10 个」写死，结果页面上其实是 <strong>11 个</strong> <code>&lt;h2&gt;</code>（10 轮 + 1 个「附：v3 最终状态速览」）。<strong>教训：断言要写「与源文数量相等」这种关系，而不是写死数字。</strong></li>
-<li><strong>手机端表格多出 5px 横向滚动。</strong> 表格设了 420px 最小宽度，而手机上卡片内宽只有约 417px，于是表格自己多出一条几乎看不见的横向滚动条。已在窄屏断点里取消最小宽度。</li>
-<li><strong>Pages 构建延迟又一次骗人。</strong> 推送成功后前 4 次探测都是 404，第 5 次（约 60 秒后）才拿到新页面并 SHA256 一致。<strong>「推上去了」≠「线上已更新」</strong>，这条再次被验证。</li>
-<li><strong>改这一页的顺序很重要</strong>：这份对话记录<strong>就是</strong>那个网页的内容源，所以必须「先追加文字 → 再重新生成网页 → 再发布」，否则线上页面会比 markdown 旧一轮。</li>
-</ul>
-<p><strong>最终校验结果</strong></p>
-<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>生成器自检（<code>build_notes.py</code>）</td><td><strong>14 / 14 PASS</strong>（不过则不写盘）</td></tr><tr><td>布局量化（<code>notes_layout.py</code>）</td><td><strong>20 / 20 PASS</strong>：浅/深 × 桌面/手机四种组合均<strong>无横向溢出</strong>、卡片不超视口、表格溢出 0px</td></tr><tr><td>主题切换实测</td><td>无头浏览器确认 <code>preferredColorScheme=1 → light</code>、<code>=0 → dark</code></td></tr><tr><td>定格截图目视</td><td>浅/深 × 桌面/手机 + 表格局部共 6 张，渲染正常</td></tr><tr><td>线上发布</td><td>前 4 次 404，<strong>第 5 次命中且 SHA256 逐字节一致</strong>；复核主页哈希<strong>未变</strong></td></tr><tr><td>文档一致性（<code>verify_docs.py</code>）</td><td><strong>ALL DOC CHECKS PASSED</strong></td></tr></tbody></table></div>
-<p><strong>发布结果</strong></p>
-<ul>
-<li>线上 https://bryanhw.github.io/notes/ 与本地 <code>outputs/v3/notes.html</code> <strong>SHA256 字节完全一致</strong>。</li>
-<li><strong>主页 https://bryanhw.github.io/ 未被改动</strong>（哈希 <code>93114817…95F87C4</code> 发布前后一致）。</li>
-<li>发布提交：<code>798e1a7</code>。</li>
-<li>桌面存档新增 <code>notes.html</code>，并同步更新 <code>v3开发记录.md</code> 与本文件。</li>
-</ul>
-<hr class="rule">
-<h2>第 12 轮 · 首页「我关注的方向」细化为 6 个可进入的子板块（2026-09-20）</h2>
-<p><strong>我的需求</strong> 首页「我关注的方向」那一栏列了六个方向，但每张卡只有一句话，访客看完就停住了。我想要<strong>能点进去</strong>：点开任意一个方向，就能看到我具体在关注什么。</p>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>首页六张方向卡本身变成入口，点进去就是各自的子板块，网址形如 <code>#/focus/bci</code>。</li>
-<li>每个子板块里有：面包屑（首页 / 我关注的方向 / 方向名）、我的一段原话，以及「我在关注什么」的具体条目；底部还有一条切换栏，可以直接跳到别的方向或一键返回首页。</li>
-<li>顺带把「个人信息」页里那六个方向标签也做成入口 —— 首页和「个人信息」页，两个地方都能进。</li>
-<li>数字分身「小文」也同步了：现在问它某个方向（例如「脑机接口」），它会<strong>直接读该方向子板块的内容</strong>来回答，而不只是报一个方向名。</li>
-</ul>
-<p><strong>过程中的关键决策</strong></p>
-<ul>
-<li><strong>先对齐再动手</strong>：我用结构化提问和你确认了三件事 —— ① 实现形态选「单文件内新增子页面」（复用现有 hash 路由，不新增文件、不引入任何外部依赖）；② 内容来源限定为「你给素材、我只负责排版」；③ 素材由你直接提供。</li>
-<li>正文全部按你给的素材排版，<strong>没有添加任何你没提过的事实、经历或成果</strong>。只有三处把简称写全：<code>openai</code> → <code>OpenAI</code>、<code>南方医科大</code> → <code>南方医科大学</code>、<code>华科</code> → <code>华中科技大学</code>。</li>
-</ul>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>无头浏览器的「窄屏截图」会骗人。</strong> 请求窗口宽 390px 时，浏览器实际渲染的视口是 <strong>492px</strong>，但截图仍按请求宽度输出 <strong>390px</strong> 宽的图 —— 右侧 102px 被整块丢掉。视觉检查先报了「正文右侧被裁切」，据此一度以为手机端有横向溢出。实测才发现：<strong>所有组合下 <code>scrollWidth == clientWidth</code>、横向溢出都是 0</strong>，问题只出在截图本身。<strong>教训：判定「是否横向溢出」只看 <code>scrollWidth == clientWidth</code>，绝不看截图像素；出窄屏图时请求宽度必须写 492。</strong></li>
-<li><strong>校验脚本的词法器不认识正则字面量，报了一个假警报。</strong> 路由里原本写 <code>.replace(/\//g, "-")</code>，其中转义斜杠后面紧跟一个斜杠，会被词法器误读成 <code>//</code> 行注释，于是吞掉行尾的括号，报出「括号不平衡」。<strong>这不是页面的问题，是校验脚本的盲区。</strong> 已把这处改写成等价的 <code>split("/").join("-")</code>，并给校验脚本加了针对性提示，以后同类写法会被直接指出来。</li>
-<li><strong>让两处内容共用一份数据源。</strong> 数字分身的回答改成「读子页 DOM」之后，以后改子页文案不必再单独同步分身知识库，从源头上避免了「两处文案不一致」。</li>
-</ul>
-<p><strong>最终校验结果</strong></p>
-<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>结构校验（<code>check_focus.py</code>）</td><td><strong>69 / 69 PASS</strong></td></tr><tr><td>布局与路由实测（<code>focus_layout.py</code>）</td><td><strong>121 / 121 PASS</strong>：9 个页面 × 桌面 / 窄屏 × 浅色 / 深色，横向溢出均为 0</td></tr><tr><td>改动前后对照（<code>focus_ref.py</code>）</td><td>首页原有的两处元素内溢出，<strong>改动前后数值完全相同</strong>，确认不是这次改出来的</td></tr><tr><td>静态校验（<code>check_v3.py</code> / <code>check_balance.py</code>）</td><td>ALL STATIC CHECKS PASSED / CODE-LEVEL BRACKET BALANCE: OK</td></tr><tr><td>数字分身问答（<code>test_focusanswer.py</code>）</td><td><strong>11 / 11 PASS</strong>：问六个方向里的任意一个都能答出该子板块内容，无关问题仍回落兜底回答</td></tr><tr><td>线上发布</td><td>推送一次成功，线上与本地 <strong>SHA256 逐字节一致</strong></td></tr></tbody></table></div>
-<p><strong>发布结果</strong></p>
-<ul>
-<li>线上 https://bryanhw.github.io/ 与本地 <code>outputs/v3/index.html</code> <strong>SHA256 字节完全一致</strong>（118887 字节）。</li>
-<li>这一轮共发布两次：先发「6 个方向子板块」（提交 <code>cf21ad17</code>，117263 字节），确认无误后，再发「小文同步方向细节」（提交 <code>ef404bd</code>，118887 字节）。</li>
-</ul>
-<hr class="rule">
-<h2>第 13 轮 · 全站中英双语：一键切换中文 / English（2026-09-20）</h2>
-<p><strong>我的需求</strong> 网站现在只有中文。我希望不懂中文的人也能看：顶部放一个切换按钮，一点就能<strong>整页</strong>变成英文 —— 导航、自我介绍、关注方向、数字分身的问答、留言区的提示都要跟着变。</p>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>顶栏右上角新增「<strong>中 / EN</strong>」切换按钮；也可以直接在网址后面加 <code>?lang=en</code> 打开英文版。<strong>选择记在浏览器里</strong>，下次访问还是上次选的语言。</li>
-<li>整页文案双语化：导航、首屏、About、关注方向（6 个方向卡 + 每个方向子页正文）、留言区、页脚，全部有对应英文。</li>
-<li>数字分身「小文」也<strong>能用英文对话</strong>：英文版下提供 8 条英文快捷问题，回答也是英文，并保留原有的兜底回答。</li>
-<li>双语词表单独维护（<strong>167 条文本 + 14 条属性</strong>），另有脚本专门校验「中英两边一条不缺、一条不多」。</li>
-</ul>
-<p><strong>过程中的关键决策</strong></p>
-<ul>
-<li><strong>不做「翻译壳」，做真双语</strong>：英文内容与中文一一对应写成词表，切换时整页重写，不引入任何翻译插件或外部依赖（仍然是单文件、零外部依赖）。</li>
-<li>中文原文始终是<strong>唯一基准</strong>，英文由它现算；因此「切回中文」不会因为来回翻译而漂移。</li>
-<li><strong>先对齐再动手</strong>：AI 先与我确认了切换范围、是否保留中文原文、是否记住选择，然后才改代码。</li>
-</ul>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>无头浏览器在 <code>file://</code> 下不生效 localStorage</strong>：截图必须走本地 http 服务，否则「记住上次语言」这条根本测不出来（截出来的永远是默认语言）。</li>
-</ul>
-<p><strong>最终校验结果</strong></p>
-<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>词表对齐（<code>validate_i18n_dict.py</code>）</td><td><strong>0 缺 0 多</strong>（167 条文本 / 14 条属性）</td></tr><tr><td>真实浏览器双语运行时（<code>test_i18n_runtime.py</code>）</td><td><strong>36 / 36 PASS</strong>：切到英文后整页<strong>残留汉字 = 0</strong>，数字分身英文回答里也没有汉字</td></tr><tr><td>子页结构 / 子页布局与路由</td><td>69 / 69 PASS、121 / 121 PASS</td></tr><tr><td>用户输入</td><td>切换语言时<strong>我打的字原样保留</strong>，不会被改写</td></tr></tbody></table></div>
-<p><strong>同轮后续两次补修（都在上线前做完）</strong></p>
-<ul>
-<li><strong>窄屏也要能找到「联系我」</strong>：窗口收窄或手机上时，顶栏原本把「联系我」收进了菜单里，不好找。现在 <strong>≤760px</strong> 顶栏直接显示紧凑按钮，<strong>≤600px</strong> 收成信封图标，<strong>≤430px</strong> 再收紧间距；<strong>320–900px 共 11 档实测中英两版横向溢出均为 0</strong>。</li>
-<li><strong>切回中文后整页仍是英文</strong>（我验收时发现的）：只要点回中文，<strong>只有数字分身那一行</strong>变成中文，其它还是英文。AI 查出的根因是「把中文写回去」的那一步<strong>只认当前含汉字的节点</strong> —— 切到英文后节点里已经没有汉字，于是一个都收不到，实测 <strong>262 个文本节点不复原</strong>；改成「登记表 + 双向还原」后实测 <strong>262 → 0</strong>。同时给运行时门禁补了 3 条断言（36 → 39 项），并<strong>专门拿修复前的备份跑了一遍</strong>，确认这条新断言真的会报红（不是摆设）。</li>
-</ul>
-<hr class="rule">
-<h2>第 14 轮 · 开场红灯调暗调小 + v3.1 一起上线（2026-09-21）</h2>
-<p><strong>我的需求</strong> （1）开场动画里的发车红灯<strong>又亮又大</strong>，手机上尤其大 —— 调暗一点、也调小一点；（2）把做好的这一版<strong>发布到网上</strong>；（3）更新 git 和 markdown；（4）截一张<strong>英文模式主页</strong>的图放进存档文件夹。</p>
-<p><strong>AI 的交付</strong></p>
-<ul>
-<li>红灯按「调暗 + 调小」两个方向都改了，而且是<strong>量出来</strong>的结果（不是凭感觉调）：</li>
-</ul>
-<div class="table-wrap"><table><thead><tr><th>视口</th><th>灯直径</th><th>整组占屏</th><th>最亮像素（RGB）</th><th>亮度≥100 的发光面积</th></tr></thead><tbody><tr><td>桌面 1254×660（横排）</td><td>231px → <strong>178px</strong></td><td>横占屏宽 97.4% → <strong>93.3%</strong></td><td><code>255,214,204</code> → <strong><code>239,176,162</code></strong></td><td>17.67% → <strong>8.20%</strong></td></tr><tr><td>手机 492×704（竖排）</td><td>113px → <strong>70px</strong></td><td>纵占屏高 92.3% → <strong>86.1%</strong></td><td><code>255,213,203</code> → <strong><code>239,175,161</code></strong></td><td>18.10% → <strong>5.41%</strong></td></tr><tr><td>小屏 492×500（竖排）</td><td>80px → <strong>50px</strong></td><td>纵占屏高 90.8% → <strong>84.8%</strong></td><td>—</td><td>—</td></tr></tbody></table></div>
-<ul>
-<li>手机档另加了一档<strong>更暗的光晕</strong>：竖排时五盏灯纵向叠得很近，光晕不压住会更显刺眼。</li>
-<li>除红灯外，开场动画的其它实测项（车身无文字、车头朝左、方向盘居中且不超屏、10 颗换挡灯、结尾一行字与挥旗人物不重叠、绕盘心旋转正确）<strong>全部与改动前一致</strong>。</li>
-<li>英文模式主页截图重出并存进存档（<code>images/v3-lang-en-home.png</code>，1280×1800）。</li>
-<li><strong>v3.1 正式上线</strong>：线上主页与本地文件 <strong>SHA256 逐字节一致</strong>。</li>
-</ul>
-<p><strong>最终校验结果</strong></p>
-<div class="table-wrap"><table><thead><tr><th>校验项</th><th>结果</th></tr></thead><tbody><tr><td>红灯几何实测（<code>intro_geom.py</code>）</td><td>桌面 231→178px、竖排 113→70px；三档均<strong>互不重叠、无横向溢出</strong></td></tr><tr><td>红灯亮度实测（<code>intro_light_bright.py</code>）</td><td>三档的「最亮像素 <strong>193</strong>」「发光面积」「亮核像素」全部下降（桌面亮核 32066 → 2289 像素）</td></tr><tr><td>开场动画回归（<code>intro_timeline.py</code>）</td><td>21 项全过（含顺序约束，时长仍为 7.4 秒）</td></tr><tr><td>静态校验（<code>check_v3.py</code> / <code>check_balance.py</code>）</td><td>ALL STATIC CHECKS PASSED / CODE-LEVEL BRACKET BALANCE: OK</td></tr><tr><td>双语与内容门禁</td><td>运行时 39/39、子页 69/69、布局与路由 121/121 全过</td></tr><tr><td>线上发布</td><td>推送<strong>一次成功</strong>，线上与本地 <strong>SHA256 逐字节一致</strong></td></tr></tbody></table></div>
-<p><strong>发布结果</strong></p>
-<ul>
-<li>线上 https://bryanhw.github.io/ 与本地 <code>outputs/v3/index.html</code> <strong>SHA256 字节完全一致</strong>（155103 字节，<code>B9E9174C…3439E4</code>）。</li>
-<li>这一版一次把四件事一起发了：<strong>全站中英双语</strong>、窄屏「联系我」补修、切回中文修复，外加<strong>开场红灯调暗调小</strong>。</li>
-<li>发布用的提交是 <code>4c8b5b2</code>；发布前后两次都复核了「对话记录页那份文件没有被顺手改动」。</li>
-</ul>
-<p><strong>过程中的坑</strong></p>
-<ul>
-<li><strong>亮度检查脚本第一版「量错了对象」</strong>：给开场画面定格时只隐藏了开场层的一部分元素，结果右下角「跳过」按钮的白底被当成了「最亮的灯」（<code>maxL</code> 一直卡在 255 附近），看起来像「灯没变暗」。改成「隐藏开场层里除灯之外的<strong>所有</strong>子元素」后，才量到真正的灯，数据也才和肉眼观感对上。</li>
-</ul>
-<hr class="rule">
-<h2>附：v3 最终状态速览</h2>
-<div class="table-wrap"><table><thead><tr><th>项目</th><th>结果</th></tr></thead><tbody><tr><td>线上地址</td><td>https://bryanhw.github.io/</td></tr><tr><td>对话记录页</td><td>https://bryanhw.github.io/notes/ ，由 <code>docs/v3对话记录.md</code> 生成，与主页同款深浅主题</td></tr><tr><td>代码仓库</td><td>https://github.com/Bryanhw/bryanhw.github.io</td></tr><tr><td>网页文件</td><td><code>outputs/v3/index.html</code>，<strong>155103 字节</strong>，SHA256 <code>B9E9174C…3439E4</code>（本地 / 存档 / 线上三方一致；2026-09-21 发布）</td></tr><tr><td>关注方向子板块</td><td>首页 6 张方向卡可点进 <code>#/focus/*</code>；「个人信息」页 6 个标签同样是入口；数字分身问方向名会返回该子板块内容</td></tr><tr><td>开场动画</td><td>五盏发车灯 → 方向盘特写 → 赛车冲刺（朝左）→ 挥方格旗 → 定格一行字，约 <strong>7.4 秒</strong>，可跳过；2026-09-21 按要求把红灯<strong>调暗调小</strong>（桌面灯直径 231→178px、竖排 113→70px，手机档另加更暗光晕）</td></tr><tr><td>中英双语</td><td>顶栏「<strong>中 / EN</strong>」一键切换（也支持网址加 <code>?lang=en</code>），语言选择记在浏览器里；数字分身「小文」可用英文问答（8 条英文快捷问题）</td></tr><tr><td>留言数据</td><td>上线时测试数据已清空；上线后已收到 <strong>2 条</strong>真实留言（2026-09-17 复核，非自测数据）</td></tr><tr><td>访客能看到</td><td>只有留言总数，读不到任何一条留言内容</td></tr><tr><td>站主能看到</td><td>Supabase 后台 <code>messages</code> 表全部留言 + 新留言邮件提醒</td></tr><tr><td>静态校验</td><td>ALL STATIC CHECKS PASSED；双语运行时 39/39、词表 0 缺 0 多、子页 69/69、布局与路由 121/121</td></tr></tbody></table></div>
-<blockquote><p>留言数据一行为 2026-09-17 的复核结果（上线时清空为 0，之后收到 2 条访客留言）。留言数会随访客留言变化，需要看当前值时以实时调用 <code>message_count()</code> 为准。</p></blockquote>
   </article>
 </main>
 
 <footer>
-  <p>本页由 <code>docs/v3对话记录.md</code> 生成 · <a href="/">返回主页</a></p>
-  <p>阎浩文 Bryan · 个人主页 v3</p>
+  <p>本页由 <code>docs/v4对话记录.md</code> 生成 · <a href="/">返回主页</a></p>
+  <div class="copyright">
+    <p>阎浩文 Bryan · 个人主页 v4.0</p>
+    <p>本页与主页共用同一套设计与主题设置：在主页切换深色 / 浅色，本页会保持一致。</p>
+  </div>
 </footer>
 
 <script>
