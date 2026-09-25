@@ -168,11 +168,13 @@
     background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='120'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='120'%20height='120'%20filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* 尊重"减少动态效果"系统偏好 */
+  /* 尊重"减少动态效果"系统偏好
+     注意：本块在基础动画规则之前，必须加 !important 才不会被后面的同名声明按源码顺序盖掉 */
   @media (prefers-reduced-motion:reduce){
-    .bg-flow{animation:none}
-    .nav-speed::after{animation:none}
-    .btn-leave{animation:none;filter:drop-shadow(0 10px 24px rgba(126,240,176,.38))}
+    .bg-flow{animation:none!important}
+    .nav-speed::after{animation:none!important}
+    .caret{animation:none!important}
+    .btn-leave{animation:none!important;filter:drop-shadow(0 10px 24px rgba(126,240,176,.38))}
   }
 
   /* 键盘可达性：统一的焦点环（仅键盘导航时出现，鼠标点击不显示） */
@@ -220,6 +222,9 @@
     color:#fff;background:var(--brand-grad);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 18px rgba(20,58,107,.26);
   }
+  /* 二级菜单里的站外入口（对话记录页）：细线分隔 + ↗ 提示「会开新标签页」 */
+  .nav-link-ext{margin-top:5px;border-top:1px solid var(--line)}
+  .nav-link-ext::after{content:"↗";margin-left:7px;font-size:11px;opacity:.6}
   .nav-cta{
     margin-left:auto;text-decoration:none;color:#fff;font-weight:700;font-size:13.5px;white-space:nowrap;
     padding:9px 18px;border-radius:10px;
@@ -325,8 +330,17 @@
   .hero2 h1 .hl{color:var(--blue-300)}
   .hero2 .typed-line{position:relative;display:block;font-size:19px;font-weight:700;color:#cfe3ff;margin-top:14px;min-height:30px}
   .hero2 .caret{display:inline-block;width:2px;height:19px;background:var(--blue-300);margin-left:3px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  /* 首屏「一句有性格的话」（2026-09-25 新增，起因是访客留言：自我介绍太像简历，缺人味）。
+     整句必须待在同一个文本节点里 —— i18n 字典按节点原文查表，拆成多个 span 就得各自补 key。
+     醒目只靠字号 / 字重 / 左侧品牌色竖线，不加别的标签。 */
+  .hero2 .hero-quote{
+    position:relative;display:block;max-width:620px;margin-top:18px;padding-left:15px;
+    font-size:21px;font-weight:800;line-height:1.5;letter-spacing:.3px;color:#f2f7ff;
+    border-left:3px solid var(--blue-300);
+  }
   @keyframes blink{50%{opacity:0}}
-  .hero2 .lede{position:relative;max-width:620px;color:#d6e6ff;font-size:15.5px;margin-top:16px}
+  /* 自我介绍压成一句（性格 / 兴趣爱好已交给上面的打字机轮播，不再重复堆在这里） */
+  .hero2 .lede{position:relative;max-width:620px;color:#d6e6ff;font-size:15.5px;margin-top:12px}
   .hero2 .btns{position:relative;display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
   .btn{
     display:inline-flex;align-items:center;gap:8px;text-decoration:none;
@@ -793,6 +807,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
     .hero2{padding:36px 22px;border-radius:20px}
     .hero2 h1{font-size:30px}
     .hero2 .typed-line{font-size:16px}
+    .hero2 .hero-quote{font-size:17.5px;margin-top:14px;padding-left:12px}
     .stats{margin:36px 0 0;grid-template-columns:1fr;box-shadow:var(--shadow)}
     .stat + .stat::before{left:18%;right:18%;top:0;bottom:auto;width:auto;height:1px}
     .about{grid-template-columns:1fr}
@@ -884,12 +899,13 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .intro-lights i:nth-child(5){animation-delay:1.80s,2.25s}
   @keyframes lightOn{to{opacity:1}}
   @keyframes lightOff{from{opacity:1}to{opacity:0}}
-  /* 窄屏改成竖排；手机端再小一档、也再暗一档（用户 2026-09-21 反馈） */
+  /* 窄屏改成竖排；手机端一档比一档小（2026-09-21 首次调小；2026-09-25 按用户要求再小一些：
+     直径 40vw/10vh -> 32vw/7.2vh，间距与上下留白同步收紧，光晕一起收小，免得五盏灯糊成一片） */
   @media (max-width:560px){
-    .intro-lights{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr);gap:1.2vmin;padding:4vmin 0}
+    .intro-lights{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr);gap:1vmin;padding:3vmin 0}
     .intro-lights i{
-      width:min(40vw,10vh);
-      box-shadow:0 0 5.5vmin rgba(206,48,32,.26),0 0 1.6vmin rgba(226,110,88,.2);
+      width:min(32vw,7.2vh);
+      box-shadow:0 0 4vmin rgba(206,48,32,.24),0 0 1.2vmin rgba(226,110,88,.18);
     }
   }
 
@@ -1374,6 +1390,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
       <a class="nav-link" data-view="traits" href="#/traits">我的特点</a>
       <a class="nav-link" data-view="chat" href="#/chat">数字分身</a>
       <a class="nav-link" data-view="feedback" href="#/feedback">留言反馈</a>
+      <a class="nav-link nav-link-ext" href="https://bryanhw.github.io/notes/" target="_blank" rel="noopener">对话记录</a>
     </nav>
     <a class="nav-cta" href="mailto:yhw20070910@outlook.com">联系我</a>
     <a class="nav-cta-sm" href="mailto:yhw20070910@outlook.com" aria-label="联系我" title="联系我">
@@ -1405,7 +1422,8 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
           <span class="eyebrow">天津大学 · 香港理工大学 · 深圳未来技术学院</span>
           <h1>你好，我是 <span class="hl">阎浩文</span> Bryan</h1>
           <span class="typed-line"><span id="typed"></span><span class="caret" aria-hidden="true"></span></span>
-          <p class="lede">一名智能医学工程专业的大一学生，正在探索如何用 AI 辅助自己更高效地获取和掌握知识。性格乐于助人，喜欢围棋、阅读和打羽毛球。</p>
+          <p class="hero-quote">AI 是副驾，方向盘我自己握。</p>
+          <p class="lede">智能医学工程专业大一，在深圳；平时在琢磨怎么用 AI 把学习做得更快、更深。</p>
           <div class="btns">
             <a class="btn btn-primary" href="#/info">认识我 →</a>
             <a class="btn btn-ghost" href="#/chat">💬 和数字分身「小文」聊聊</a>
@@ -1878,10 +1896,12 @@ const I18N_EN = {
   "我的特点": "Traits",
   "数字分身": "Digital Twin",
   "留言反馈": "Feedback",
+  "对话记录": "Notes",
   "联系我": "Contact",
   "天津大学 · 香港理工大学 · 深圳未来技术学院": "Tianjin University · The Hong Kong Polytechnic University · Shenzhen Future Technology Institute",
   "你好，我是": "Hi, I'm",
-  "一名智能医学工程专业的大一学生，正在探索如何用 AI 辅助自己更高效地获取和掌握知识。性格乐于助人，喜欢围棋、阅读和打羽毛球。": "A first-year Intelligent Medical Engineering student, exploring how AI can help me gain and master knowledge more efficiently. I'm glad to help others, and I enjoy Go, reading and badminton.",
+  "AI 是副驾，方向盘我自己握。": "AI rides shotgun; I keep my hands on the wheel.",
+  "智能医学工程专业大一，在深圳；平时在琢磨怎么用 AI 把学习做得更快、更深。": "First-year Intelligent Medical Engineering student in Shenzhen, figuring out how AI can make learning faster and deeper.",
   "认识我 →": "About me →",
   "💬 和数字分身「小文」聊聊": "💬 Chat with my digital twin “Xiaowen”",
   "✍️ 给我留言": "✍️ Leave me a message",
@@ -2242,7 +2262,17 @@ const KNOWLEDGE = {
   city: { zh: "我平时住在深圳。学校（天津大学-香港理工大学-深圳未来技术学院）也在深圳，所以我生活、上学都在这座城市。", en: "I live in Shenzhen. The Tianjin University-PolyU Shenzhen Future Technology Institute is in Shenzhen as well, so this is the city where I study and live." },
   twin: { zh: "我是「小文」，是阎浩文的数字分身，不是他本人 —— 所以有些问题我真的答不上来。我只会回答他放在这个网站上的信息（专业、兴趣、获奖、关注的方向、联系方式这些），不会自己编。想找他本人聊天，发邮件或者在「留言反馈」页留言都可以。", en: "I'm \"Xiaowen\", Yan Haowen's digital twin - not him in person, so some questions I genuinely cannot answer. I only answer from the information he put on this site (his major, interests, awards, the fields he follows, how to reach him) and I won't make things up. To talk to the real him, send an email or leave a note on the feedback page." },
   site: { zh: "这个网站是他自己做的：一个单文件静态页面 —— 所有 HTML / CSS / JS 都在同一个文件里，双击就能打开，不依赖任何外部框架。留言会存进 Supabase 数据库，整个开发过程都记录在「对话记录」页里。", en: "He built this site himself: a single-file static page - all the HTML, CSS and JS live in one file that you can just double-click, with no external framework. Messages are stored in a Supabase database, and the whole build process is written up on the notes page." },
-  greeting: { zh: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系、他住哪、关注哪些方向，或者他最近在忙什么。", en: "Hi there! I'm Xiaowen, Yan Haowen's digital twin. You can ask me about his studies, interests, traits, awards, how to contact him, where he lives, the fields he follows, or what he's been up to lately." }
+  greeting: { zh: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系、他住哪、关注哪些方向，或者他最近在忙什么。", en: "Hi there! I'm Xiaowen, Yan Haowen's digital twin. You can ask me about his studies, interests, traits, awards, how to contact him, where he lives, the fields he follows, or what he's been up to lately." },
+
+  /* v4 第 8 轮（2026-09-25）扩充：把「关于我」「6 个方向」「网站功能」「记录页」里
+     已经写着的事实编成问答，让分身在更多问法下都答得上来。
+     纪律：只搬页面上已有的事实，一个字都不编；拿不准的宁可不写
+     （还想让它答什么 → 见 v4-handoff.md 的「待补清单」，需要本人提供真信息）。 */
+  why_ai: { zh: "我对「AI 如何帮助人更好地学习」这件事特别感兴趣 —— 我自己每天都在读书、做笔记、理解复杂概念、整理信息；把 AI 用进来之后，同样一段时间能读得更深一点、笔记也更清楚一点。这条方法我还在摸索，但它确实在改变我的学习方式。", en: "I'm especially interested in how AI can help people learn better. Every day I read, take notes, work through complex concepts and organise information; with AI in the loop I can go a bit deeper and keep my notes clearer in the same amount of time. I'm still figuring the method out, but it genuinely is changing how I study." },
+  study_method: { zh: "主要是四件事：读书时用它帮我理清结构；做笔记时把零散信息整理成条目；遇到复杂概念，让它换几种说法讲给我听；再就是用它快速筛选和归类信息。核心是「用 AI 帮自己学」，不是让它替我做。", en: "Four things, mainly: using it to sort out the structure of what I read, turning scattered information into tidy notes, asking it to explain a hard concept in several different ways, and using it to scan and group information quickly. The point is using AI to help me learn, not to do the learning for me." },
+  future: { zh: "我希望以后能把 AI 真正用到医疗健康这类前沿领域里去。现在先把基础打好：学好专业，同时把「用 AI 学习」这套方法练熟。", en: "I'd like to put AI to real use in frontier fields such as healthcare. For now I'm building the foundation: learning my major well, and getting good at using AI to learn." },
+  site_features: { zh: "访客能用的有：中英文一键切换（导航栏里，也可以直接按 T 键）、深色 / 浅色主题（默认跟随你的系统，也能手动切）、和我聊天、6 个关注方向的详情页，还有「留言反馈」—— 留言会直接进他的 Supabase 数据库，只有他本人能看到。", en: "What visitors can use: one-click Chinese/English switching (in the nav bar, or just press T), dark/light theme (follows your system by default and can be switched by hand), chatting with me, detail pages for the six fields he follows, and the feedback page - messages go straight into his Supabase database and only he can read them." },
+  notes_page: { zh: "有的。他把自己做这个网站的全过程都写在了「对话记录」页里：每一轮改了什么、为什么改、怎么验证的，都能看到。地址：<a href=\"https://bryanhw.github.io/notes/\" target=\"_blank\" rel=\"noopener\">bryanhw.github.io/notes</a>", en: "Yes - he wrote up the whole build process on the notes page: every round of changes, why he made them, and how he checked them. Link: <a href=\"https://bryanhw.github.io/notes/\" target=\"_blank\" rel=\"noopener\">bryanhw.github.io/notes</a>" }
 };
 
 /* 按当前语言取知识库字段（新增事实只要在这里补一对 zh/en） */
@@ -2273,6 +2303,28 @@ const RULES = [
   { keys: ["体育运动", "体育", "运动", "f1", "赛车", "红牛", "维斯塔潘", "阿隆索", "勒克莱尔",
            "sport", "formula 1", "racing", "verstappen", "alonso", "leclerc"],
     ans: () => k("sport") },
+  /* v4 第 8 轮（2026-09-25）新增：知识库里多了一组事实，这里补上对应的触发词。
+     位置很讲究 —— 必须排在「在做什么 / 专业 / 方向」这些宽泛规则之前：
+     它们的关键词里带着「学习」「ai」「技术」这种大词，排到后面就永远轮不到这里。
+     同时逐条核对过不抢已有答案：「你在做什么」仍走 doing、
+     「这个网站是怎么做的」仍走 site、「你关心什么方向」仍走方向。 */
+  { keys: ["为什么用ai", "为什么用 ai", "为什么要用ai", "为什么要用 ai", "为什么关注ai", "为什么关注 ai",
+           "为什么喜欢ai", "为什么喜欢 ai", "为什么学ai", "为什么学 ai", "为什么研究ai", "为什么研究 ai",
+           "why do you use ai", "why ai", "why are you interested in ai", "why ai learning"],
+    ans: () => k("why_ai") },
+  { keys: ["怎么用ai", "怎么用 ai", "平时怎么学", "学习方法", "怎么学习", "如何学习", "学习的方法",
+           "怎么安排学习", "how do you study", "how do you use ai", "study method", "study methods"],
+    ans: () => k("study_method") },
+  { keys: ["未来", "将来", "以后想", "以后打算", "以后做什么", "职业规划", "想做什么", "打算做什么",
+           "goal", "goals", "future", "career plan", "plan for the future"],
+    ans: () => k("future") },
+  { keys: ["有什么功能", "网站功能", "能做什么", "可以做什么", "支持中英文", "能切英文", "中英文切换",
+           "深色模式", "夜间模式", "切换主题", "features of this site", "what can this site do",
+           "switch language", "dark mode", "site features"],
+    ans: () => k("site_features") },
+  { keys: ["开发记录", "开发日志", "制作过程", "过程记录", "做了多久", "怎么做出来的", "对话记录",
+           "devlog", "dev log", "build log", "notes page", "how long did it take"],
+    ans: () => k("notes_page") },
   { keys: ["你干什么", "你在干什么", "在做什么", "在干嘛", "忙什么", "最近", "学习",
            "what are you doing", "working on", "busy", "study", "studies", "studying", "learning"],
     ans: () => k("doing") },
@@ -2402,6 +2454,32 @@ function focusAnswer(text) {
   return null;
 }
 
+/* 第三遍（v4 第 8 轮新增）：前两遍都落空时，如果问句里出现了「勉强沾边」的话题词，
+   就仍然坦白答不上来（绝不编），但顺手把最接近的两三个话题、连同可以直接照抄的问法一起给他。
+   仍是纯加法：只有原本要掉兜底的问题才会走到这里，兜底文案本身一个字没少。
+   规矩：这里的词一律只放「不会跟已有规则抢答」的边角词，抢答了就把它挪回 RULES。 */
+const TOPIC_HINTS = [
+  { ask: () => L("你平时怎么用 AI？", "How do you use AI day to day?"),
+    words: ["效率", "笔记", "读书", "看书", "记忆", "复习", "背单词", "方法论", "习惯", "时间管理",
+            "notes", "memorize", "productivity", "habit"] },
+  { ask: () => L("你关心什么方向？", "Which fields do you focus on?"),
+    words: ["科研", "学术", "医学", "科技", "互联网", "research", "medicine", "technology"] },
+  { ask: () => L("你有什么特点？", "What are your traits?"),
+    words: ["棋", "羽毛球", "体育", "音乐", "电影", "游戏", "性格", "music", "movie", "game"] },
+  { ask: () => L("你未来想做什么？", "What do you want to do in the future?"),
+    words: ["规划", "目标", "梦想", "就业", "工作", "career", "job", "dream"] },
+  { ask: () => L("怎么联系你？", "How can I contact you?"),
+    words: ["聊天", "私聊", "认识一下", "加个", "好友", "chat", "talk to"] }
+];
+
+function hintAnswer(text) {
+  const near = TOPIC_HINTS.filter(h => h.words.some(w => hit(text, w))).slice(0, 3);
+  if (!near.length) return fallbackAnswer();
+  return fallbackAnswer()
+       + L("\n\n顺便一提，这些我倒是答得上来：\n", "\n\nThat said, these I can answer:\n")
+       + near.map(h => "· " + h.ask()).join("\n");
+}
+
 function answer(raw) {
   const text = (raw || "").toLowerCase();
 
@@ -2419,7 +2497,7 @@ function answer(raw) {
   }
 
   /* 两遍都不行 → 坦白 + 指路，而不是甩一句「有事私聊我」 */
-  return fallbackAnswer();
+  return hintAnswer(text);
 }
 
 /* ================= 聊天 UI ================= */
@@ -2459,7 +2537,13 @@ const QUICK_QS = [
   /* v4 第 5 轮补的两条：一条答「城市」（旧版直接掉兜底），
      一条答「你是真人吗」（访客对数字分身最先想确认的事） */
   { zh: "你住在哪？", en: "Where do you live?" },
-  { zh: "你是真人吗？", en: "Are you a real person?" }
+  { zh: "你是真人吗？", en: "Are you a real person?" },
+  /* v4 第 8 轮（2026-09-25）补的四条：把新知识库里最值得被问到的摆到明面上，
+     顺带让「知识库扩建」这件事在界面上一眼看得见（10 -> 14）。 */
+  { zh: "你为什么要用 AI？", en: "Why do you use AI?" },
+  { zh: "你平时怎么用 AI？", en: "How do you use AI day to day?" },
+  { zh: "你未来想做什么？", en: "What do you want to do in the future?" },
+  { zh: "这个网站有什么功能？", en: "What can this site do?" }
 ];
 
 function renderQuick() {
@@ -2933,6 +3017,13 @@ navToggle.addEventListener("click", e => {
 /* 点击菜单外 / 按 Esc 关闭 */
 document.addEventListener("click", e => {
   if (!navLinks.classList.contains("open")) return;
+  /* 站外入口（对话记录）：开新标签页，本页不跳转，所以顺手把菜单收起来 */
+  const extLink = e.target && e.target.closest ? e.target.closest(".nav-link-ext") : null;
+  if (extLink) {
+    navLinks.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+    return;
+  }
   if (navLinks.contains(e.target) || navToggle.contains(e.target)) return;
   navLinks.classList.remove("open");
   navToggle.setAttribute("aria-expanded", "false");
