@@ -388,9 +388,9 @@
     background:#fff;border-radius:10px;padding:9px;
   }
 
-  /* 数据条 */
+  /* 数据条（A2-2 起位于「关于我」之后，不再压 hero 下沿，改为常规区块间距） */
   .stats{
-    position:relative;z-index:2;margin:-30px 26px 0;
+    position:relative;z-index:2;margin:52px 0 0;
     background:var(--card);border:1px solid var(--line);border-radius:18px;
     box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;
   }
@@ -793,7 +793,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
     .hero2{padding:36px 22px;border-radius:20px}
     .hero2 h1{font-size:30px}
     .hero2 .typed-line{font-size:16px}
-    .stats{margin:-22px 10px 0;grid-template-columns:1fr;box-shadow:var(--shadow)}
+    .stats{margin:36px 0 0;grid-template-columns:1fr;box-shadow:var(--shadow)}
     .stat + .stat::before{left:18%;right:18%;top:0;bottom:auto;width:auto;height:1px}
     .about{grid-template-columns:1fr}
     .cta{padding:32px 20px}
@@ -1425,12 +1425,6 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
       </div>
     </div>
 
-    <div class="stats reveal">
-      <div class="stat"><div class="stat-num" data-target="2">0</div><div class="stat-lb">所院校联合培养</div></div>
-      <div class="stat"><div class="stat-num" data-target="3">0</div><div class="stat-lb">项省级以上获奖</div></div>
-      <div class="stat"><div class="stat-num" data-target="6">0</div><div class="stat-lb">个前沿关注方向</div></div>
-    </div>
-
     <div class="block reveal">
       <div class="block-head">
         <span class="block-eyebrow">About</span>
@@ -1454,6 +1448,14 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 数据条：原在首屏 hero 下方（负边距压卡片下沿），A2-2 起下移到「关于我」之后，
+         让首屏只留 hero；同时跟随其后正好引出「6 个前沿关注方向」。 -->
+    <div class="stats reveal">
+      <div class="stat"><div class="stat-num" data-target="2">0</div><div class="stat-lb">所院校联合培养</div></div>
+      <div class="stat"><div class="stat-num" data-target="3">0</div><div class="stat-lb">项省级以上获奖</div></div>
+      <div class="stat"><div class="stat-num" data-target="6">0</div><div class="stat-lb">个前沿关注方向</div></div>
     </div>
 
     <div class="block reveal">
@@ -2871,10 +2873,9 @@ function activateReveals(root) {
   if (!root) return;
   root.querySelectorAll(".reveal").forEach(el => {
     const r = el.getBoundingClientRect();
-    if (r.top < window.innerHeight * 0.92) el.classList.add("in");
+    if (r.top < window.innerHeight * 0.92) { el.classList.add("in"); countStats(el); }
     else revealObserver.observe(el);
   });
-  root.querySelectorAll(".stat-num").forEach(el => countUp(el));
 }
 
 function render() {
@@ -2895,8 +2896,16 @@ window.addEventListener("hashchange", render);
 
 /* 滚动入场观察器 */
 const revealObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revealObserver.unobserve(e.target); } });
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add("in"); countStats(e.target); revealObserver.unobserve(e.target); }
+  });
 }, { threshold: 0.12 });
+
+/* 数字滚动：数据条已移到「关于我」之后（在首屏折叠线以下），
+   所以只在它真正进入视口时才滚动，避免动画在屏幕外白跑、滚到就只剩最终值。 */
+function countStats(scope) {
+  scope.querySelectorAll(".stat-num").forEach(el => countUp(el));
+}
 
 /* 数字滚动 */
 function countUp(el) {
