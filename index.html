@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="阎浩文（Bryan）的个人主页 —— 天津大学·香港理工大学·深圳未来技术学院 智能医学工程大一学生，含数字分身「小文」。" />
 <meta name="theme-color" content="#e4e1f9" id="metaTheme" />
-<title>阎浩文 Bryan · 个人主页 v3.1</title>
+<title>阎浩文 Bryan · 个人主页 v4.0</title>
 <meta name="author" content="阎浩文 Bryan" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231c55a0'/><text x='32' y='46' font-family='system-ui,sans-serif' font-size='40' font-weight='700' fill='%23ffffff' text-anchor='middle'>B</text></svg>" />
 <script>
@@ -32,8 +32,16 @@
     --blue-500:#2f7ce0; --blue-400:#4f9af5; --blue-300:#86bdfb; --blue-100:#e7f0fd;
     /* 语义色：随主题切换 */
     --ink:#102a4c; --muted:#5b6f8c; --bg:#e4e1f9; --card:#fff; --line:#d6e3f5;
-    --radius:18px; --shadow:0 10px 30px rgba(20,58,107,.10);
+    --radius:18px;
     --nav-h:64px;
+    /* 阴影：多层叠加，模拟"贴地细影 + 大范围柔影"的真实光照，比单层更精致 */
+    --shadow:0 1px 2px rgba(20,58,107,.04),0 12px 32px rgba(20,58,107,.10);
+    /* v4 精致化令牌：键盘焦点环 / 品牌渐变 / 文字渐变 / 光晕 / 统一缓动 */
+    --ring-soft:0 0 0 3px rgba(79,154,245,.16);
+    --brand-grad:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    --grad-text:linear-gradient(135deg,var(--blue-600),var(--blue-800));
+    --glow-blue:rgba(79,154,245,.30);
+    --ease:cubic-bezier(.2,.7,.2,1);
     /* 文字强调色（浅色主题用深蓝保证对比度） */
     --accent:#1c55a0; --accent-strong:#143a6b;
     /* 表面分层 */
@@ -64,8 +72,8 @@
     --cta-bg:linear-gradient(135deg,#1c55a0,#0b1e3f);
     --cta-shadow:0 18px 44px rgba(11,30,63,.32);
     /* 卡片阴影与状态色 */
-    --sh-card:0 6px 18px rgba(20,58,107,.06);
-    --sh-card-hover:0 16px 32px rgba(20,58,107,.13);
+    --sh-card:0 1px 2px rgba(20,58,107,.045),0 6px 18px rgba(20,58,107,.06);
+    --sh-card-hover:0 2px 6px rgba(20,58,107,.07),0 18px 40px rgba(20,58,107,.14);
     --danger:#c0392b; --danger-soft:#fdeaea; --danger-line:#e08b8b;
     color-scheme:light;
   }
@@ -73,7 +81,12 @@
   /* ================= 深色主题：同样的结构，只换语义色 ================= */
   :root[data-theme="dark"]{
     --ink:#e8edfb; --muted:#95a4c6; --bg:#0a0f22; --card:#141b34; --line:#28324f;
-    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --shadow:0 1px 2px rgba(0,0,0,.42),0 14px 36px rgba(0,0,0,.46);
+    /* v4 精致化令牌同步（深色下文字渐变更亮、焦点环更亮） */
+    --ring-soft:0 0 0 3px rgba(127,180,249,.20);
+    --brand-grad:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    --grad-text:linear-gradient(135deg,#8cc4ff,#dbe9ff);
+    --glow-blue:rgba(79,154,245,.24);
     --blue-100:#1c2545;
     --accent:#7fb4f9; --accent-strong:#a9cdfd;
     --surface-1:linear-gradient(180deg,#18203a,#151c33);
@@ -99,8 +112,8 @@
     --award-shadow:0 12px 30px rgba(0,0,0,.50);
     --cta-bg:linear-gradient(135deg,#1a3f78,#0a1730);
     --cta-shadow:0 18px 44px rgba(0,0,0,.55);
-    --sh-card:0 6px 18px rgba(0,0,0,.35);
-    --sh-card-hover:0 16px 32px rgba(0,0,0,.50);
+    --sh-card:0 1px 2px rgba(0,0,0,.30),0 8px 20px rgba(0,0,0,.36);
+    --sh-card-hover:0 2px 6px rgba(0,0,0,.40),0 20px 44px rgba(0,0,0,.50);
     --danger:#f08c8c; --danger-soft:#3a1c1c; --danger-line:#8a4a4a;
     color-scheme:dark;
   }
@@ -158,16 +171,22 @@
   /* 尊重"减少动态效果"系统偏好 */
   @media (prefers-reduced-motion:reduce){
     .bg-flow{animation:none}
-    .btn-leave{animation:none;box-shadow:0 10px 24px rgba(126,240,176,.38)}
+    .nav-speed::after{animation:none}
+    .btn-leave{animation:none;filter:drop-shadow(0 10px 24px rgba(126,240,176,.38))}
+  }
+
+  /* 键盘可达性：统一的焦点环（仅键盘导航时出现，鼠标点击不显示） */
+  :where(a,button,input,textarea,select,[tabindex]):focus-visible{
+    outline:2px solid var(--blue-400);outline-offset:2px;box-shadow:var(--ring-soft);
   }
 
   /* ================= 顶部导航 ================= */
   .nav{
     position:fixed;top:0;left:0;right:0;z-index:80;
     background:var(--nav-bg);
-    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(16px) saturate(1.35);-webkit-backdrop-filter:blur(16px) saturate(1.35);
     border-bottom:1px solid transparent;
-    transition:background .25s,border-color .25s,box-shadow .25s;
+    transition:background .3s var(--ease),border-color .3s,box-shadow .3s;
   }
   .nav.scrolled{background:var(--nav-bg-solid);border-bottom-color:var(--line);box-shadow:var(--nav-shadow)}
   .nav-inner{position:relative;max-width:1080px;margin:0 auto;height:var(--nav-h);padding:0 20px;display:flex;align-items:center;gap:16px}
@@ -193,21 +212,25 @@
   @keyframes menuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
   .nav-link{
     padding:11px 14px;border-radius:10px;text-decoration:none;color:var(--muted);
-    font-weight:700;font-size:14px;transition:.15s;white-space:nowrap;
+    font-weight:700;font-size:14px;white-space:nowrap;
+    transition:background .16s var(--ease),color .16s,transform .16s;
   }
-  .nav-link:hover{color:var(--accent);background:var(--blue-100)}
+  .nav-link:hover{color:var(--accent);background:var(--blue-100);transform:translateX(2px)}
   .nav-link.active{
-    color:#fff;background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
-    box-shadow:0 6px 16px rgba(20,58,107,.24);
+    color:#fff;background:var(--brand-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 18px rgba(20,58,107,.26);
   }
   .nav-cta{
     margin-left:auto;text-decoration:none;color:#fff;font-weight:700;font-size:13.5px;white-space:nowrap;
     padding:9px 18px;border-radius:10px;
-    background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+    background:var(--brand-grad);
+    /* clip-path 会把 box-shadow 一并裁掉，斜切元素改用 drop-shadow 贴合轮廓 */
+    filter:drop-shadow(0 4px 10px rgba(28,85,160,.30));
     clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%);
-    transition:.15s;
+    transition:transform .16s var(--ease),filter .16s;
   }
-  .nav-cta:hover{filter:brightness(1.1)}
+  .nav-cta:hover{filter:brightness(1.08) drop-shadow(0 8px 18px rgba(28,85,160,.42));transform:translateY(-1px)}
+  .nav-cta:active{transform:translateY(0)}
   /* 窄屏专用的紧凑「联系我」（右上角，图标 + 短文字；只在 ≤760px 出现），
      保证收窄窗口或手机上依然有显眼的联系方式入口 */
   .nav-cta-sm{display:none;text-decoration:none;color:#fff;font-weight:700;font-size:13px;
@@ -217,17 +240,22 @@
   .nav-cta-sm:hover{filter:brightness(1.1)}
   .nav-toggle{
     display:block;flex:0 0 auto;width:42px;height:38px;border:1px solid var(--line);
-    border-radius:10px;background:var(--card);color:var(--accent-strong);font-size:18px;cursor:pointer;transition:.15s;
+    border-radius:10px;background:var(--card);color:var(--accent-strong);font-size:18px;cursor:pointer;
+    transition:background .16s var(--ease),border-color .16s,transform .16s,box-shadow .16s;
   }
-  .nav-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
-  .nav-toggle[aria-expanded="true"]{background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;border-color:transparent}
+  .nav-toggle:hover{background:var(--blue-100);border-color:var(--line-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,58,107,.10)}
+  .nav-toggle:active{transform:translateY(0)}
+  .nav-toggle[aria-expanded="true"]{background:var(--brand-grad);color:#fff;border-color:transparent;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 6px 16px rgba(20,58,107,.24)}
   /* 主题切换按钮：浅色时显示月亮（切到深色），深色时显示太阳（切回浅色） */
   .theme-toggle{
     display:grid;place-items:center;flex:0 0 auto;width:42px;height:38px;cursor:pointer;
     border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent-strong);
-    font-size:16px;line-height:1;transition:.15s;
+    font-size:16px;line-height:1;
+    transition:background .16s var(--ease),border-color .16s,transform .16s,box-shadow .16s;
   }
-  .theme-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
+  .theme-toggle:hover{background:var(--blue-100);border-color:var(--line-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,58,107,.10)}
+  .theme-toggle:active{transform:translateY(0)}
   .theme-toggle .ic-light{display:none}
   :root[data-theme="dark"] .theme-toggle .ic-light{display:block}
   :root[data-theme="dark"] .theme-toggle .ic-dark{display:none}
@@ -235,13 +263,23 @@
   .lang-toggle{
     display:grid;place-items:center;flex:0 0 auto;min-width:46px;height:38px;padding:0 9px;cursor:pointer;
     border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent-strong);
-    font-size:12.5px;font-weight:800;letter-spacing:.5px;line-height:1;transition:.15s;
+    font-size:12.5px;font-weight:800;letter-spacing:.5px;line-height:1;
+    transition:background .16s var(--ease),border-color .16s,transform .16s,box-shadow .16s;
   }
-  .lang-toggle:hover{background:var(--blue-100);border-color:var(--line-hover)}
+  .lang-toggle:hover{background:var(--blue-100);border-color:var(--line-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,58,107,.10)}
+  .lang-toggle:active{transform:translateY(0)}
   .lang-toggle .lg-zh{display:none}
   :root[data-lang="en"] .lang-toggle .lg-en{display:none}
   :root[data-lang="en"] .lang-toggle .lg-zh{display:block}
-  .nav-speed{height:3px;background:linear-gradient(90deg,var(--blue-700),var(--blue-400),var(--blue-700));opacity:.9}
+  /* 顶部「速度条」：一道斜向高光缓慢扫过，呼应赛车主题（减少动态偏好下自动停） */
+  .nav-speed{position:relative;height:3px;overflow:hidden;opacity:.92;
+    background:linear-gradient(90deg,var(--blue-700),var(--blue-400),var(--blue-700))}
+  .nav-speed::after{
+    content:"";position:absolute;top:0;left:-45%;width:45%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+    animation:navSheen 4.2s var(--ease) infinite;
+  }
+  @keyframes navSheen{0%{left:-45%}55%,100%{left:125%}}
 
   /* ================= 视图切换 ================= */
   .view{display:none}
@@ -249,14 +287,14 @@
   @keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
   /* 滚动入场 */
-  .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1)}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
   .reveal.in{opacity:1;transform:none}
 
   /* ================= 首页 Hero ================= */
   .hero2{
     position:relative;overflow:hidden;border-radius:24px;color:#fff;
-    background:linear-gradient(135deg,#0b1e3f 0%,#143a6b 52%,#1c55a0 100%);
-    box-shadow:0 20px 50px rgba(11,30,63,.35);
+    background:linear-gradient(135deg,#0a1b39 0%,#13396a 52%,#1c55a0 100%);
+    box-shadow:0 24px 60px rgba(11,30,63,.40),inset 0 1px 0 rgba(255,255,255,.14);
     padding:54px 46px;
   }
   .hero2::before{
@@ -281,6 +319,7 @@
     font-size:12.5px;font-weight:700;letter-spacing:.6px;color:#bcd9ff;
     background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
     padding:5px 14px;border-radius:999px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
   }
   .hero2 h1{position:relative;font-size:42px;line-height:1.24;font-weight:800;letter-spacing:.5px;margin-top:20px}
   .hero2 h1 .hl{color:var(--blue-300)}
@@ -292,12 +331,20 @@
   .btn{
     display:inline-flex;align-items:center;gap:8px;text-decoration:none;
     font-weight:800;font-size:14.5px;padding:12px 24px;border-radius:12px;
-    clip-path:polygon(11px 0,100% 0,calc(100% - 11px) 100%,0 100%);transition:.16s;
+    clip-path:polygon(11px 0,100% 0,calc(100% - 11px) 100%,0 100%);
+    transition:transform .18s var(--ease),filter .18s,background .18s;
+    will-change:transform;
   }
-  .btn-primary{background:#fff;color:var(--blue-800)}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.22)}
-  .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.45)}
-  .btn-ghost:hover{background:rgba(255,255,255,.18)}
+  .btn:active{transform:translateY(0) scale(.985)}
+  /* 斜切按钮的阴影用 drop-shadow（box-shadow 会被 clip-path 裁掉） */
+  .btn-primary{background:#fff;color:var(--blue-800);filter:drop-shadow(0 6px 16px rgba(2,10,26,.30))}
+  .btn-primary:hover{transform:translateY(-2px);filter:brightness(1.03) drop-shadow(0 12px 28px rgba(2,10,26,.42))}
+  .btn-ghost{
+    background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.45);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.18);transform:translateY(-2px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
   /* 主页醒目入口：直接进入留言反馈（用站内已有的"在线"薄荷绿做强调色） */
   .btn-leave{
     background:linear-gradient(135deg,#8ff5bd,#3fd08a);color:#06301c;
@@ -306,11 +353,10 @@
   }
   .btn-leave:hover{
     transform:translateY(-2px);background:linear-gradient(135deg,#a6ffcd,#4ee09a);
-    box-shadow:0 16px 34px rgba(126,240,176,.55);
   }
   @keyframes leaveGlow{
-    0%,100%{box-shadow:0 10px 24px rgba(126,240,176,.34)}
-    50%{box-shadow:0 10px 36px rgba(126,240,176,.68)}
+    0%,100%{filter:drop-shadow(0 8px 20px rgba(126,240,176,.36))}
+    50%{filter:drop-shadow(0 10px 32px rgba(126,240,176,.70))}
   }
 
   /* Hero 双栏布局 + 「小文」对话预览卡（唯一主视觉） */
@@ -348,11 +394,25 @@
     background:var(--card);border:1px solid var(--line);border-radius:18px;
     box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;
   }
+  /* 顶部一道品牌色「速度条」，呼应赛车主题并强化数据条的层级 */
+  .stats::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--blue-400),var(--blue-600) 45%,var(--blue-800));opacity:.92;
+  }
   .stat{padding:22px 18px;text-align:center;position:relative}
-  .stat + .stat::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:1px;background:var(--line)}
-  .stat-num{font-size:34px;font-weight:800;color:var(--accent);line-height:1.1}
-  .stat-num small{font-size:18px;color:var(--blue-400)}
+  .stat + .stat::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:1px;
+    background:linear-gradient(180deg,transparent,var(--line),transparent)}
+  .stat-num{
+    font-size:34px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;
+    background-image:var(--grad-text);-webkit-background-clip:text;background-clip:text;
+    color:transparent;-webkit-text-fill-color:transparent;
+  }
+  .stat-num small{font-size:18px;color:var(--blue-400);-webkit-text-fill-color:var(--blue-400)}
   .stat-lb{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600}
+  /* 极老旧浏览器不支持文字渐变时回退为纯品牌色，避免数字不可见 */
+  @supports not ((-webkit-background-clip:text) or (background-clip:text)){
+    .stat-num{color:var(--accent);-webkit-text-fill-color:var(--accent)}
+  }
 
   /* ================= 通用区块 ================= */
   .block{margin-top:52px}
@@ -361,7 +421,10 @@
     display:inline-block;font-size:12px;font-weight:800;letter-spacing:1.5px;
     color:var(--accent);text-transform:uppercase;margin-bottom:8px;
   }
-  .block-head h2{font-size:27px;font-weight:800;letter-spacing:.3px}
+  .block-head h2{font-size:27px;font-weight:800;letter-spacing:.2px;position:relative;display:inline-block}
+  /* 标题下的品牌短横线，统一各分区标题的观感 */
+  .block-head h2::after{content:"";display:block;width:46px;height:3px;border-radius:999px;margin:10px auto 0;
+    background:linear-gradient(90deg,var(--blue-500),var(--blue-800))}
   .block-head p{color:var(--muted);font-size:14.5px;margin-top:8px}
   .flag-dot{
     display:inline-block;width:14px;height:14px;margin-right:8px;border-radius:4px;transform:skewX(-10deg) translateY(1px);
@@ -402,16 +465,21 @@
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;
-    box-shadow:var(--sh-card);transition:.2s;position:relative;overflow:hidden;
+    box-shadow:var(--sh-card);position:relative;overflow:hidden;
+    transition:transform .24s var(--ease),box-shadow .24s var(--ease),border-color .24s;
   }
   .card:hover{transform:translateY(-4px);box-shadow:var(--sh-card-hover);border-color:var(--line-hover)}
   .card .ico{
     width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:21px;
-    background:var(--icon-bg);margin-bottom:14px;
+    background:var(--icon-bg);margin-bottom:14px;box-shadow:0 4px 12px rgba(31,85,158,.14);
+    transition:transform .24s var(--ease);
   }
+  .card:hover .ico{transform:translateY(-1px) scale(1.04)}
   .card h3{font-size:16px;font-weight:800;margin-bottom:6px}
   .card p{font-size:13.5px;color:var(--muted)}
-  .card .stripe{position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(180deg,var(--blue-500),var(--blue-300))}
+  .card .stripe{position:absolute;left:0;top:0;width:4px;height:100%;
+    background:linear-gradient(180deg,var(--blue-400),var(--blue-700));opacity:.95;
+    box-shadow:0 0 12px var(--glow-blue)}
   /* 可点击的方向卡（首页「我关注的方向」） */
   a.card{display:block;text-decoration:none;color:inherit}
   .card .more{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--accent)}
@@ -423,9 +491,11 @@
   .awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
   .award{
     background:var(--award-bg);color:#fff;border-radius:16px;padding:24px;
-    position:relative;overflow:hidden;box-shadow:var(--award-shadow);transition:.2s;
+    position:relative;overflow:hidden;
+    box-shadow:var(--award-shadow),inset 0 1px 0 rgba(255,255,255,.10);
+    transition:transform .24s var(--ease),box-shadow .24s var(--ease);
   }
-  .award:hover{transform:translateY(-4px)}
+  .award:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(16,41,79,.36),inset 0 1px 0 rgba(255,255,255,.14)}
   .award::after{
     content:"";position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;
     background:radial-gradient(circle,rgba(79,154,245,.5),transparent 70%);
@@ -437,7 +507,8 @@
   /* 联系 CTA */
   .cta{
     background:var(--cta-bg);color:#fff;border-radius:22px;padding:44px 40px;
-    position:relative;overflow:hidden;box-shadow:var(--cta-shadow);text-align:center;
+    position:relative;overflow:hidden;
+    box-shadow:var(--cta-shadow),inset 0 1px 0 rgba(255,255,255,.12);text-align:center;
   }
   .cta::before{
     content:"";position:absolute;inset:0;
@@ -450,9 +521,10 @@
   .mail-pill{
     display:inline-flex;align-items:center;gap:8px;text-decoration:none;
     background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;
-    padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;transition:.16s;word-break:break-all;
+    padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;word-break:break-all;
+    transition:background .18s var(--ease),transform .18s var(--ease),box-shadow .18s;
   }
-  .mail-pill:hover{background:rgba(255,255,255,.2)}
+  .mail-pill:hover{background:rgba(255,255,255,.2);transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
   .mail-pill .lb{color:#a9c9f5;font-size:11.5px}
   .cta .btn-primary{margin-top:24px}
 
@@ -469,13 +541,14 @@
   .focus-block h3{font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:9px;margin-bottom:13px}
   .focus-block h3 .fk-ico{
     width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;
-    background:var(--icon-bg);flex:none;
+    background:var(--icon-bg);flex:none;box-shadow:0 3px 9px rgba(31,85,158,.16);
   }
   .focus-list{list-style:none;display:flex;flex-direction:column;gap:10px}
   .focus-list li{position:relative;padding-left:19px;font-size:14px;line-height:1.7;color:var(--body-text)}
   .focus-list li::before{
     content:"";position:absolute;left:1px;top:9px;width:6px;height:6px;border-radius:50%;
     background:linear-gradient(180deg,var(--blue-500),var(--blue-300));
+    box-shadow:0 0 0 3px var(--glow-blue);
   }
   .focus-list li b{color:var(--ink);font-weight:700}
 
@@ -488,9 +561,10 @@
   .fs-pill{
     display:inline-flex;align-items:center;gap:7px;text-decoration:none;
     background:var(--field-bg);border:1px solid var(--line);color:var(--ink);
-    padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;transition:.16s;
+    padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;
+    transition:background .18s var(--ease),border-color .18s,transform .18s var(--ease),box-shadow .18s;
   }
-  .fs-pill:hover{border-color:var(--line-hover);transform:translateY(-2px)}
+  .fs-pill:hover{border-color:var(--line-hover);transform:translateY(-2px);box-shadow:0 6px 14px rgba(20,58,107,.10)}
   .fs-pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
   .fs-pill:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .focus-back{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
@@ -504,7 +578,9 @@
     background:repeating-linear-gradient(-55deg,var(--blue-500) 0 18px,var(--blue-300) 18px 36px);
   }
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-  .info-card{background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .info-card{background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:16px;
+    transition:border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease)}
+  .info-card:hover{border-color:var(--line-hover);transform:translateY(-2px);box-shadow:var(--sh-card)}
   .info-card .k{font-size:12.5px;color:var(--accent);font-weight:800;letter-spacing:.3px;margin-bottom:4px}
   .info-card .v{font-size:15px}
   .tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
@@ -521,7 +597,9 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .trait-item{
     background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
     padding:18px;display:flex;align-items:flex-start;gap:12px;
+    transition:border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease);
   }
+  .trait-item:hover{border-color:var(--line-hover);transform:translateY(-2px);box-shadow:var(--sh-card)}
   .trait-item .emoji{font-size:23px}
   .trait-item .tt{font-size:15px;font-weight:800;margin-bottom:3px}
   .trait-item .td{font-size:13.5px;color:var(--muted)}
@@ -531,6 +609,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .chat-head{
     padding:16px 22px;background:linear-gradient(135deg,var(--blue-800),var(--blue-600) 60%,var(--blue-500));
     color:#fff;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
   }
   .chat-head::after{
     content:"";position:absolute;right:0;top:0;bottom:0;width:90px;pointer-events:none;
@@ -547,7 +626,8 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .chat-body{height:360px;overflow-y:auto;padding:20px 22px;background:var(--surface-chat);display:flex;flex-direction:column;gap:12px}
   .msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:14.5px;white-space:pre-wrap;line-height:1.6;animation:pop .2s ease}
   .msg.ai{align-self:flex-start;background:var(--bubble-ai);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px}
-  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff;border-bottom-right-radius:4px}
+  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff;
+    border-bottom-right-radius:4px;box-shadow:0 6px 16px rgba(28,85,160,.22)}
   .msg .who{font-size:11px;opacity:.7;margin-bottom:3px;font-weight:800}
   @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .msg.typing{display:flex;gap:5px;align-items:center;padding:14px 16px}
@@ -558,27 +638,33 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .quick{display:flex;flex-wrap:wrap;gap:8px;padding:12px 22px 0;background:var(--surface-chat)}
   .quick button{
     border:1px solid var(--blue-400);background:var(--card);color:var(--accent-strong);padding:6px 12px;border-radius:999px;
-    font-size:12.5px;cursor:pointer;font-weight:700;transition:.15s;
+    font-size:12.5px;cursor:pointer;font-weight:700;
+    transition:background .18s var(--ease),color .18s,border-color .18s,transform .18s var(--ease),box-shadow .18s;
   }
-  .quick button:hover{background:var(--blue-500);color:#fff}
+  .quick button:hover{background:var(--blue-500);color:#fff;border-color:var(--blue-500);transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(47,124,224,.28)}
   .chat-input{display:flex;gap:10px;padding:14px 22px 18px;background:var(--surface-chat)}
   .chat-input input{
     flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14.5px;
     outline:none;background:var(--field-bg);color:var(--ink);
   }
-  .chat-input input:focus{border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(79,154,245,.15)}
+  .chat-input input:focus{border-color:var(--blue-400);box-shadow:var(--ring-soft)}
+  .chat-input input{transition:border-color .18s var(--ease),box-shadow .18s}
   .chat-input button{
-    border:none;cursor:pointer;background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;
-    padding:0 22px;border-radius:12px;font-size:14.5px;font-weight:800;transition:.15s;
+    border:none;cursor:pointer;background:var(--brand-grad);color:#fff;
+    padding:0 22px;border-radius:12px;font-size:14.5px;font-weight:800;
     clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+    filter:drop-shadow(0 4px 12px rgba(28,85,160,.28));
+    transition:transform .16s var(--ease),filter .16s;
   }
-  .chat-input button:hover{filter:brightness(1.1)}
+  .chat-input button:hover{filter:brightness(1.08) drop-shadow(0 8px 18px rgba(28,85,160,.40));transform:translateY(-1px)}
+  .chat-input button:active{transform:translateY(0)}
 
   /* ================= 页脚 ================= */
   .page-footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:56px}
   .footer-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:18px}
-  .footer-links a{color:var(--accent);text-decoration:none;font-weight:700;font-size:13px}
-  .footer-links a:hover{text-decoration:underline}
+  .footer-links a{color:var(--accent);text-decoration:none;font-weight:700;font-size:13px;transition:color .18s var(--ease)}
+  .footer-links a:hover{text-decoration:underline;text-underline-offset:3px;color:var(--accent-strong)}
   .copyright{
     max-width:760px;margin:16px auto 0;padding:16px 20px;background:var(--surface-chat);border:1px solid var(--line);
     border-radius:14px;line-height:1.8;text-align:left;
@@ -596,7 +682,8 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .fb-badge.opt{background:var(--blue-100);color:var(--accent)}
   .fb-textarea,.fb-input{
     width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;
-    font-family:inherit;color:var(--ink);background:var(--field-bg);outline:none;transition:.15s;
+    font-family:inherit;color:var(--ink);background:var(--field-bg);outline:none;
+    transition:border-color .18s var(--ease),box-shadow .18s;
   }
   .fb-textarea{resize:vertical;min-height:132px;line-height:1.6}
 /* 单选胶囊组（关系 / 设备） */
@@ -606,28 +693,33 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
 .fb-chip span{
   display:inline-flex;align-items:center;padding:9px 17px;border-radius:999px;
   border:1px solid var(--line);background:var(--field-bg);color:var(--ink);
-  font-size:14px;font-weight:700;cursor:pointer;user-select:none;transition:.15s;
+  font-size:14px;font-weight:700;cursor:pointer;user-select:none;
+  transition:background .18s var(--ease),border-color .18s,color .18s,transform .18s var(--ease),box-shadow .18s;
 }
-.fb-chip span:hover{border-color:var(--line-hover);background:var(--blue-100)}
+.fb-chip span:hover{border-color:var(--line-hover);background:var(--blue-100);transform:translateY(-1px)}
 .fb-chip input:checked + span{
-  background:linear-gradient(135deg,var(--blue-500),var(--blue-800));color:#fff;
-  border-color:transparent;box-shadow:0 6px 16px rgba(20,58,107,.22);
+  background:var(--brand-grad);color:#fff;
+  border-color:transparent;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 6px 16px rgba(20,58,107,.24);
 }
 .fb-chip input:focus-visible + span{outline:2px solid var(--blue-400);outline-offset:2px}
 .fb-chips.invalid span{border-color:var(--danger-line)}
 /* 选择「其他」后展开的补充输入框 */
 .fb-other{display:none;margin-top:10px}
 .fb-other.show{display:block}
-  .fb-textarea:focus,.fb-input:focus{border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(79,154,245,.15)}
+  .fb-textarea:focus,.fb-input:focus{border-color:var(--blue-400);box-shadow:var(--ring-soft)}
   .fb-input.invalid,.fb-textarea.invalid{border-color:var(--danger-line);box-shadow:0 0 0 3px rgba(192,57,43,.10)}
   .fb-err{font-size:12.5px;color:var(--danger);font-weight:700;min-height:17px;margin-top:3px}
   .fb-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
   .fb-submit{
     border:none;cursor:pointer;color:#fff;font-weight:800;font-size:14.5px;padding:12px 30px;border-radius:12px;
-    background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
-    clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:.15s;
+    background:var(--brand-grad);
+    clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+    filter:drop-shadow(0 5px 14px rgba(28,85,160,.30));
+    transition:transform .16s var(--ease),filter .16s;
   }
-  .fb-submit:hover{filter:brightness(1.1)}
+  .fb-submit:hover{filter:brightness(1.08) drop-shadow(0 10px 22px rgba(28,85,160,.42));transform:translateY(-1px)}
+  .fb-submit:active{transform:translateY(0)}
   .fb-submit:disabled{opacity:.6;cursor:default}
   .fb-note{font-size:12.5px;color:var(--muted);max-width:380px;line-height:1.6}
   .fb-count{font-size:12.5px;color:var(--muted);text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
@@ -637,15 +729,17 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
   .fb-done .ok{
     width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:30px;
     background:linear-gradient(145deg,var(--blue-400),var(--blue-700));color:#fff;
-    box-shadow:0 10px 26px rgba(31,85,158,.35);
+    box-shadow:0 10px 26px rgba(31,85,158,.35),inset 0 1px 0 rgba(255,255,255,.28);
   }
   .fb-done h3{font-size:19px;font-weight:800}
   .fb-done p{font-size:14px;color:var(--muted);max-width:430px}
   .fb-done button{
     margin-top:8px;border:1px solid var(--line);background:var(--card);color:var(--accent-strong);font-weight:700;
-    padding:9px 20px;border-radius:10px;cursor:pointer;font-size:14px;transition:.15s;
+    padding:9px 20px;border-radius:10px;cursor:pointer;font-size:14px;
+    transition:background .18s var(--ease),border-color .18s,transform .18s var(--ease),box-shadow .18s;
   }
-  .fb-done button:hover{background:var(--blue-100)}
+  .fb-done button:hover{background:var(--blue-100);border-color:var(--line-hover);transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(20,58,107,.10)}
 
   /* ================= 留言计数 ================= */
   /* 页面上只出现一个数字；留言内容不对访客公开（数据库也没给匿名读取权限） */
@@ -670,8 +764,9 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
     /* 窄屏：把「联系我」收成紧凑按钮，保证手机上联系入口不丢 */
     .nav-cta-sm{
       display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:8px 15px;border-radius:10px;
-      background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+      background:var(--brand-grad);
       clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+      filter:drop-shadow(0 3px 10px rgba(28,85,160,.26));
     }
     /* 窄屏：语言按钮顶到最右，主题与汉堡按钮跟在它后面 */
     .lang-toggle{margin-left:auto}
@@ -707,6 +802,11 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
     .chat-body{height:320px}
     .msg{max-width:90%}
     .block-head h2{font-size:22px}
+  }
+  /* 触屏设备没有真正的 hover：取消"浮起"反馈，避免点按后状态残留 */
+  @media (hover:none){
+    .card:hover,.info-card:hover,.trait-item:hover,.award:hover,.mail-pill:hover,.fs-pill:hover,
+    .quick button:hover,.fb-chip span:hover,.btn:hover,.btn-leave:hover{transform:none}
   }
   /* ================= 开场动画（赛车主题 · 可跳过） ================= */
   /* 独立图层：固定使用深色赛道配色，浅色/深色主题下都有足够对比度；
@@ -1748,7 +1848,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
       <a href="#/feedback">留言反馈</a>
       <a href="mailto:yhw20070910@outlook.com">联系我</a>
     </div>
-    <p>阎浩文 · 个人主页 v3.1</p>
+    <p>阎浩文 · 个人主页 v4.0</p>
     <div class="copyright">
       <p>© 2026 阎浩文（Bryan） All Rights Reserved.</p>
       <p>本页面所有内容（包括文字、排版、设计及数字分身信息）均为本人原创，仅用于个人展示，不侵犯任何第三方知识产权。本网站含有 AI 生成内容。如需转载或引用，请先征得本人同意。</p>
@@ -1768,7 +1868,7 @@ a.tag:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
      · check_i18n_static.py —— 页面里每个中文文本节点 / 属性都必须在字典里
      · shoot_lang.py        —— 英文模式下渲染出的页面不应再出现汉字 */
 const I18N_EN = {
-  "阎浩文 Bryan · 个人主页 v3.1": "Yan Haowen (Bryan) · Personal Homepage v3.1",
+  "阎浩文 Bryan · 个人主页 v4.0": "Yan Haowen (Bryan) · Personal Homepage v4.0",
   "跳过": "Skip",
   "阎浩文": "Yan Haowen",
   "首页": "Home",
@@ -1932,7 +2032,7 @@ const I18N_EN = {
   "谢谢你花时间写下这些。留言已经直接存进站主的数据库，只有站主能看到。": "Thank you for taking the time to write this. Your message is now in the site owner's database, and only the owner can see it.",
   "再写一条": "Write another",
   "中文": "中文",
-  "阎浩文 · 个人主页 v3.1": "Yan Haowen · Personal Homepage v3.1",
+  "阎浩文 · 个人主页 v4.0": "Yan Haowen · Personal Homepage v4.0",
   "© 2026 阎浩文（Bryan） All Rights Reserved.": "© 2026 Yan Haowen (Bryan). All Rights Reserved.",
   "本页面所有内容（包括文字、排版、设计及数字分身信息）均为本人原创，仅用于个人展示，不侵犯任何第三方知识产权。本网站含有 AI 生成内容。如需转载或引用，请先征得本人同意。": "All content on this page (including text, layout, design and the digital twin's information) is my own original work. It is for personal presentation only and infringes no third-party intellectual property. This site contains AI-generated content. Please ask for my permission before republishing or quoting anything."
 };
@@ -2130,13 +2230,17 @@ const KNOWLEDGE = {
   occupation: { zh: "天津大学-香港理工大学-深圳未来技术学院 智能医学工程专业的大一新生（学生）", en: "a first-year Intelligent Medical Engineering student at the Tianjin University-PolyU Shenzhen Future Technology Institute (a student)" },
   focus: { zh: "AI 辅助学习、AI 应用、脑机接口、前沿医疗、自动驾驶与低空经济", en: "AI-assisted learning, AI applications, brain-computer interfaces, frontier medicine, autonomous driving and the low-altitude economy" },
   doing: { zh: "我目前是一名大一新生，专业是智能医学工程。主要在做的事情是：学习专业知识，同时探索如何用 AI 辅助自己更高效地读书、做笔记、理解复杂概念、整理信息。我会把我学到的 AI 方法应用到日常学习和未来的科研里。", en: "I'm a first-year university student majoring in Intelligent Medical Engineering. My main work right now is studying my field, while exploring how AI can help me read, take notes, understand complex concepts and organise information more efficiently. I apply the AI methods I learn to my daily study and to the research I want to do later." },
-  contact: { zh: "想联系我可以发邮件：\\n常见邮箱 yhw20070910@outlook.com\\n天津大学邮箱 3026445056@tju.edu.cn\\n香港理工大学邮箱 26130039d@connect.polyu.hk\\n也可以直接在校内找我——毕竟我是乐于助人的阎浩文 :)", en: "You can reach me by email:\\nPersonal  yhw20070910@outlook.com\\nTianjin University  3026445056@tju.edu.cn\\nPolyU  26130039d@connect.polyu.hk\\nYou can also just find me on campus - I'm Yan Haowen, always glad to help :)" },
+  contact: { zh: "想联系我可以发邮件：\n常见邮箱 yhw20070910@outlook.com\n天津大学邮箱 3026445056@tju.edu.cn\n香港理工大学邮箱 26130039d@connect.polyu.hk\n也可以直接在校内找我——毕竟我是乐于助人的阎浩文 :)", en: "You can reach me by email:\nPersonal  yhw20070910@outlook.com\nTianjin University  3026445056@tju.edu.cn\nPolyU  26130039d@connect.polyu.hk\nYou can also just find me on campus - I'm Yan Haowen, always glad to help :)" },
   traits: { zh: "我的兴趣是围棋、阅读和打羽毛球。性格上一个明显特点是乐于助人，我很乐意帮同学解决问题；做事比较有条理，喜欢先把事情理清楚再动手。如果要用几个词形容我，那就是：乐于助人、有条理、爱学习。", en: "I enjoy playing Go, reading and playing badminton. One obvious trait is that I'm glad to help others: I really like solving problems for my classmates. I'm also fairly organised and prefer to get things clear before I start. If you had to describe me in a few words: helpful, organised, keen to learn." },
-  awards: { zh: "我的获奖经历：\\n· 外研社杯口语比赛 国家级一等奖\\n· 广东省生物科普论文大赛 特等奖\\n· 深圳市高级中学（集团）中心校区 优秀毕业生", en: "My awards:\\n- FLTRP Cup Speaking Competition: National First Prize\\n- Guangdong Biology Popular-Science Essay Competition: Grand Prize\\n- Shenzhen Senior High School (Group) Central Campus: Outstanding Graduate" },
+  awards: { zh: "我的获奖经历：\n· 外研社杯口语比赛 国家级一等奖\n· 广东省生物科普论文大赛 特等奖\n· 深圳市高级中学（集团）中心校区 优秀毕业生", en: "My awards:\n- FLTRP Cup Speaking Competition: National First Prize\n- Guangdong Biology Popular-Science Essay Competition: Grand Prize\n- Shenzhen Senior High School (Group) Central Campus: Outstanding Graduate" },
   sport: { zh: "体育运动里我最关注的是 F1 赛车。我喜欢红牛车队，也支持维斯塔潘、阿隆索和勒克莱尔。", en: "In sports I follow Formula 1 the most. I like the Red Bull team, and I support Max Verstappen, Fernando Alonso and Charles Leclerc." },
   campus: { zh: "我的校园生活挺充实的：交到了许多朋友，正在学新的东西，也在努力让自己每天都进步一点。", en: "Campus life is full: I've made a lot of friends, I'm learning new things, and I try to improve a little every day." },
   highschool: { zh: "我的高中生活很充实，遇见了许多好友和好老师。特别感谢高一九班、高二四班、高三四班的同学和老师；也感谢那些没有和我同班、却一直给我力量的老师和同学。", en: "My high school years were rich and full - I met many good friends and great teachers. My special thanks go to the classmates and teachers of Class 9, Grade 10; Class 4, Grade 11; and Class 4, Grade 12. And also to the teachers and classmates who were never in my class but kept giving me strength." },
-  greeting: { zh: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系，或者他最近在忙什么。", en: "Hi there! I'm Xiaowen, Yan Haowen's digital twin. You can ask me about his studies, interests, traits, awards, how to contact him, or what he's been up to lately." }
+  /* 以下三条事实与「个人信息」页 / 页面本身保持一致（访客最常问、v4 第 5 轮新增） */
+  city: { zh: "我平时住在深圳。学校（天津大学-香港理工大学-深圳未来技术学院）也在深圳，所以我生活、上学都在这座城市。", en: "I live in Shenzhen. The Tianjin University-PolyU Shenzhen Future Technology Institute is in Shenzhen as well, so this is the city where I study and live." },
+  twin: { zh: "我是「小文」，是阎浩文的数字分身，不是他本人 —— 所以有些问题我真的答不上来。我只会回答他放在这个网站上的信息（专业、兴趣、获奖、关注的方向、联系方式这些），不会自己编。想找他本人聊天，发邮件或者在「留言反馈」页留言都可以。", en: "I'm \"Xiaowen\", Yan Haowen's digital twin - not him in person, so some questions I genuinely cannot answer. I only answer from the information he put on this site (his major, interests, awards, the fields he follows, how to reach him) and I won't make things up. To talk to the real him, send an email or leave a note on the feedback page." },
+  site: { zh: "这个网站是他自己做的：一个单文件静态页面 —— 所有 HTML / CSS / JS 都在同一个文件里，双击就能打开，不依赖任何外部框架。留言会存进 Supabase 数据库，整个开发过程都记录在「对话记录」页里。", en: "He built this site himself: a single-file static page - all the HTML, CSS and JS live in one file that you can just double-click, with no external framework. Messages are stored in a Supabase database, and the whole build process is written up on the notes page." },
+  greeting: { zh: "你好呀！我是小文，阎浩文的数字分身。你可以问我关于他的学习、兴趣、特点、获奖经历、怎么联系、他住哪、关注哪些方向，或者他最近在忙什么。", en: "Hi there! I'm Xiaowen, Yan Haowen's digital twin. You can ask me about his studies, interests, traits, awards, how to contact him, where he lives, the fields he follows, or what he's been up to lately." }
 };
 
 /* 按当前语言取知识库字段（新增事实只要在这里补一对 zh/en） */
@@ -2148,8 +2252,20 @@ const RULES = [
   { keys: ["你好", "hi", "hello", "嗨", "在吗", "你是谁", "who are you"],
     ans: () => k("greeting") + L("\n\n你也可以点下面的快捷问题直接问我。",
                                  "\n\nYou can also tap one of the quick questions below.") },
+  /* 必须排在「名字 / 你是」之前：否则「你是真人吗」会被「你是」抢走 */
+  { keys: ["数字分身", "真人吗", "你是真人", "real person", "are you human", "机器人", "是不是ai",
+           "你是ai", "是ai吗", "ai吗", "are you real", "are you an ai", "a bot", "chatbot",
+           "digital twin", "who is xiaowen"],
+    ans: () => k("twin") },
   { keys: ["高中生活", "高中", "高一", "高二", "高三", "九班", "四班", "高中同学", "high school"],
     ans: () => k("highschool") },
+  /* 「朋友」是校园生活的关键词，但「女朋友」不是校园生活。
+     私人问题既不代答也不编，直接说清边界并把话头还给本人 —— 排在「校园」之前。 */
+  { keys: ["女朋友", "男朋友", "女友", "男友", "谈恋爱", "恋爱", "单身", "结婚",
+           "girlfriend", "boyfriend", "dating", "married", "in a relationship"],
+    ans: () => L("这个他没有公开，我也不替他回答 :) 想聊的话可以从「个人信息」页发邮件问他本人。",
+                 "He hasn't made that public, and I won't answer for him :) If you're curious, "
+                 + "just email him - the address is on the info page.") },
   { keys: ["校园生活", "大学生活", "学校生活", "校园", "朋友", "同学", "室友", "交到", "campus", "classmate", "friend"],
     ans: () => k("campus") },
   { keys: ["体育运动", "体育", "运动", "f1", "赛车", "红牛", "维斯塔潘", "阿隆索", "勒克莱尔",
@@ -2160,6 +2276,10 @@ const RULES = [
     ans: () => k("doing") },
   { keys: ["联系", "联系方式", "邮箱", "怎么找到", "微信", "电话", "找谁", "contact", "email", "reach"],
     ans: () => k("contact") },
+  { keys: ["留言", "反馈", "建议", "意见", "吐槽", "feedback", "leave a message", "comment", "suggestion"],
+    ans: () => L("网站底部有「留言反馈」页，写下的内容会直接进他的数据库，只有他本人能看到（页面上只公开显示留言条数）。你也可以直接发邮件，或者当面跟我说。",
+                 "There is a feedback page linked at the bottom of the site: what you write goes straight into his database and only he can read it (the page only shows how many messages he has received). You can also email him, or simply tell me right here.") },
+
   { keys: ["特点", "性格", "是什么样", "怎么样的人", "为人", "擅长", "traits", "personality"],
     ans: () => k("traits") },
   { keys: ["获奖", "奖项", "荣誉", "奖", "经历", "比赛", "一等奖", "特等奖", "优秀毕业生", "外研社", "论文",
@@ -2172,6 +2292,13 @@ const RULES = [
                  "I'm Xiaowen, his digital twin. He is " + KNOWLEDGE.occupation.en + ".") },
   { keys: ["专业", "职业", "学生", "做什么的", "学的", "学院", "大学", "学校", "school", "university", "major", "student", "study"],
     ans: () => k("occupation") },
+  /* 「城市」排在「专业 / 学校」之后：问学校先答学校，只有问到住处 / 城市才落到这条 */
+  { keys: ["城市", "住哪", "哪里人", "老家", "籍贯", "所在地", "深圳", "哪个城市",
+           "city", "shenzhen", "where do you live", "where are you from", "live in", "location"],
+    ans: () => k("city") },
+  { keys: ["网站", "这个页面", "网页怎么", "怎么做的", "用了什么技术", "技术栈", "前端", "单文件",
+           "website", "this site", "built this", "tech stack"],
+    ans: () => k("site") },
   { keys: ["方向", "关注", "兴趣方向", "研究", "ai", "人工智能", "技术", "focus", "field", "research", "technology"],
     ans: () => L("他最关心的六个方向是：" + KNOWLEDGE.focus.zh +
                  "。首页「我关注的方向」里，每个方向都可以点进去看到具体在关注什么。",
@@ -2185,11 +2312,66 @@ const RULES = [
                  "and right now he is mainly using AI to help him study.") }
 ];
 
+/* 同义归一化（v4 第 5 轮新增）：
+   访客不会照着我们的关键词提问 ——「你老家哪的」「你在哪个城市」都很常见，
+   旧版会直接掉进兜底。与其在每条规则里堆同义词，不如把常见变体统一映射到一个
+   「标准词」，命中变体就把标准词补到问句末尾，规则本身不用知道这些变体。
+
+   注意：它只在第一遍规则全部没命中之后才启用（见 answer()），
+   所以它只能把「原本要兜底」的问题救回来，不可能改掉原本命中的回答。 */
+const SYNONYMS = [
+  ["城市", ["住哪儿", "住哪", "住在哪", "哪里人", "哪儿人", "老家", "籍贯", "哪个城市", "所在城市", "在深圳",
+           "where do you live", "which city", "hometown", "where are you from"]],
+  ["联系", ["联络", "怎么找你", "联系方式", "邮箱地址", "email address", "get in touch", "reach him"]],
+  ["获奖", ["奖项", "拿过什么奖", "得过什么奖", "获得过什么", "荣誉", "奖励",
+           "awards", "prizes", "honours", "honors"]],
+  ["兴趣", ["爱好", "喜欢做什么", "平时做什么", "hobbies", "hobby", "pastime"]],
+  ["运动", ["体育", "赛车", "sports", "racing"]],
+  ["高中", ["中学", "高中三年", "high school"]],
+  ["专业", ["学什么", "读什么", "什么专业", "上学", "念书", "读书", "在哪读", "major", "university", "college"]],
+  ["方向", ["领域", "关注什么", "研究什么", "fields", "areas", "focus on"]],
+  ["特点", ["性格", "为人", "人品", "怎么样的人", "personality", "character", "traits"]],
+  ["留言", ["提意见", "给建议", "留言板", "leave a message", "feedback form"]],
+  ["网站", ["这个站", "网页是", "how was this built", "built this site"]],
+  ["介绍", ["自我介绍", "介绍一下", "introduce yourself", "about you"]]
+];
+
+function normalize(text) {
+  let out = text;
+  for (const pair of SYNONYMS) {
+    if (hit(out, pair[0])) continue;                    /* 已带标准词，不用补 */
+    if (pair[1].some(v => hit(out, v))) out += " " + pair[0];
+  }
+  return out;
+}
+
+/* 兜底（v4 第 5 轮重写）：旧版只有一句「有事私聊我」，答不上来就像一堵墙。
+   新版三件事：① 坦白不知道、说清我的边界（不编答案）；② 给出能直接照着问的问法；
+   ③ 给两条出路 —— 回留言反馈页或发邮件，并且「留言反馈」是可点链接，不用访客自己找入口。 */
 const FALLBACK = {
-  zh: "感谢您，若有其他问题请用各种方式（如邮箱，各个社交软件，线下）私聊我。",
-  en: "Thank you! If you have anything else to ask, feel free to message me privately in any way "
-      + "- by email, on any social app, or in person."
+  zh: "这个我确实答不上来 —— 我只会回答他放在这个网站上的信息，不会自己编。\n"
+      + "你可以换个问法，或者直接问我这些：\n"
+      + "· 你在忙什么？学什么专业？\n"
+      + "· 你关心哪些方向？（也可以直接问「脑机接口」「低空经济」）\n"
+      + "· 你住哪？有什么特点？获过什么奖？\n"
+      + "· 这个网站是怎么做的？\n\n"
+      + "也可以点下面的快捷问题，或者到 {fb} 页把话直接说给他本人 —— 他都能看到。",
+  en: "I honestly can't answer that one - I only answer from the information he put on this site, "
+      + "and I won't make things up.\n"
+      + "Try rephrasing, or just ask me something like:\n"
+      + "- What are you working on? What's your major?\n"
+      + "- Which fields do you focus on? (You can also ask about BCI or the low-altitude economy.)\n"
+      + "- Where do you live? What are your traits? What awards have you won?\n"
+      + "- How was this site built?\n\n"
+      + "You can tap one of the quick questions below, or write to him directly on the {fb} page - "
+      + "he reads every message."
 };
+
+/* 兜底回答：把占位符换成可点链接（锚点由页面自己的路由接管，不跳转新窗口） */
+function fallbackAnswer() {
+  const link = '<a href="#/feedback">' + L("留言反馈", "feedback") + '</a>';
+  return L(FALLBACK.zh, FALLBACK.en).replace("{fb}", link);
+}
 
 /* 关注方向详情：直接读「我关注的方向」子页的 DOM，
    保证数字分身的回答与子板块内容永远一致（单一数据源，不用两处维护） */
@@ -2220,10 +2402,22 @@ function focusAnswer(text) {
 
 function answer(raw) {
   const text = (raw || "").toLowerCase();
+
+  /* 第一遍：按问句原文匹配（顺序即优先级） */
   const detail = focusAnswer(text);
   if (detail) return detail;
   for (const r of RULES) { if (r.keys.some(x => hit(text, x))) return r.ans(); }
-  return L(FALLBACK.zh, FALLBACK.en);
+
+  /* 第二遍：只有第一遍全部落空，才用同义词重试一次（纯加法，不影响上面的结果） */
+  const norm = normalize(text);
+  if (norm !== text) {
+    const detail2 = focusAnswer(norm);
+    if (detail2) return detail2;
+    for (const r of RULES) { if (r.keys.some(x => hit(norm, x))) return r.ans(); }
+  }
+
+  /* 两遍都不行 → 坦白 + 指路，而不是甩一句「有事私聊我」 */
+  return fallbackAnswer();
 }
 
 /* ================= 聊天 UI ================= */
@@ -2259,7 +2453,11 @@ const QUICK_QS = [
   { zh: "你关心什么方向？", en: "Which fields do you focus on?" },
   { zh: "你的高中生活怎么样？", en: "How was his high school life?" },
   { zh: "校园生活怎么样？", en: "How is campus life?" },
-  { zh: "你喜欢什么运动？", en: "What sports does he like?" }
+  { zh: "你喜欢什么运动？", en: "What sports does he like?" },
+  /* v4 第 5 轮补的两条：一条答「城市」（旧版直接掉兜底），
+     一条答「你是真人吗」（访客对数字分身最先想确认的事） */
+  { zh: "你住在哪？", en: "Where do you live?" },
+  { zh: "你是真人吗？", en: "Are you a real person?" }
 ];
 
 function renderQuick() {
@@ -2294,7 +2492,9 @@ function ask(text) {
   chatBody.appendChild(typing);
   chatBody.scrollTop = chatBody.scrollHeight;
   const reply = { who: "ai", q: q };
-  setTimeout(() => { typing.remove(); chatLog.push(reply); addMsg(answer(q), "ai"); }, 550);
+  /* 打字停顿按问题长度轻微变化（420–950ms），固定 550ms 的机械感会轻一些 */
+  const delay = Math.min(950, 420 + q.length * 14);
+  setTimeout(() => { typing.remove(); chatLog.push(reply); addMsg(answer(q), "ai"); }, delay);
 }
 
 document.getElementById("sendBtn").addEventListener("click", () => ask(chatInput.value));
