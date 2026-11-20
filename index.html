@@ -2738,6 +2738,27 @@ chatInput.addEventListener("keydown", e => { if (e.key === "Enter") ask(chatInpu
 renderQuick();
 addMsg(greetingText(), "ai");
 
+/* 诊断模式：仅在 URL 带 ?diag=1 时显示，正常访客完全看不到。
+   用途：线上排查"大模型没接通"到底卡在哪一层（网络 / CORS / 状态码）。 */
+if (/[?&]diag=1/.test(location.search)) {
+  (async () => {
+    let txt;
+    try {
+      const r = await fetch(CHAT_HEALTH, { cache: "no-store" });
+      const t = await r.text();
+      txt = "诊断 · health " + r.status + " · " + t.slice(0, 140);
+    } catch (e) {
+      txt = "诊断 · health 请求失败：" + String((e && e.message) || e);
+    }
+    const d = document.createElement("div");
+    d.className = "msg ai";
+    d.style.cssText = "opacity:.85;font-size:12px;white-space:pre-wrap;word-break:break-all";
+    d.textContent = txt;
+    chatBody.appendChild(d);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  })();
+}
+
 /* ================= 留言反馈 ================= */
 /* 本站是纯静态单文件（双击即可打开、零外部依赖），没有自己的服务器。
    留言通过 Supabase 的 REST 接口（底层是 PostgREST）直接写进站主的数据库：
