@@ -2514,10 +2514,10 @@ function hintAnswer(text) {
    规则落空才把问题发给 /api/chat，由 DeepSeek 按知识库回答。
 
    CHAT_API 留空 = 纯规则模式，双击打开 HTML 也能正常用。
-   部署后改成 Cloudflare Worker 完整地址（免备案、Key 存 Secret）：
-      const CHAT_API = "https://twin-chat.yanhonghk-7f4.workers.dev/api/chat"  */
-const CHAT_API = "https://twin-chat.yanhonghk-7f4.workers.dev/api/chat";
-const CHAT_HEALTH = "https://twin-chat.yanhonghk-7f4.workers.dev/api/health";
+   部署后指向自有后端（国内可达、已在阿里云 ECS 上运行）：
+      const CHAT_API = "https://bryanyan.com/api/chat"  */
+const CHAT_API = "https://bryanyan.com/api/chat";
+const CHAT_HEALTH = "https://bryanyan.com/api/health";
 const CHAT_TIMEOUT_MS = 25000;
 
 /* 后端是否就绪：没填 Key 时后端返回 503，这里探一次就记住，
