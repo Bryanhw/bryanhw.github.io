@@ -2742,18 +2742,23 @@ addMsg(greetingText(), "ai");
    用途：线上排查"大模型没接通"到底卡在哪一层（网络 / CORS / 状态码）。 */
 if (/[?&]diag=1/.test(location.search)) {
   (async () => {
-    let txt;
-    try {
-      const r = await fetch(CHAT_HEALTH, { cache: "no-store" });
-      const t = await r.text();
-      txt = "诊断 · health " + r.status + " · " + t.slice(0, 140);
-    } catch (e) {
-      txt = "诊断 · health 请求失败：" + String((e && e.message) || e);
-    }
+    const probe = async (u) => {
+      const short = u.replace(/^https?:\/\//, "");
+      try {
+        const r = await fetch(u, { cache: "no-store" });
+        return short + " → " + r.status;
+      } catch (e) {
+        return short + " → 失败(" + String((e && e.message) || e) + ")";
+      }
+    };
+    const rows = ["origin=" + location.origin + " · online=" + navigator.onLine];
+    rows.push(await probe(CHAT_HEALTH));
+    rows.push(await probe("https://api.github.com/zen"));
+    rows.push(await probe("https://www.cloudflare.com/cdn-cgi/trace"));
     const d = document.createElement("div");
     d.className = "msg ai";
     d.style.cssText = "opacity:.85;font-size:12px;white-space:pre-wrap;word-break:break-all";
-    d.textContent = txt;
+    d.textContent = "诊断\n" + rows.join("\n");
     chatBody.appendChild(d);
     chatBody.scrollTop = chatBody.scrollHeight;
   })();
